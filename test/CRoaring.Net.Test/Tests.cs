@@ -297,11 +297,11 @@ namespace CRoaring.Test
             bitmap.AddMany(999991, 999992, 999993, 999994, 999996, 999997);
             var stats = bitmap.GetStatistics();
 
-            Assert.Equal(stats.Cardinality, bitmap.Cardinality);
-            Assert.Equal(stats.ContainerCount, 2U);
-            Assert.Equal(stats.ArrayContainerCount, 2U);
-            Assert.Equal(stats.RunContainerCount, 0U);
-            Assert.Equal(stats.BitsetContainerCount, 0U);
+            Assert.Equal(bitmap.Cardinality, stats.Cardinality);
+            Assert.Equal(2U, stats.ContainerCount);
+            Assert.Equal(2U, stats.ArrayContainerCount);
+            Assert.Equal(0U, stats.RunContainerCount);
+            Assert.Equal(0U, stats.BitsetContainerCount);
         }
 
         private static ulong OrCount(params IEnumerable<uint>[] values)

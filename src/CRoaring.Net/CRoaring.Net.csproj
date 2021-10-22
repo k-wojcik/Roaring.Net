@@ -4,7 +4,8 @@
     <AssemblyName>CRoaring.Net</AssemblyName>
     <RootNamespace>CRoaring</RootNamespace>
     <Description>.Net wrapper for CRoaring - a C implementation of Roaring Bitmaps</Description>
-    <TargetFrameworks>net45;netstandard1.1</TargetFrameworks>
+    <TargetFrameworks>net5.0;netcoreapp3.1;netstandard2.0</TargetFrameworks>
+    <LangVersion>9</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Include="*.dll">
