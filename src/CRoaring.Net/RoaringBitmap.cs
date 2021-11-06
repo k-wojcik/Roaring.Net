@@ -20,7 +20,7 @@ namespace CRoaring
 
         public RoaringBitmap()
         {
-            _pointer = NativeMethods.roaring_bitmap_create();
+            _pointer = NativeMethods.roaring_bitmap_create_with_capacity(0);
         }
         public RoaringBitmap(uint capacity)
         {

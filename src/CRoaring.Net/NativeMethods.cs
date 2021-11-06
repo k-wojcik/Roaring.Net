@@ -6,9 +6,7 @@ namespace CRoaring
     internal static unsafe class NativeMethods
     {
         //Creation/Destruction
-
-        [DllImport("roaring")]
-        public static extern IntPtr roaring_bitmap_create();
+        
         [DllImport("roaring")]
         public static extern IntPtr roaring_bitmap_create_with_capacity(uint capacity);
         [DllImport("roaring")]
@@ -163,7 +161,6 @@ namespace CRoaring
             public int container_index;
             public int in_container_index;
             public int run_index;
-            public uint in_run_index;
 
             public uint current_value;
             public bool has_value;
