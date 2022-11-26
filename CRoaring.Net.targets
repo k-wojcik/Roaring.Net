@@ -1,11 +1,12 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
+        <PackageId>CRoaring.Net.CrossPlatform</PackageId>
         <VersionPrefix>0.0.1</VersionPrefix>
-        <VersionSuffix>preview</VersionSuffix>
+        <VersionSuffix></VersionSuffix>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <PackageTags>croaring;roaring;bitmap</PackageTags>
         <PackageProjectUrl>https://github.com/rasmuskl/CRoaring.Net</PackageProjectUrl>
-        <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>git://github.com/rasmuskl/CRoaring.Net</RepositoryUrl>
     </PropertyGroup>
