@@ -91,4 +91,12 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal --configuration Release
 
+    - name: Pack
+      run: dotnet pack --configuration Release --no-build --output nupkgs
+    
+    - name: Upload nuget package
+      uses: actions/upload-artifact@v3
+      with:
+        name: nuget-package
+        path: nupkgs/*    
     
