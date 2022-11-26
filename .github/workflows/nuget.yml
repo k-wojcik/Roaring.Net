@@ -16,9 +16,18 @@ jobs:
       run: mkdir build
       working-directory: lib/CRoaring
 
-    - name: Run cmake
+    - name: Run cmake generate
       run: cmake -DBUILD_SHARED_LIBS=ON ..
       working-directory: lib/CRoaring/build
+
+    - name: Run cmake
+      run: cmake --build . --target roaring
+      working-directory: lib/CRoaring/build
+
+    - name: Copy build directory
+      run: ls
+      working-directory: lib/CRoaring/build
+
 
     # - name: Setup .NET
     #   uses: actions/setup-dotnet@v3
