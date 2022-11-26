@@ -17,7 +17,7 @@ jobs:
       working-directory: lib/CRoaring
 
     - name: Run cmake generate
-      run: cmake -DBUILD_SHARED_LIBS=ON ..
+      run: cmake -DBUILD_SHARED_LIBS=ON -DNO_SONAME=ON ..
       working-directory: lib/CRoaring/build
 
     - name: Run cmake
