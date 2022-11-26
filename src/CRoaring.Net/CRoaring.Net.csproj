@@ -3,9 +3,8 @@
   <PropertyGroup>
     <AssemblyName>CRoaring.Net</AssemblyName>
     <RootNamespace>CRoaring</RootNamespace>
-    <Description>.Net wrapper for CRoaring - a C implementation of Roaring Bitmaps</Description>
+    <Description>.NET wrapper for CRoaring - a C implementation of Roaring Bitmaps</Description>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <LangVersion>9</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="*.dll">

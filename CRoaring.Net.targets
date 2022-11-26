@@ -1,13 +1,13 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <VersionPrefix>0.4.0</VersionPrefix>
-        <VersionSuffix></VersionSuffix>
+        <VersionPrefix>0.0.1</VersionPrefix>
+        <VersionSuffix>preview</VersionSuffix>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <PackageTags>croaring;roaring;bitmap</PackageTags>
-        <PackageProjectUrl>https://github.com/thibault-reigner/CRoaring.Net</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/rasmuskl/CRoaring.Net</PackageProjectUrl>
         <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
         <RepositoryType>git</RepositoryType>
-        <RepositoryUrl>git://github.com/thibault-reigner/CRoaring.Net</RepositoryUrl>
+        <RepositoryUrl>git://github.com/rasmuskl/CRoaring.Net</RepositoryUrl>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(BuildNumber)' == '' ">
         <VersionSuffix Condition=" '$(VersionSuffix)' != ''">$(VersionSuffix)-dev</VersionSuffix>
