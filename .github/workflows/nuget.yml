@@ -69,13 +69,13 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: linux-x64
-        path: src/CRoaring
+        path: src
 
     - name: Download win-x64 output
       uses: actions/download-artifact@v3
       with:
         name: windows-x64
-        path: src/CRoaring
+        path: src
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
