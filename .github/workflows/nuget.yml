@@ -5,7 +5,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
+  build-linux-x64:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -34,6 +34,30 @@ jobs:
       run: ls -l
       working-directory: lib/CRoaring/build
 
+  build-windows-x64:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+
+    - name: Create build directory
+      run: mkdir build
+      working-directory: lib/CRoaring
+
+    - name: Run cmake generate
+      run: cmake -DCMAKE_GENERATOR_PLATFORM=x64 -DROARING_BUILD_STATIC=OFF ..
+      working-directory: lib/CRoaring/build
+
+    - name: Run cmake
+      run: cmake --build . --config Release --target roaring
+      working-directory: lib/CRoaring/build
+
+    - name: Upload cmake output
+      uses: actions/upload-artifact@v3
+      with:
+        name: linux-x64
+        path: lib/CRoaring/build/src/Release/roaring.dll
 
     # - name: Setup .NET
     #   uses: actions/setup-dotnet@v3
