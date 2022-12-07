@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace CRoaring
 {
-    public unsafe class RoaringBitmap : IDisposable, IEnumerable<uint>
+    public unsafe class RoaringBitmap : IDisposable
     {
         private readonly IntPtr _pointer;
         private bool _isDisposed = false;
@@ -233,12 +233,7 @@ namespace CRoaring
         }
 
         //Iterators
-
-        public IEnumerator<uint> GetEnumerator()
-        {
-            return new Enumerator(_pointer);
-        }
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        public IEnumerable<uint> Values => new Enumerator(_pointer);
 
         public uint[] ToArray()
         {
@@ -266,7 +261,7 @@ namespace CRoaring
             return stats;
         }
 
-        private unsafe class Enumerator : IEnumerator<uint>
+        private class Enumerator : IEnumerator<uint>, IEnumerable<uint>
         {
             private readonly NativeMethods.Iterator* _iterator;
             private bool _isFirst, _isDisposed;
@@ -307,7 +302,17 @@ namespace CRoaring
                 Dispose(true);
                 GC.SuppressFinalize(this);
             }
+
+            public IEnumerator<uint> GetEnumerator()
+            {
+                return this;
+            }
+
             ~Enumerator() => Dispose(false);
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
         }
     }
 }

@@ -266,7 +266,9 @@ namespace CRoaring.Test
             uint[] values = new uint[] { 1, 2, 3, 4, 5, 100, 1000 };
 
             using (var result = RoaringBitmap.FromValues(values))
-                Assert.True(Enumerable.SequenceEqual(result, values));
+            {
+                Assert.True(Enumerable.SequenceEqual(result.Values, values));
+            }
         }
 
         [Fact]
