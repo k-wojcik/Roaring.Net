@@ -11,6 +11,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Roaring.Net", "src\Roaring.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Roaring.Net.Test", "test\Roaring.Net.Test\Roaring.Net.Test.csproj", "{46B4130E-8255-43AD-BB9D-1C055968EE28}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5B2792D3-AF9B-44F6-AFA9-1E1EAD36C30E}"
+	ProjectSection(SolutionItems) = preProject
+		vcpkg.json = vcpkg.json
+		vcpkg-configuration.json = vcpkg-configuration.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

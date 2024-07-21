@@ -22,15 +22,13 @@ using (var rb2 = new RoaringBitmap())
 }
 ```
 
-## Compiling
+## Requirements
 ### Linux
-Requirements:
 - gcc
 - [VCpkg](https://vcpkg.io/en/getting-started) and please do `vcpkg integrate install`. (CMake for CRoaring will be handled by VCpkg on your behalf.)
+- run `build/build-libs.sh` to build a CRoaring library
 
 ### Windows
-Requirements:
 - [VS2022 or later](https://www.visualstudio.com/downloads/)
 - [VCpkg](https://vcpkg.io/en/getting-started) and please do `vcpkg integrate install`. (CMake for CRoaring will be handled by VCpkg on your behalf.)
-
-Build the CRoaring and CRoaring.Net projects.
+- run `build/build-libs.bat` to build a CRoaring library
