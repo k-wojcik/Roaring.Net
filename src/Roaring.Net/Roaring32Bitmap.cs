@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Roaring
 {
-    public unsafe class RoaringBitmap : IDisposable
+    public unsafe class Roaring32Bitmap : IDisposable
     {
         private readonly IntPtr _pointer;
-        private bool _isDisposed = false;
+        private bool _isDisposed;
 
         public ulong Cardinality => NativeMethods.roaring_bitmap_get_cardinality(_pointer);
         public bool IsEmpty => NativeMethods.roaring_bitmap_is_empty(_pointer);
@@ -18,27 +17,29 @@ namespace Roaring
 
         //Creation/Destruction
 
-        public RoaringBitmap()
+        public Roaring32Bitmap()
         {
             _pointer = NativeMethods.roaring_bitmap_create_with_capacity(0);
         }
-        public RoaringBitmap(uint capacity)
+        public Roaring32Bitmap(uint capacity)
         {
             _pointer = NativeMethods.roaring_bitmap_create_with_capacity(capacity);
         }
-        private RoaringBitmap(IntPtr pointer)
+        private Roaring32Bitmap(IntPtr pointer)
         {
             _pointer = pointer;
         }
 
-        public static RoaringBitmap FromRange(uint min, uint max, uint step = 1)
-            => new RoaringBitmap(NativeMethods.roaring_bitmap_from_range(min, max, step));
-        public static RoaringBitmap FromValues(params uint[] values)
+        public static Roaring32Bitmap FromRange(uint min, uint max, uint step = 1)
+            => new Roaring32Bitmap(NativeMethods.roaring_bitmap_from_range(min, max, step));
+        
+        public static Roaring32Bitmap FromValues(params uint[] values)
             => FromValues(values, 0, values.Length);
-        public static RoaringBitmap FromValues(uint[] values, int offset, int count)
+        
+        public static Roaring32Bitmap FromValues(uint[] values, int offset, int count)
         {
             fixed (uint* valuePtr = values)
-                return new RoaringBitmap(NativeMethods.roaring_bitmap_of_ptr((uint)count, valuePtr + offset));
+                return new Roaring32Bitmap(NativeMethods.roaring_bitmap_of_ptr((uint)count, valuePtr + offset));
         }
 
         protected virtual void Dispose(bool disposing)
@@ -50,16 +51,16 @@ namespace Roaring
             }
         }
 
-        ~RoaringBitmap() { Dispose(false); }
+        ~Roaring32Bitmap() { Dispose(false); }
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        public RoaringBitmap Clone()
+        public Roaring32Bitmap Clone()
         {
-            return new RoaringBitmap(NativeMethods.roaring_bitmap_copy(_pointer));
+            return new Roaring32Bitmap(NativeMethods.roaring_bitmap_copy(_pointer));
         }
 
         //List operations
@@ -91,13 +92,13 @@ namespace Roaring
         public bool Contains(uint value)
             => NativeMethods.roaring_bitmap_contains(_pointer, value);
 
-        public bool Equals(RoaringBitmap bitmap)
+        public bool Equals(Roaring32Bitmap bitmap)
         {
             if (bitmap == null) return false;
             return NativeMethods.roaring_bitmap_equals(_pointer, bitmap._pointer);
         }
 
-        public bool IsSubset(RoaringBitmap bitmap, bool isStrict = false)
+        public bool IsSubset(Roaring32Bitmap bitmap, bool isStrict = false)
         {
             if (bitmap == null) return false;
             if (isStrict)
@@ -111,76 +112,76 @@ namespace Roaring
         public bool Select(uint rank, out uint element)
             => NativeMethods.roaring_bitmap_select(_pointer, rank, out element);
 
-        public RoaringBitmap Not(ulong start, ulong end)
-            => new RoaringBitmap(NativeMethods.roaring_bitmap_flip(_pointer, start, end));
+        public Roaring32Bitmap Not(ulong start, ulong end)
+            => new Roaring32Bitmap(NativeMethods.roaring_bitmap_flip(_pointer, start, end));
         public void INot(ulong start, ulong end)
             => NativeMethods.roaring_bitmap_flip_inplace(_pointer, start, end);
 
-        public RoaringBitmap And(RoaringBitmap bitmap)
-            => new RoaringBitmap(NativeMethods.roaring_bitmap_and(_pointer, bitmap._pointer));
-        public void IAnd(RoaringBitmap bitmap)
+        public Roaring32Bitmap And(Roaring32Bitmap bitmap)
+            => new Roaring32Bitmap(NativeMethods.roaring_bitmap_and(_pointer, bitmap._pointer));
+        public void IAnd(Roaring32Bitmap bitmap)
             => NativeMethods.roaring_bitmap_and_inplace(_pointer, bitmap._pointer);
-        public ulong AndCardinality(RoaringBitmap bitmap)
+        public ulong AndCardinality(Roaring32Bitmap bitmap)
             => NativeMethods.roaring_bitmap_and_cardinality(_pointer, bitmap._pointer);
 
-        public RoaringBitmap AndNot(RoaringBitmap bitmap)
-            => new RoaringBitmap(NativeMethods.roaring_bitmap_andnot(_pointer, bitmap._pointer));
-        public void IAndNot(RoaringBitmap bitmap)
+        public Roaring32Bitmap AndNot(Roaring32Bitmap bitmap)
+            => new Roaring32Bitmap(NativeMethods.roaring_bitmap_andnot(_pointer, bitmap._pointer));
+        public void IAndNot(Roaring32Bitmap bitmap)
             => NativeMethods.roaring_bitmap_andnot_inplace(_pointer, bitmap._pointer);
-        public ulong AndNotCardinality(RoaringBitmap bitmap)
+        public ulong AndNotCardinality(Roaring32Bitmap bitmap)
             => NativeMethods.roaring_bitmap_andnot_cardinality(_pointer, bitmap._pointer);
 
-        public RoaringBitmap Or(RoaringBitmap bitmap)
-            => new RoaringBitmap(NativeMethods.roaring_bitmap_or(_pointer, bitmap._pointer));
-        public void IOr(RoaringBitmap bitmap)
+        public Roaring32Bitmap Or(Roaring32Bitmap bitmap)
+            => new Roaring32Bitmap(NativeMethods.roaring_bitmap_or(_pointer, bitmap._pointer));
+        public void IOr(Roaring32Bitmap bitmap)
             => NativeMethods.roaring_bitmap_or_inplace(_pointer, bitmap._pointer);
-        public ulong OrCardinality(RoaringBitmap bitmap)
+        public ulong OrCardinality(Roaring32Bitmap bitmap)
             => NativeMethods.roaring_bitmap_or_cardinality(_pointer, bitmap._pointer);
 
-        public RoaringBitmap Xor(RoaringBitmap bitmap)
-            => new RoaringBitmap(NativeMethods.roaring_bitmap_xor(_pointer, bitmap._pointer));
-        public void IXor(RoaringBitmap bitmap)
+        public Roaring32Bitmap Xor(Roaring32Bitmap bitmap)
+            => new Roaring32Bitmap(NativeMethods.roaring_bitmap_xor(_pointer, bitmap._pointer));
+        public void IXor(Roaring32Bitmap bitmap)
             => NativeMethods.roaring_bitmap_xor_inplace(_pointer, bitmap._pointer);
-        public ulong XorCardinality(RoaringBitmap bitmap)
+        public ulong XorCardinality(Roaring32Bitmap bitmap)
             => NativeMethods.roaring_bitmap_xor_cardinality(_pointer, bitmap._pointer);
 
-        public static RoaringBitmap OrMany(params RoaringBitmap[] bitmaps)
+        public static Roaring32Bitmap OrMany(params Roaring32Bitmap[] bitmaps)
         {
             var pointers = new IntPtr[bitmaps.Length];
             for (int i = 0; i < pointers.Length; i++)
                 pointers[i] = bitmaps[i]._pointer;
-            return new RoaringBitmap(NativeMethods.roaring_bitmap_or_many((uint)bitmaps.Length, pointers));
+            return new Roaring32Bitmap(NativeMethods.roaring_bitmap_or_many((uint)bitmaps.Length, pointers));
         }
-        public static RoaringBitmap OrManyHeap(params RoaringBitmap[] bitmaps)
+        public static Roaring32Bitmap OrManyHeap(params Roaring32Bitmap[] bitmaps)
         {
             var pointers = new IntPtr[bitmaps.Length];
             for (int i = 0; i < pointers.Length; i++)
                 pointers[i] = bitmaps[i]._pointer;
-            return new RoaringBitmap(NativeMethods.roaring_bitmap_or_many_heap((uint)bitmaps.Length, pointers));
+            return new Roaring32Bitmap(NativeMethods.roaring_bitmap_or_many_heap((uint)bitmaps.Length, pointers));
         }
-        public static RoaringBitmap XorMany(params RoaringBitmap[] bitmaps)
+        public static Roaring32Bitmap XorMany(params Roaring32Bitmap[] bitmaps)
         {
             var pointers = new IntPtr[bitmaps.Length];
             for (int i = 0; i < pointers.Length; i++)
                 pointers[i] = bitmaps[i]._pointer;
-            return new RoaringBitmap(NativeMethods.roaring_bitmap_xor_many((uint)bitmaps.Length, pointers));
+            return new Roaring32Bitmap(NativeMethods.roaring_bitmap_xor_many((uint)bitmaps.Length, pointers));
         }
 
-        public RoaringBitmap LazyOr(RoaringBitmap bitmap, bool bitsetConversion)
-            => new RoaringBitmap(NativeMethods.roaring_bitmap_lazy_or(_pointer, bitmap._pointer, bitsetConversion));
-        public void ILazyOr(RoaringBitmap bitmap, bool bitsetConversion)
+        public Roaring32Bitmap LazyOr(Roaring32Bitmap bitmap, bool bitsetConversion)
+            => new Roaring32Bitmap(NativeMethods.roaring_bitmap_lazy_or(_pointer, bitmap._pointer, bitsetConversion));
+        public void ILazyOr(Roaring32Bitmap bitmap, bool bitsetConversion)
             => NativeMethods.roaring_bitmap_lazy_or_inplace(_pointer, bitmap._pointer, bitsetConversion);
-        public RoaringBitmap LazyXor(RoaringBitmap bitmap, bool bitsetConversion)
-            => new RoaringBitmap(NativeMethods.roaring_bitmap_lazy_xor(_pointer, bitmap._pointer, bitsetConversion));
-        public void ILazyXor(RoaringBitmap bitmap, bool bitsetConversion)
+        public Roaring32Bitmap LazyXor(Roaring32Bitmap bitmap, bool bitsetConversion)
+            => new Roaring32Bitmap(NativeMethods.roaring_bitmap_lazy_xor(_pointer, bitmap._pointer, bitsetConversion));
+        public void ILazyXor(Roaring32Bitmap bitmap, bool bitsetConversion)
             => NativeMethods.roaring_bitmap_lazy_xor_inplace(_pointer, bitmap._pointer, bitsetConversion);
         public void RepairAfterLazy()
             => NativeMethods.roaring_bitmap_repair_after_lazy(_pointer);
 
-        public bool Intersects(RoaringBitmap bitmap)
+        public bool Intersects(Roaring32Bitmap bitmap)
             => NativeMethods.roaring_bitmap_intersect(_pointer, bitmap._pointer);
 
-        public double GetJaccardIndex(RoaringBitmap bitmap)
+        public double GetJaccardIndex(Roaring32Bitmap bitmap)
             => NativeMethods.roaring_bitmap_jaccard_index(_pointer, bitmap._pointer);
 
         //Optimization/Compression
@@ -214,7 +215,8 @@ namespace Roaring
             }
             return buffer;
         }
-        public static RoaringBitmap Deserialize(byte[] buffer, SerializationFormat format = SerializationFormat.Normal)
+        
+        public static Roaring32Bitmap Deserialize(byte[] buffer, SerializationFormat format = SerializationFormat.Normal)
         {
             IntPtr ptr;
             switch (format)
@@ -229,11 +231,11 @@ namespace Roaring
             }
             if (ptr == IntPtr.Zero)
                 throw new InvalidOperationException("Deserialization failed");
-            return new RoaringBitmap(ptr);
+            return new Roaring32Bitmap(ptr);
         }
 
         //Iterators
-        public IEnumerable<uint> Values => new Enumerator(_pointer);
+        public IEnumerable<uint> Values => new Roaring32Enumerator(_pointer);
 
         public uint[] ToArray()
         {
@@ -254,65 +256,10 @@ namespace Roaring
         }
 
         //Other
-
         public Statistics GetStatistics()
         {
             NativeMethods.roaring_bitmap_statistics(_pointer, out var stats);
             return stats;
-        }
-
-        private class Enumerator : IEnumerator<uint>, IEnumerable<uint>
-        {
-            private readonly NativeMethods.Iterator* _iterator;
-            private bool _isFirst, _isDisposed;
-            
-            public uint Current => _iterator->current_value;
-            object IEnumerator.Current => Current;
-
-            public Enumerator(IntPtr bitmap)
-            {
-                _iterator = (NativeMethods.Iterator*)NativeMethods.roaring_iterator_create(bitmap);
-                _isFirst = true;
-            }
-
-            public bool MoveNext()
-            {
-                if (_isFirst)
-                {
-                    _isFirst = false;
-                    return _iterator->has_value;
-                }
-                return NativeMethods.roaring_uint32_iterator_advance(new IntPtr(_iterator));
-            }
-
-            public void Reset()
-            {
-                throw new InvalidOperationException();
-            }
-
-            private void Dispose(bool isDisposing)
-            {
-                if (_isDisposed) return;
-
-                NativeMethods.roaring_uint32_iterator_free(new IntPtr(_iterator));
-                _isDisposed = true;
-            }
-            public void Dispose()
-            {
-                Dispose(true);
-                GC.SuppressFinalize(this);
-            }
-
-            public IEnumerator<uint> GetEnumerator()
-            {
-                return this;
-            }
-
-            ~Enumerator() => Dispose(false);
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
         }
     }
 }

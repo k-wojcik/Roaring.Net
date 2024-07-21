@@ -10,7 +10,7 @@ public class EnumerableTests
     {
         uint[] values = [1, 2, 3, 4, 5, 100, 1000];
 
-        using var result = RoaringBitmap.FromValues(values);
+        using var result = Roaring32Bitmap.FromValues(values);
         Assert.Equal(result.Values, values);
     }
     
@@ -19,7 +19,7 @@ public class EnumerableTests
     {
         uint[] values = [];
 
-        using var result = RoaringBitmap.FromValues(values);
+        using var result = Roaring32Bitmap.FromValues(values);
         Assert.Empty(result.Values);
     }
 }

@@ -4,14 +4,14 @@ using Xunit;
 
 namespace Roaring.Test
 {
-    public class Tests
+    public class Roaring32BitmapTests
     {        
         [Fact]
         public void TestCardinality()
         {
             uint[] values = [1, 2, 3, 4, 5, 100, 1000];
 
-            using var result = RoaringBitmap.FromValues(values);
+            using var result = Roaring32Bitmap.FromValues(values);
             Assert.Equal(7U, result.Cardinality);
         }
         [Fact]
@@ -19,7 +19,7 @@ namespace Roaring.Test
         {
             uint[] values = [1, 2, 3, 4, 5, 100, 1000];
 
-            using var result = RoaringBitmap.FromValues(values);
+            using var result = Roaring32Bitmap.FromValues(values);
             Assert.Equal(1U, result.Min);
         }
         [Fact]
@@ -27,7 +27,7 @@ namespace Roaring.Test
         {
             uint[] values = [1, 2, 3, 4, 5, 100, 1000];
 
-            using var result = RoaringBitmap.FromValues(values);
+            using var result = Roaring32Bitmap.FromValues(values);
             Assert.Equal(1000U, result.Max);
         }
 
@@ -37,9 +37,9 @@ namespace Roaring.Test
             uint[] values = [1, 2, 3, 4, 5, 100, 1000];
             uint max = values.Max() + 1;
 
-            using var rb1 = new RoaringBitmap();
-            using var rb2 = new RoaringBitmap();
-            using var rb3 = RoaringBitmap.FromValues(values);
+            using var rb1 = new Roaring32Bitmap();
+            using var rb2 = new Roaring32Bitmap();
+            using var rb3 = Roaring32Bitmap.FromValues(values);
             for (int i = 0; i < values.Length; i++)
                 rb1.Add(values[i]);
             rb1.Optimize();
@@ -78,7 +78,7 @@ namespace Roaring.Test
             uint[] finalValues = initialValues.Except(removeValues).ToArray();
             uint max = initialValues.Max() + 1;
 
-            using var rb = RoaringBitmap.FromValues(initialValues);
+            using var rb = Roaring32Bitmap.FromValues(initialValues);
             rb.RemoveMany(removeValues);
             rb.Optimize();
 
@@ -99,7 +99,7 @@ namespace Roaring.Test
             uint[] values = [1, 2, 3, 4, 5, 100, 1000];
             uint max = values.Max() + 1;
 
-            using var source = RoaringBitmap.FromValues(values);
+            using var source = Roaring32Bitmap.FromValues(values);
             using var result = source.Not(0, max);
             for (uint i = 0; i < max; i++)
             {
@@ -117,9 +117,9 @@ namespace Roaring.Test
             uint[] values2 = [1, 2, 3, 4, 5, 100, 1000];
             uint[] values3 = [3, 4, 5, 7, 100, 1020];
 
-            using var source1 = RoaringBitmap.FromValues(values1);
-            using var source2 = RoaringBitmap.FromValues(values2);
-            using var source3 = RoaringBitmap.FromValues(values3);
+            using var source1 = Roaring32Bitmap.FromValues(values1);
+            using var source2 = Roaring32Bitmap.FromValues(values2);
+            using var source3 = Roaring32Bitmap.FromValues(values3);
             using var result1 = source1.Or(source2);
             using var result2 = source2.Or(source3);
             using var result3 = result1.Or(source3);
@@ -134,9 +134,9 @@ namespace Roaring.Test
             uint[] values2 = [1, 2, 3, 4, 5, 100, 1000];
             uint[] values3 = [3, 4, 5, 7, 100, 1020];
 
-            using var result = RoaringBitmap.FromValues(values1);
-            using var source1 = RoaringBitmap.FromValues(values2);
-            using var source2 = RoaringBitmap.FromValues(values3);
+            using var result = Roaring32Bitmap.FromValues(values1);
+            using var source1 = Roaring32Bitmap.FromValues(values2);
+            using var source2 = Roaring32Bitmap.FromValues(values3);
             result.IOr(source1);
             result.IOr(source2);
             Assert.Equal(result.Cardinality, OrCount(values1, values2, values3));
@@ -149,9 +149,9 @@ namespace Roaring.Test
             uint[] values2 = [1, 2, 3, 4, 5, 100, 1000];
             uint[] values3 = [3, 4, 5, 7, 100, 1020];
 
-            using var source1 = RoaringBitmap.FromValues(values1);
-            using var source2 = RoaringBitmap.FromValues(values2);
-            using var source3 = RoaringBitmap.FromValues(values3);
+            using var source1 = Roaring32Bitmap.FromValues(values1);
+            using var source2 = Roaring32Bitmap.FromValues(values2);
+            using var source3 = Roaring32Bitmap.FromValues(values3);
             using var result1 = source1.And(source2);
             using var result2 = source2.And(source3);
             using var result3 = result1.And(source3);
@@ -166,9 +166,9 @@ namespace Roaring.Test
             uint[] values2 = [1, 2, 3, 4, 5, 100, 1000];
             uint[] values3 = [3, 4, 5, 7, 100, 1020];
 
-            using var result = RoaringBitmap.FromValues(values1);
-            using var source1 = RoaringBitmap.FromValues(values2);
-            using var source2 = RoaringBitmap.FromValues(values3);
+            using var result = Roaring32Bitmap.FromValues(values1);
+            using var source1 = Roaring32Bitmap.FromValues(values2);
+            using var source2 = Roaring32Bitmap.FromValues(values3);
             result.IAnd(source1);
             result.IAnd(source2);
             Assert.Equal(result.Cardinality, AndCount(values1, values2, values3));
@@ -181,9 +181,9 @@ namespace Roaring.Test
             uint[] values2 = [1, 2, 3, 4, 5, 100, 1000];
             uint[] values3 = [3, 4, 5, 7, 100, 1020];
 
-            using var source1 = RoaringBitmap.FromValues(values1);
-            using var source2 = RoaringBitmap.FromValues(values2);
-            using var source3 = RoaringBitmap.FromValues(values3);
+            using var source1 = Roaring32Bitmap.FromValues(values1);
+            using var source2 = Roaring32Bitmap.FromValues(values2);
+            using var source3 = Roaring32Bitmap.FromValues(values3);
             using var result1 = source1.AndNot(source2);
             using var result2 = source2.AndNot(source3);
             using var result3 = result1.AndNot(source3);
@@ -198,9 +198,9 @@ namespace Roaring.Test
             uint[] values2 = [1, 2, 3, 4, 5, 100, 1000];
             uint[] values3 = [3, 4, 5, 7, 100, 1020];
 
-            using var result = RoaringBitmap.FromValues(values1);
-            using var source1 = RoaringBitmap.FromValues(values2);
-            using var source2 = RoaringBitmap.FromValues(values3);
+            using var result = Roaring32Bitmap.FromValues(values1);
+            using var source1 = Roaring32Bitmap.FromValues(values2);
+            using var source2 = Roaring32Bitmap.FromValues(values3);
             result.IAndNot(source1);
             result.IAndNot(source2);
             Assert.Equal(result.Cardinality, AndNotCount(values1, values2, values3));
@@ -213,9 +213,9 @@ namespace Roaring.Test
             uint[] values2 = [1, 2, 3, 4, 5, 100, 1000];
             uint[] values3 = [3, 4, 5, 7, 100, 1020];
 
-            using var source1 = RoaringBitmap.FromValues(values1);
-            using var source2 = RoaringBitmap.FromValues(values2);
-            using var source3 = RoaringBitmap.FromValues(values3);
+            using var source1 = Roaring32Bitmap.FromValues(values1);
+            using var source2 = Roaring32Bitmap.FromValues(values2);
+            using var source3 = Roaring32Bitmap.FromValues(values3);
             using var result1 = source1.Xor(source2);
             using var result2 = source2.Xor(source3);
             using var result3 = result1.Xor(source3);
@@ -230,9 +230,9 @@ namespace Roaring.Test
             uint[] values2 = [1, 2, 3, 4, 5, 100, 1000];
             uint[] values3 = [3, 4, 5, 7, 100, 1020];
 
-            using var result = RoaringBitmap.FromValues(values1);
-            using var source1 = RoaringBitmap.FromValues(values2);
-            using var source2 = RoaringBitmap.FromValues(values3);
+            using var result = Roaring32Bitmap.FromValues(values1);
+            using var source1 = Roaring32Bitmap.FromValues(values2);
+            using var source2 = Roaring32Bitmap.FromValues(values3);
             result.IXor(source1);
             result.IXor(source2);
             Assert.Equal(result.Cardinality, XorCount(values1, values2, values3));
@@ -241,15 +241,15 @@ namespace Roaring.Test
         [Fact]
         public void TestSerialization()
         {
-            using var rb1 = new RoaringBitmap();
+            using var rb1 = new Roaring32Bitmap();
             rb1.AddMany(1, 2, 3, 4, 5, 100, 1000);
             rb1.Optimize();
 
             var s1 = rb1.Serialize(SerializationFormat.Normal);
             var s2 = rb1.Serialize(SerializationFormat.Portable);
 
-            using var rb2 = RoaringBitmap.Deserialize(s1, SerializationFormat.Normal);
-            using var rb3 = RoaringBitmap.Deserialize(s2, SerializationFormat.Portable);
+            using var rb2 = Roaring32Bitmap.Deserialize(s1, SerializationFormat.Normal);
+            using var rb3 = Roaring32Bitmap.Deserialize(s2, SerializationFormat.Portable);
             Assert.True(rb1.Equals(rb2));
             Assert.True(rb1.Equals(rb3));
         }
@@ -257,7 +257,7 @@ namespace Roaring.Test
         [Fact]
         public void TestStats()
         {
-            var bitmap = new RoaringBitmap();
+            var bitmap = new Roaring32Bitmap();
             bitmap.AddMany(1, 2, 3, 4, 6, 7);
             bitmap.AddMany(999991, 999992, 999993, 999994, 999996, 999997);
             var stats = bitmap.GetStatistics();
