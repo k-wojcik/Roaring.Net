@@ -1,5 +1,4 @@
 # CRoaring.Net
-[![NuGet](https://img.shields.io/nuget/v/CRoaring.Net.CrossPlatform)](https://www.nuget.org/packages/CRoaring.Net.CrossPlatform/)
 
 A .Net wrapper for [CRoaring](https://github.com/RoaringBitmap/CRoaring) - a C implementation of [RoaringBitmap](https://github.com/RoaringBitmap/RoaringBitmap).
 
@@ -26,22 +25,12 @@ using (var rb2 = new RoaringBitmap())
 ## Compiling
 ### Linux
 Requirements:
-- [GCC](https://gcc.gnu.org/)
-
-Run the `build.sh` script
+- gcc
+- [VCpkg](https://vcpkg.io/en/getting-started) and please do `vcpkg integrate install`. (CMake for CRoaring will be handled by VCpkg on your behalf.)
 
 ### Windows
 Requirements:
-- [VS2015 or later](https://www.visualstudio.com/downloads/)
-- [CMake](https://cmake.org/download/)
-
-Note: CMake must be available from the command line (added to PATH).
+- [VS2022 or later](https://www.visualstudio.com/downloads/)
+- [VCpkg](https://vcpkg.io/en/getting-started) and please do `vcpkg integrate install`. (CMake for CRoaring will be handled by VCpkg on your behalf.)
 
 Build the CRoaring and CRoaring.Net projects.
-
-Microsoft CodeGen currently doesn't support the intrinsics required for building for x86_64. 
-Instead, it is recommended you build using the Linux route above with a virtual machine or [Ubuntu on Windows](https://msdn.microsoft.com/en-us/commandline/wsl/about).
-
-## Testing CRoaring.Net
-
-Run the `test.sh` or `test.bat` scripts.

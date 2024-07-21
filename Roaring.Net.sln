@@ -7,9 +7,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{20F281E9-D85
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{D65028B1-446E-4FD5-89EC-A82C4CFE321D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CRoaring.Net", "src\CRoaring.Net\CRoaring.Net.csproj", "{59225474-33B9-40FD-B8CB-0B5B753BC31A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Roaring.Net", "src\Roaring.Net\Roaring.Net.csproj", "{59225474-33B9-40FD-B8CB-0B5B753BC31A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CRoaring.Net.Test", "test\CRoaring.Net.Test\CRoaring.Net.Test.csproj", "{46B4130E-8255-43AD-BB9D-1C055968EE28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Roaring.Net.Test", "test\Roaring.Net.Test\Roaring.Net.Test.csproj", "{46B4130E-8255-43AD-BB9D-1C055968EE28}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

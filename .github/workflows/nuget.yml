@@ -1,139 +1,224 @@
 name: NuGet Package
 
 on:
-  push:
-    branches: [ "master" ]
+ release:
+   types: [published, edited]
 
 jobs:
-  build-macos-universal:
+  build-osx-x64:
     runs-on: macos-latest
+    env:
+        VCPKG_DISABLE_METRICS: 1
+        VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed    
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+    - name: install deps
+      run: brew install ninja
+    - name: vcpkg x64-osx
+      uses: lukka/run-vcpkg@v11
+      env:
+        VCPKG_DEFAULT_TRIPLET: x64-osx-dynamic
       with:
-        submodules: 'recursive'
-
-    - name: Create build directory
-      run: mkdir build
-      working-directory: lib/CRoaring
-
-    - name: Run cmake
-      run: cmake --version
-
-    - name: Run cmake generate
-      run: cmake -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DBUILD_SHARED_LIBS=ON ..
-      working-directory: lib/CRoaring/build
-
-    - name: Run cmake
-      run: cmake --build . --target roaring
-      working-directory: lib/CRoaring/build
-
-    - name: Upload cmake output
-      uses: actions/upload-artifact@v3
+        doNotCache: false
+        runVcpkgInstall: true
+    - name: copy lib
+      run: mkdir -p libs/x64-osx/ && cp vcpkg_installed/x64-osx-dynamic/lib/libroaring.dylib libs/x64-osx/
+    - name: Upload lib to artifacts
+      uses: actions/upload-artifact@v4
       with:
-        name: macos-universal
-        path: lib/CRoaring/build/libroaring.dylib
+        name: libs-osx-x64
+        path: |
+          libs/**/*.dylib
 
-    - name: Copy build directory
-      run: ls -l
-      working-directory: lib/CRoaring/build
+  build-osx-arm64:
+    runs-on: macos-latest
+    env:
+        VCPKG_DISABLE_METRICS: 1
+        VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed    
+    steps:
+    - uses: actions/checkout@v4
+    - name: install deps
+      run: brew install ninja
+    - name: vcpkg arm64-osx
+      uses: lukka/run-vcpkg@v11
+      env:
+        VCPKG_DEFAULT_TRIPLET: arm64-osx-dynamic
+      with:
+        doNotCache: false
+        runVcpkgInstall: true
+    - run: ls -la vcpkg_installed/arm64-osx-dynamic        
+    - name: copy lib
+      run: mkdir -p libs/arm64-osx/ && cp vcpkg_installed/arm64-osx-dynamic/lib/libroaring.dylib libs/arm64-osx/
+    - name: Upload lib to artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: libs-osx-arm64
+        path: |
+          libs/**/*.dylib          
 
   build-linux-x64:
     runs-on: ubuntu-latest
+    env:
+        VCPKG_DISABLE_METRICS: 1
+        VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+    - name: vcpkg x64-linux
+      uses: lukka/run-vcpkg@v11
+      env:
+        VCPKG_DEFAULT_TRIPLET: x64-linux-dynamic
       with:
-        submodules: 'recursive'
-
-    - name: Create build directory
-      run: mkdir build
-      working-directory: lib/CRoaring
-
-    - name: Run cmake generate
-      run: cmake -DBUILD_SHARED_LIBS=ON ..
-      working-directory: lib/CRoaring/build
-
-    - name: Run cmake
-      run: cmake --build . --target roaring
-      working-directory: lib/CRoaring/build
-
-    - name: Upload cmake output
-      uses: actions/upload-artifact@v3
+        doNotCache: false
+        runVcpkgInstall: true
+    - name: copy lib
+      run: mkdir -p libs/x64-linux/ && cp vcpkg_installed/x64-linux-dynamic/lib/libroaring.so libs/x64-linux/
+    - name: Upload lib to artifacts
+      uses: actions/upload-artifact@v4
       with:
-        name: linux-x64
-        path: lib/CRoaring/build/libroaring.so
+        name: libs-linux-x64
+        path: |
+          libs/**/*.so
 
-    - name: Copy build directory
-      run: ls -l
-      working-directory: lib/CRoaring/build
+  build-linux-arm64:
+    runs-on: ubuntu-latest
+    env:
+        VCPKG_DISABLE_METRICS: 1
+        VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
+    steps:
+    - uses: actions/checkout@v4
+    - name: install deps
+      run: sudo apt-get install -qy gcc-aarch64-linux-gnu g++-aarch64-linux-gnu 
+    - name: vcpkg arm64-linux
+      uses: lukka/run-vcpkg@v11
+      env:
+        VCPKG_DEFAULT_TRIPLET: arm64-linux-dynamic
+      with:
+        doNotCache: false
+        runVcpkgInstall: true
+    - name: copy lib
+      run: mkdir -p libs/arm64-linux/ && cp vcpkg_installed/arm64-linux-dynamic/lib/libroaring.so libs/arm64-linux/        
+    - name: Upload lib to artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: libs-linux-arm64
+        path: |
+          libs/**/*.so
 
-  build-windows-x64:
+  build-linux-arm:
+    runs-on: ubuntu-latest
+    env:
+        VCPKG_DISABLE_METRICS: 1
+        VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
+    steps:
+    - uses: actions/checkout@v4
+    - name: install deps
+      run: sudo apt-get install -qy gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf        
+    - name: arm-linux
+      uses: lukka/run-vcpkg@v11
+      env:
+        VCPKG_DEFAULT_TRIPLET: arm-linux-dynamic
+      with:
+        doNotCache: false
+        runVcpkgInstall: true
+    - name: copy lib
+      run: mkdir -p libs/arm-linux/ && cp vcpkg_installed/arm-linux-dynamic/lib/libroaring.so libs/arm-linux/
+    - name: Upload lib to artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: libs-linux-arm
+        path: |
+          libs/**/*.so
+
+  windows-x64:
     runs-on: windows-latest
+    env:
+        VCPKG_DISABLE_METRICS: 1
+        VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed    
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+    - name: vcpkg x64-windows
+      uses: lukka/run-vcpkg@v11
+      env:
+        VCPKG_DEFAULT_TRIPLET: x64-windows
       with:
-        submodules: 'recursive'
-
-    - name: Create build directory
-      run: mkdir build
-      working-directory: lib/CRoaring
-
-    - name: Run cmake generate
-      run: cmake -DCMAKE_GENERATOR_PLATFORM=x64 -DROARING_BUILD_STATIC=OFF ..
-      working-directory: lib/CRoaring/build
-
-    - name: Run cmake
-      run: cmake --build . --config Release --target roaring
-      working-directory: lib/CRoaring/build
-
-    - name: Upload cmake output
-      uses: actions/upload-artifact@v3
+        doNotCache: false
+        runVcpkgInstall: true   
+    - name: copy lib
+      run: mkdir -p libs/x64-windows/ && cp vcpkg_installed/x64-windows/bin/roaring.dll libs/x64-windows/
+    - name: Upload lib to artifacts
+      uses: actions/upload-artifact@v4
       with:
-        name: windows-x64
-        path: lib/CRoaring/build/src/Release/roaring.dll
+        name: libs-windows-x64
+        path: |
+          libs/**/*.dll
+
+  windows-x86:
+    runs-on: windows-latest
+    env:
+        VCPKG_DISABLE_METRICS: 1
+        VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed    
+    steps:
+    - uses: actions/checkout@v4
+    - name: vcpkg x86-windows
+      uses: lukka/run-vcpkg@v11
+      env:
+        VCPKG_DEFAULT_TRIPLET: x86-windows
+      with:
+        doNotCache: false
+        runVcpkgInstall: true 
+    - name: copy lib
+      run: mkdir -p libs/x86-windows/ && cp vcpkg_installed/x86-windows/bin/roaring.dll libs/x86-windows/
+    - name: Upload lib to artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: libs-windows-x86
+        path: |
+          libs/**/*.dll
+
 
   build-dotnet:
     runs-on: ubuntu-latest
-    needs: [build-linux-x64, build-windows-x64, build-macos-universal]
+    needs: [build-linux-x64, build-linux-arm64, build-linux-arm, build-osx-x64, build-osx-arm64, windows-x64, windows-x86]
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-    - name: Download linux-x64 output
-      uses: actions/download-artifact@v3
+    - name: Merge Artifacts
+      uses: actions/upload-artifact/merge@v4
       with:
-        name: linux-x64
-        path: src
+        name: libs
+        pattern: libs-*
+        delete-merged: true
 
-    - name: Download win-x64 output
-      uses: actions/download-artifact@v3
+    - name: Download libs atrifacts
+      uses: actions/download-artifact@v4
       with:
-        name: windows-x64
-        path: src
+        name: libs
+        path: libs
 
-    - name: Download macos-universal output
-      uses: actions/download-artifact@v3
-      with:
-        name: macos-universal
-        path: src
+    - name: Set the version env
+      run: echo VERSION=${GITHUB_REF#refs/tags/}  >> $GITHUB_ENV
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
 
     - name: Restore dependencies
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --no-restore --configuration Release
+      run: dotnet build --no-restore --configuration Release -p:Version="${{ env.VERSION }}"
 
     - name: Test
-      run: dotnet test --no-build --verbosity normal --configuration Release
+      run: dotnet test --no-build --configuration Release
 
     - name: Pack
-      run: dotnet pack --configuration Release --no-build --output nupkgs
+      run: dotnet pack --configuration Release --no-build --output nupkgs -p:Version="${{ env.VERSION }}"
     
     - name: Upload nuget package
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: nuget-package
         path: nupkgs/*    

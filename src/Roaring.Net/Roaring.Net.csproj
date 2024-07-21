@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Roaring.Net</AssemblyName>
+    <RootNamespace>Roaring</RootNamespace>
+    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PackageId>Roaring.Net</PackageId>
+    <Version>0.0.0-dev</Version>
+    <Description>.NET wrapper for CRoaring - a C implementation of Roaring Bitmaps</Description>
+    <PackageTags>croaring;roaring;bitmap</PackageTags>
+    <PackageProjectUrl>https://github.com/k-wojcik/Roaring.Net</PackageProjectUrl>
+    <RepositoryUrl>git://github.com/k-wojcik/Roaring.Net</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="../../libs/x64-windows/*.dll">
+      <Pack>true</Pack>
+      <PackagePath>runtimes/win-x64/native</PackagePath>
+      <CopyToOutputDirectory Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="../../libs/x86-windows/*.dll">
+      <Pack>true</Pack>
+      <PackagePath>runtimes/win-x86/native</PackagePath>
+    </Content>
+    <Content Include="../../libs/x64-linux/*.so">
+      <Pack>true</Pack>
+      <PackagePath>runtimes/linux-x64/native</PackagePath>
+      <CopyToOutputDirectory  Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="../../libs/arm64-linux/*.so">
+      <Pack>true</Pack>
+      <PackagePath>runtimes/linux-arm64/native</PackagePath>
+    </Content>
+    <Content Include="../../libs/arm-linux/*.so">
+      <Pack>true</Pack>
+      <PackagePath>runtimes/linux-arm32/native</PackagePath>
+    </Content>
+    <Content Include="../../libs/x64-osx/*.dylib">
+      <Pack>true</Pack>
+      <PackagePath>runtimes/osx-x64/native</PackagePath>
+    </Content>
+    <Content Include="../../libs/arm64-osx/*.dylib">
+      <Pack>true</Pack>
+      <PackagePath>runtimes/osx-arm64/native</PackagePath>
+    </Content>    
+  </ItemGroup>
+</Project>

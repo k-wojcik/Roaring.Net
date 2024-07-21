@@ -17,13 +17,19 @@
 [Rr]eleases/
 x64/
 x86/
-build/
 bld/
 [Bb]in/
 [Oo]bj/
 
 # Visual Studo 2015 cache/options directory
 .vs/
+
+# Rider
+.idea/
+
+# vcpkg 
+libs/
+vcpkg_installed/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/

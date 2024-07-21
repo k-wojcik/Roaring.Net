@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace CRoaring
+namespace Roaring
 {
     internal static unsafe class NativeMethods
     {
@@ -154,20 +154,25 @@ namespace CRoaring
 
         //Iterators
 
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        [StructLayout(LayoutKind.Sequential)]
         public struct Iterator
         {
             public readonly IntPtr parent;
-            public int container_index;
-            public int in_container_index;
-            public int run_index;
-
-            public uint current_value;
-            public bool has_value;
-
             public readonly IntPtr container;
             public byte typecode;
+            public int container_index;
             public uint highbits;
+            
+            public readonly ContainerIt container_it;
+            
+            public uint current_value;
+            public bool has_value;
+        }
+        
+        [StructLayout(LayoutKind.Sequential)]
+        public struct ContainerIt
+        {
+            public int index;
         }
 
         [DllImport("roaring")]
@@ -189,16 +194,16 @@ namespace CRoaring
         public delegate bool IteratorDelegate64(uint value, IntPtr tag);
 
         [DllImport("roaring")]
-        public static extern IntPtr roaring_create_iterator(IntPtr bitmap);
+        public static extern IntPtr roaring_iterator_create(IntPtr bitmap);
         [DllImport("roaring")]
-        public static extern void roaring_init_iterator(IntPtr bitmap, IntPtr iterator);
+        public static extern void roaring_iterator_init(IntPtr bitmap, IntPtr iterator);
         [DllImport("roaring")]
         [return: MarshalAs(UnmanagedType.I1)]
-        public static extern bool roaring_advance_uint32_iterator(IntPtr iterator);
+        public static extern bool roaring_uint32_iterator_advance(IntPtr iterator);
         [DllImport("roaring")]
-        public static extern IntPtr roaring_copy_uint32_iterator(IntPtr iterator);
+        public static extern IntPtr roaring_uint32_iterator_copy(IntPtr iterator);
         [DllImport("roaring")]
-        public static extern void roaring_free_uint32_iterator(IntPtr iterator);
+        public static extern void roaring_uint32_iterator_free(IntPtr iterator);
 
         // Other
         [DllImport("roaring")]

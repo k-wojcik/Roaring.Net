@@ -1,4 +1,4 @@
-﻿namespace CRoaring
+﻿namespace Roaring
 {
     public enum SerializationFormat
     {

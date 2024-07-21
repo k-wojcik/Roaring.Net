@@ -1,6 +1,11 @@
 The MIT License (MIT)
 
-Copyright for portions of project CRoaring.Net are held by RogueException, 2015.
+Copyright (c) 2024 Karol Wójcik (@k-wojcik)
+
+Copyright for portions of project CRoaring.Net are held by 
+- RogueException https://github.com/Auralytical/CRoaring.Net
+- Thibault Reigner https://github.com/thibault-reigner/CRoaring.Net
+- Rasmus Kromann-Larsen https://github.com/rasmuskl/CRoaring.Net
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
