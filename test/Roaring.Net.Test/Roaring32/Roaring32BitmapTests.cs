@@ -2,7 +2,7 @@
 using System.Linq;
 using Xunit;
 
-namespace Roaring.Test
+namespace Roaring.Test.Roaring32
 {
     public class Roaring32BitmapTests
     {        
