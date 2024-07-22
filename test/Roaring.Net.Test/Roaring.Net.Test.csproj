@@ -3,15 +3,6 @@
     <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>Roaring.Test</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Configurations>Release x64;Debug x86;Debug x64;Release x86</Configurations>
-    <Platforms>x64;x86</Platforms>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release x64|x64' ">
-    <Optimize Condition=" '$(Optimize)' == '' ">true</Optimize>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug x64|x64' ">
-    <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>
-    <Optimize Condition=" '$(Optimize)' == '' ">false</Optimize>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/Roaring.Net/Roaring.Net.csproj" />

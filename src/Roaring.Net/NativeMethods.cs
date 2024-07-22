@@ -130,25 +130,25 @@ namespace Roaring
         [return: MarshalAs(UnmanagedType.I1)]
         public static extern bool roaring_bitmap_remove_run_compression(IntPtr bitmap);
         [DllImport("roaring")]
-        public static extern int roaring_bitmap_shrink_to_fit(IntPtr bitmap);
+        public static extern nuint roaring_bitmap_shrink_to_fit(IntPtr bitmap);
 
         //Serialization
 
         [DllImport("roaring")]
-        public static extern int roaring_bitmap_size_in_bytes(IntPtr bitmap);
+        public static extern nuint roaring_bitmap_size_in_bytes(IntPtr bitmap);
         [DllImport("roaring")]
-        public static extern int roaring_bitmap_portable_size_in_bytes(IntPtr bitmap);
+        public static extern nuint roaring_bitmap_portable_size_in_bytes(IntPtr bitmap);
 
         [DllImport("roaring")]
         public static extern void roaring_bitmap_to_uint32_array(IntPtr bitmap, uint[] values);
 
         [DllImport("roaring")]
-        public static extern int roaring_bitmap_serialize(IntPtr bitmap, byte[] buffer);
+        public static extern nuint roaring_bitmap_serialize(IntPtr bitmap, byte[] buffer);
         [DllImport("roaring")]
         public static extern IntPtr roaring_bitmap_deserialize(byte[] buffer);
 
         [DllImport("roaring")]
-        public static extern int roaring_bitmap_portable_serialize(IntPtr bitmap, byte[] buffer);
+        public static extern nuint roaring_bitmap_portable_serialize(IntPtr bitmap, byte[] buffer);
         [DllImport("roaring")]
         public static extern IntPtr roaring_bitmap_portable_deserialize(byte[] buffer);
 

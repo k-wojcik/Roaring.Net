@@ -11,33 +11,31 @@ public class EnumerableTests
     public void Values_BitmapContainsValues_EnumeratesBitmap()
     {
         // Arrange
-        uint[] values = [1, 2, 3, 4, 5, 100, 1000];
+        using var testObject = Roaring32BitmapTestObject.GetDefault();
 
         // Act
-        using var result = Roaring32Bitmap.FromValues(values);
+        var actual = testObject.Bitmap.Values;
 
         // Assert
-        Assert.Equal(result.Values, values);
+        Assert.Equal(testObject.Values, actual);
     }
 
     [Fact]
     public void Values_BitmapIsEmpty_BreaksEnumeration()
     { 
         // Arrange
-        uint[] values = [];
-        using var result = Roaring32Bitmap.FromValues(values);
+        using var testObject = Roaring32BitmapTestObject.GetEmpty();
 
         // Act && Assert
-        Assert.Empty(result.Values);
+        Assert.Empty(testObject.Bitmap.Values);
     }
 
     [Fact]
     public void Values_Reset_ThrowsNotSupportedException()
     {
         // Arrange
-        uint[] values = [1, 2, 3, 4, 5, 100, 1000];
-        using var result = Roaring32Bitmap.FromValues(values);
-        using var enumerator = result.Values.GetEnumerator();
+        using var testObject = Roaring32BitmapTestObject.GetDefault();
+        using var enumerator = testObject.Bitmap.Values.GetEnumerator();
         
         // Act && Assert
         Assert.Throws<NotSupportedException>(() => enumerator.Reset());
@@ -47,9 +45,8 @@ public class EnumerableTests
     public void Values_ForNonGenericEnumeratorReset_ThrowsNotSupportedException()
     {
         // Arrange
-        uint[] values = [1, 2, 3, 4, 5, 100, 1000];
-        using var result = Roaring32Bitmap.FromValues(values);
-        using var enumerator = result.Values.GetEnumerator();
+        using var testObject = Roaring32BitmapTestObject.GetDefault();
+        using var enumerator = testObject.Bitmap.Values.GetEnumerator();
         IEnumerator enumeratorNonGeneric = enumerator;
 
         // Act && Assert
@@ -60,49 +57,46 @@ public class EnumerableTests
     public void Values_Current_ReturnsFirstElement()
     {
         // Arrange
-        uint[] values = [1, 2, 3, 4, 5, 100, 1000];
-        using var result = Roaring32Bitmap.FromValues(values);
-        using var enumerator = result.Values.GetEnumerator();
+        using var testObject = Roaring32BitmapTestObject.GetDefault();
+        using var enumerator = testObject.Bitmap.Values.GetEnumerator();
 
         // Act && Assert
-        Assert.Equal(values[0], enumerator.Current);
+        Assert.Equal(testObject.Values[0], enumerator.Current);
     }
 
     [Fact]
     public void Values_ForNonGenericEnumerator_Current_ReturnsFirstElement()
     {
-        uint[] values = [1, 2, 3, 4, 5, 100, 1000];
-        using var result = Roaring32Bitmap.FromValues(values);
-        using var enumerator = result.Values.GetEnumerator();
+        // Arrange
+        using var testObject = Roaring32BitmapTestObject.GetDefault();
+        using var enumerator = testObject.Bitmap.Values.GetEnumerator();
         IEnumerator enumeratorNonGeneric = enumerator;
 
         // Act && Assert
-        Assert.Equal(values[0], enumeratorNonGeneric.Current);
+        Assert.Equal(testObject.Values[0], enumeratorNonGeneric.Current);
     }
 
     [Fact]
     public void Values_MoveNext_ReturnsNextElement()
     {
         // Arrange
-        uint[] values = [1, 2, 3, 4, 5, 100, 1000];
-        using var result = Roaring32Bitmap.FromValues(values);
-        using var enumerator = result.Values.GetEnumerator();
+        using var testObject = Roaring32BitmapTestObject.GetDefault();
+        using var enumerator = testObject.Bitmap.Values.GetEnumerator();
 
         // Act
         enumerator.MoveNext();
         enumerator.MoveNext();
 
         // Assert
-        Assert.Equal(values[1], enumerator.Current);
+        Assert.Equal(testObject.Values[1], enumerator.Current);
     }
 
     [Fact]
     public void Values_ForNonGenericEnumerator_MoveNext_ReturnsNextElement()
     {
         // Arrange
-        uint[] values = [1, 2, 3, 4, 5, 100, 1000];
-        using var result = Roaring32Bitmap.FromValues(values);
-        using var enumerator = result.Values.GetEnumerator();
+        using var testObject = Roaring32BitmapTestObject.GetDefault();
+        using var enumerator = testObject.Bitmap.Values.GetEnumerator();
         IEnumerator enumeratorNonGeneric = enumerator;
 
         // Act
@@ -110,32 +104,30 @@ public class EnumerableTests
         enumeratorNonGeneric.MoveNext();
 
         // Assert
-        Assert.Equal(values[1], enumeratorNonGeneric.Current);
+        Assert.Equal(testObject.Values[1], enumeratorNonGeneric.Current);
     }
 
     [Fact]
     public void Values_ForNonGenericEnumerable_GetEnumerator_ReturnsEnumerator()
     {
         // Arrange
-        uint[] values = [1, 2, 3, 4, 5, 100, 1000];
-        using var result = Roaring32Bitmap.FromValues(values);
-        var enumerable = (IEnumerable)result.Values;
+        using var testObject = Roaring32BitmapTestObject.GetDefault();
+        var enumerable = (IEnumerable)testObject.Bitmap.Values;
         
         // Act
         var enumerator = enumerable.GetEnumerator();
         using var enumeratorDisposable = enumerator as IDisposable;
 
         // Assert
-        Assert.Equal(values[0], enumerator.Current);
+        Assert.Equal(testObject.Values[0], enumerator.Current);
     }
 
     [Fact]
     public void Values_Dispose_CurrentThrowsObjectDisposedException()
     {
         // Arrange
-        uint[] values = [1, 2, 3, 4, 5, 100, 1000];
-        using var result = Roaring32Bitmap.FromValues(values);
-        var enumerator = result.Values.GetEnumerator();
+        using var testObject = Roaring32BitmapTestObject.GetDefault();
+        var enumerator = testObject.Bitmap.Values.GetEnumerator();
         
         // Act
         enumerator.Dispose();
@@ -148,9 +140,8 @@ public class EnumerableTests
     public void Values_Dispose_MoveNextThrowsObjectDisposedException()
     {
         // Arrange
-        uint[] values = [1, 2, 3, 4, 5, 100, 1000];
-        using var result = Roaring32Bitmap.FromValues(values);
-        var enumerator = result.Values.GetEnumerator();
+        using var testObject = Roaring32BitmapTestObject.GetDefault();
+        var enumerator = testObject.Bitmap.Values.GetEnumerator();
         
         // Act
         enumerator.Dispose();
@@ -163,9 +154,8 @@ public class EnumerableTests
     public void Values_DisposeTwice_IgnoresSecondDipose()
     {
         // Arrange
-        uint[] values = [1, 2, 3, 4, 5, 100, 1000];
-        using var result = Roaring32Bitmap.FromValues(values);
-        var enumerator = result.Values.GetEnumerator();
+        using var testObject = Roaring32BitmapTestObject.GetDefault();
+        var enumerator = testObject.Bitmap.Values.GetEnumerator();
         
         // Act
         enumerator.Dispose();
@@ -182,9 +172,8 @@ public class EnumerableTests
         WeakReference<IEnumerable<uint>> weakReference = null;
         var dispose = () => 
         {
-            uint[] values = [1, 2, 3, 4, 5, 100, 1000];
-            using var result = Roaring32Bitmap.FromValues(values);
-            var enumerable = result.Values;
+            using var testObject = Roaring32BitmapTestObject.GetDefault();
+            var enumerable = testObject.Bitmap.Values;
             weakReference = new WeakReference<IEnumerable<uint>>(enumerable, true);
         };
         

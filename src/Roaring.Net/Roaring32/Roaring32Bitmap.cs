@@ -10,10 +10,10 @@ namespace Roaring
 
         public ulong Cardinality => NativeMethods.roaring_bitmap_get_cardinality(_pointer);
         public bool IsEmpty => NativeMethods.roaring_bitmap_is_empty(_pointer);
-        public uint Min => NativeMethods.roaring_bitmap_minimum(_pointer);
-        public uint Max => NativeMethods.roaring_bitmap_maximum(_pointer);
-        public int SerializedBytes => NativeMethods.roaring_bitmap_size_in_bytes(_pointer);
-        public int PortableSerializedBytes => NativeMethods.roaring_bitmap_portable_size_in_bytes(_pointer);
+        public uint? Min => IsEmpty ? null : NativeMethods.roaring_bitmap_minimum(_pointer);
+        public uint? Max => IsEmpty ? null : NativeMethods.roaring_bitmap_maximum(_pointer);
+        public nuint SerializedBytes => NativeMethods.roaring_bitmap_size_in_bytes(_pointer);
+        public nuint PortableSerializedBytes => NativeMethods.roaring_bitmap_portable_size_in_bytes(_pointer);
 
         //Creation/Destruction
 
@@ -21,10 +21,12 @@ namespace Roaring
         {
             _pointer = NativeMethods.roaring_bitmap_create_with_capacity(0);
         }
+        
         public Roaring32Bitmap(uint capacity)
         {
             _pointer = NativeMethods.roaring_bitmap_create_with_capacity(capacity);
         }
+        
         private Roaring32Bitmap(IntPtr pointer)
         {
             _pointer = pointer;
@@ -190,7 +192,7 @@ namespace Roaring
             => NativeMethods.roaring_bitmap_run_optimize(_pointer);
         public bool RemoveRunCompression()
             => NativeMethods.roaring_bitmap_remove_run_compression(_pointer);
-        public int ShrinkToFit()
+        public nuint ShrinkToFit()
             => NativeMethods.roaring_bitmap_shrink_to_fit(_pointer);
 
         //Serialization
