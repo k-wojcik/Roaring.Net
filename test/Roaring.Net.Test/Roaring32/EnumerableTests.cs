@@ -22,7 +22,7 @@ public class EnumerableTests
 
     [Fact]
     public void Values_BitmapIsEmpty_BreaksEnumeration()
-    { 
+    {
         // Arrange
         using var testObject = Roaring32BitmapTestObject.GetEmpty();
 
@@ -36,7 +36,7 @@ public class EnumerableTests
         // Arrange
         using var testObject = Roaring32BitmapTestObject.GetDefault();
         using var enumerator = testObject.Bitmap.Values.GetEnumerator();
-        
+
         // Act && Assert
         Assert.Throws<NotSupportedException>(() => enumerator.Reset());
     }
@@ -113,7 +113,7 @@ public class EnumerableTests
         // Arrange
         using var testObject = Roaring32BitmapTestObject.GetDefault();
         var enumerable = (IEnumerable)testObject.Bitmap.Values;
-        
+
         // Act
         var enumerator = enumerable.GetEnumerator();
         using var enumeratorDisposable = enumerator as IDisposable;
@@ -128,60 +128,60 @@ public class EnumerableTests
         // Arrange
         using var testObject = Roaring32BitmapTestObject.GetDefault();
         var enumerator = testObject.Bitmap.Values.GetEnumerator();
-        
+
         // Act
         enumerator.Dispose();
-        
+
         // Assert
         Assert.Throws<ObjectDisposedException>(() => enumerator.Current);
     }
-    
+
     [Fact]
     public void Values_Dispose_MoveNextThrowsObjectDisposedException()
     {
         // Arrange
         using var testObject = Roaring32BitmapTestObject.GetDefault();
         var enumerator = testObject.Bitmap.Values.GetEnumerator();
-        
+
         // Act
         enumerator.Dispose();
-        
+
         // Assert
         Assert.Throws<ObjectDisposedException>(() => enumerator.MoveNext());
     }
-    
+
     [Fact]
     public void Values_DisposeTwice_IgnoresSecondDipose()
     {
         // Arrange
         using var testObject = Roaring32BitmapTestObject.GetDefault();
         var enumerator = testObject.Bitmap.Values.GetEnumerator();
-        
+
         // Act
         enumerator.Dispose();
         enumerator.Dispose();
-        
+
         // Assert
         Assert.Throws<ObjectDisposedException>(() => enumerator.MoveNext());
     }
-    
+
     [Fact]
     public void Values_Destructor_InvokesDispose()
     {
         // Arrange
         WeakReference<IEnumerable<uint>> weakReference = null;
-        var dispose = () => 
+        var dispose = () =>
         {
             using var testObject = Roaring32BitmapTestObject.GetDefault();
             var enumerable = testObject.Bitmap.Values;
             weakReference = new WeakReference<IEnumerable<uint>>(enumerable, true);
         };
-        
+
         // Act
         dispose();
         GC.Collect(0, GCCollectionMode.Forced);
         GC.WaitForPendingFinalizers();
-    
+
         // Assert
         weakReference.TryGetTarget(out var target);
         Assert.Throws<ObjectDisposedException>(() => target?.GetEnumerator().Current);

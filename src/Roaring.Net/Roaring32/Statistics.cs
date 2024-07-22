@@ -1,27 +1,26 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Roaring
+namespace Roaring;
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct Statistics
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct Statistics
-    {
-        public uint ContainerCount;
-        public uint ArrayContainerCount;
-        public uint RunContainerCount;
-        public uint BitsetContainerCount;
+    public uint ContainerCount;
+    public uint ArrayContainerCount;
+    public uint RunContainerCount;
+    public uint BitsetContainerCount;
 
-        public uint ArrayContainerValues;
-        public uint RunContainerValues;
-        public uint BitsetContainerValues;
+    public uint ArrayContainerValues;
+    public uint RunContainerValues;
+    public uint BitsetContainerValues;
 
-        public uint ArrayContainerBytes;
-        public uint RunContainerBytes;
-        public uint BitsetContainerBytes;
+    public uint ArrayContainerBytes;
+    public uint RunContainerBytes;
+    public uint BitsetContainerBytes;
 
-        public uint MaxValue;
-        public uint MinValue;
+    public uint MaxValue;
+    public uint MinValue;
 
-        public ulong ValueSum;
-        public ulong Cardinality;
-    }
+    public ulong ValueSum;
+    public ulong Cardinality;
 }

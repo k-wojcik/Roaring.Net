@@ -12,11 +12,11 @@ public class PropertiesTests
 
         // Act
         var actual = testObject.Bitmap.Cardinality;
-            
+
         // Assert
         Assert.Equal((ulong)testObject.Values.Length, actual);
     }
-    
+
     [Fact]
     public void Cardinality_EmptyBitmap_ReturnsZero()
     {
@@ -25,11 +25,11 @@ public class PropertiesTests
 
         // Act
         var actual = testObject.Bitmap.Cardinality;
-            
+
         // Assert
         Assert.Equal(0U, actual);
     }
-    
+
     [Fact]
     public void IsEmpty_BitmapContainsValues_ReturnsFalse()
     {
@@ -38,11 +38,11 @@ public class PropertiesTests
 
         // Act
         var actual = testObject.Bitmap.IsEmpty;
-            
+
         // Assert
         Assert.False(actual);
     }
-    
+
     [Fact]
     public void IsEmpty_EmptyBitmap_ReturnsTrue()
     {
@@ -51,11 +51,11 @@ public class PropertiesTests
 
         // Act
         var actual = testObject.Bitmap.IsEmpty;
-            
+
         // Assert
         Assert.True(actual);
     }
-        
+
     [Fact]
     public void Min_BitmapContainsValues_ReturnsMinValue()
     {
@@ -64,11 +64,11 @@ public class PropertiesTests
 
         // Act
         var actual = testObject.Bitmap.Min;
-        
+
         // Assert
         Assert.Equal(10U, actual);
     }
-    
+
     [Fact]
     public void Min_EmptyBitmap_ReturnsNull()
     {
@@ -77,11 +77,11 @@ public class PropertiesTests
 
         // Act
         uint? actual = testObject.Bitmap.Min;
-        
+
         // Assert
         Assert.Null(actual);
     }
-    
+
     [Fact]
     public void Max_BitmapContainsValues_ReturnsMaxValue()
     {
@@ -90,11 +90,11 @@ public class PropertiesTests
 
         // Act
         var actual = testObject.Bitmap.Max;
-        
+
         // Assert
         Assert.Equal(1000U, actual);
     }
-    
+
     [Fact]
     public void Max_EmptyBitmap_ReturnsNull()
     {
@@ -103,11 +103,11 @@ public class PropertiesTests
 
         // Act
         uint? actual = testObject.Bitmap.Max;
-        
+
         // Assert
         Assert.Null(actual);
     }
-    
+
     [Fact]
     public void SerializedBytes_EmptyBitmap_ReturnsValueGreaterThanZero()
     {
@@ -116,11 +116,11 @@ public class PropertiesTests
 
         // Act
         var actual = testObject.Bitmap.SerializedBytes;
-        
+
         // Assert
         Assert.True(actual > 0);
     }
-    
+
     [Fact]
     public void SerializedBytes_BitmapContainsValues_ReturnsValueGreaterThanZero()
     {
@@ -129,11 +129,11 @@ public class PropertiesTests
 
         // Act
         var actual = testObject.Bitmap.SerializedBytes;
-        
+
         // Assert
         Assert.True(actual > 0);
     }
-    
+
     [Fact]
     public void PortableSerializedBytes_EmptyBitmap_ReturnsValueGreaterThanZero()
     {
@@ -142,11 +142,11 @@ public class PropertiesTests
 
         // Act
         var actual = testObject.Bitmap.PortableSerializedBytes;
-        
+
         // Assert
         Assert.True(actual > 0);
     }
-    
+
     [Fact]
     public void PortableSerializedBytes_BitmapContainsValues_ReturnsValueGreaterThanZero()
     {
@@ -155,7 +155,7 @@ public class PropertiesTests
 
         // Act
         var actual = testObject.Bitmap.PortableSerializedBytes;
-        
+
         // Assert
         Assert.True(actual > 0);
     }

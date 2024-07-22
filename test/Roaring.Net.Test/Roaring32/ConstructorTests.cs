@@ -12,11 +12,11 @@ public class ConstructorTests
 
         // Act
         var actual = uut.SerializedBytes;
-        
+
         // Assert
         Assert.True(actual > 0);
     }
-    
+
     [Fact]
     public void Ctor_WithCapacity_CreatesBitmapWithPriviedCapacity()
     {
@@ -25,7 +25,7 @@ public class ConstructorTests
 
         // Act
         var actual = uut.SerializedBytes;
-        
+
         // Assert
         Assert.True(actual > 0);
     }

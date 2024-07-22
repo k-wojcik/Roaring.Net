@@ -1,8 +1,7 @@
-﻿namespace Roaring
+﻿namespace Roaring;
+
+public enum SerializationFormat
 {
-    public enum SerializationFormat
-    {
-        Normal,
-        Portable
-    }
+    Normal,
+    Portable
 }

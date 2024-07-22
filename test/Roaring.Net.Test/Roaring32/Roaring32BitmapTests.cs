@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
 namespace Roaring.Test.Roaring32;
 
 public class Roaring32BitmapTests
-{        
+{
     [Fact]
     public void TestAdd()
     {
@@ -103,6 +102,7 @@ public class Roaring32BitmapTests
         Assert.Equal(result2.Cardinality, OrCount(values2, values3));
         Assert.Equal(result3.Cardinality, OrCount(values1, values2, values3));
     }
+
     [Fact]
     public void TestIOr()
     {
@@ -135,6 +135,7 @@ public class Roaring32BitmapTests
         Assert.Equal(result2.Cardinality, AndCount(values2, values3));
         Assert.Equal(result3.Cardinality, AndCount(values1, values2, values3));
     }
+
     [Fact]
     public void TestIAnd()
     {
@@ -167,6 +168,7 @@ public class Roaring32BitmapTests
         Assert.Equal(result2.Cardinality, AndNotCount(values2, values3));
         Assert.Equal(result3.Cardinality, AndNotCount(values1, values2, values3));
     }
+
     [Fact]
     public void TestIAndNot()
     {
@@ -199,6 +201,7 @@ public class Roaring32BitmapTests
         Assert.Equal(result2.Cardinality, XorCount(values2, values3));
         Assert.Equal(result3.Cardinality, XorCount(values1, values2, values3));
     }
+
     [Fact]
     public void TestIXor()
     {
@@ -252,6 +255,7 @@ public class Roaring32BitmapTests
             set = set.Union(values[i]);
         return (ulong)set.LongCount();
     }
+
     private static ulong AndCount(params IEnumerable<uint>[] values)
     {
         var set = values[0];
@@ -259,6 +263,7 @@ public class Roaring32BitmapTests
             set = set.Intersect(values[i]);
         return (ulong)set.LongCount();
     }
+
     private static ulong AndNotCount(params IEnumerable<uint>[] values)
     {
         var set = values[0];
@@ -266,6 +271,7 @@ public class Roaring32BitmapTests
             set = set.Except(values[i]);
         return (ulong)set.LongCount();
     }
+
     private static ulong XorCount(params IEnumerable<uint>[] values)
     {
         var set = values[0];

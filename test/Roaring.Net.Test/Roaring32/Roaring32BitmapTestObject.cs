@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 namespace Roaring.Test.Roaring32;
 
@@ -13,11 +12,11 @@ internal sealed class Roaring32BitmapTestObject : IDisposable
         Bitmap = bitmap;
         Values = values;
     }
-    
+
     public static Roaring32BitmapTestObject GetDefault() => GetForRange(0, uint.MaxValue, count: 1000);
-    
+
     public static Roaring32BitmapTestObject GetEmpty() => GetForRange(0, uint.MaxValue, count: 0);
-    
+
     public static Roaring32BitmapTestObject GetForCount(uint count) => GetForRange(0, uint.MaxValue, count);
 
     public static Roaring32BitmapTestObject GetForRange(uint start, uint end, uint count)
