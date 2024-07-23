@@ -14,6 +14,7 @@
     <RepositoryUrl>git://github.com/k-wojcik/Roaring.Net</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="../../libs/x64-windows/*.dll">
@@ -45,6 +46,7 @@
     <Content Include="../../libs/arm64-osx/*.dylib">
       <Pack>true</Pack>
       <PackagePath>runtimes/osx-arm64/native</PackagePath>
-    </Content>    
+    </Content>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" CopyToOutputDirectory="Never" CopyToPublishDirectory="PreserveNewest" Visible="false"/>
   </ItemGroup>
 </Project>
