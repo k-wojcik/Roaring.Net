@@ -2,6 +2,11 @@
 
 A .Net wrapper for [CRoaring](https://github.com/RoaringBitmap/CRoaring) - a C implementation of [RoaringBitmap](https://github.com/RoaringBitmap/RoaringBitmap).
 
+[![push-master workflow status](https://img.shields.io/github/actions/workflow/status/k-wojcik/Roaring.Net/push-master.yml)](https://github.com/k-wojcik/Roaring.Net/actions/workflows/push-master.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/k-wojcik/Roaring.Net?include_prereleases&sort=semver)](https://github.com/k-wojcik/Roaring.Net/releases)
+[![NuGet Version](https://img.shields.io/nuget/vpre/Roaring.Net)](https://www.nuget.org/packages/Roaring.Net)
+[![codecov](https://codecov.io/github/k-wojcik/Roaring.Net/graph/badge.svg?token=ITL13NZGAH)](https://codecov.io/github/k-wojcik/Roaring.Net)
+
 ## Usage
 ```cs
 using (var rb1 = new RoaringBitmap())

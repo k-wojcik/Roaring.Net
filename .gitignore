@@ -39,6 +39,9 @@ vcpkg_installed/
 *.VisualState.xml
 TestResult.xml
 
+# coverlet
+coverage.opencover.xml
+
 # Build Results of an ATL Project
 [Dd]ebugPS/
 [Rr]eleasePS/

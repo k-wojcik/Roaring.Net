@@ -1,0 +1,67 @@
+name: Build after push to master
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build-linux-x64:
+    runs-on: ubuntu-latest
+    env:
+        VCPKG_DISABLE_METRICS: 1
+        VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
+    steps:
+    - uses: actions/checkout@v4
+    - name: vcpkg x64-linux
+      uses: lukka/run-vcpkg@v11
+      env:
+        VCPKG_DEFAULT_TRIPLET: x64-linux-dynamic
+      with:
+        doNotCache: false
+        runVcpkgInstall: true
+    - name: copy lib
+      run: mkdir -p libs/x64-linux/ && cp vcpkg_installed/x64-linux-dynamic/lib/libroaring.so libs/x64-linux/
+    - name: Upload lib to artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: libs-linux-x64
+        path: |
+          libs/**/*.so
+
+  build-dotnet:
+    runs-on: ubuntu-latest
+    needs: [build-linux-x64]
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download libs atrifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: libs-linux-x64
+        path: libs
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore --configuration Release
+
+    - name: Test
+      run: dotnet test --no-build --configuration Release /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+    
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.0.1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+
+    - uses: geekyeggo/delete-artifact@v5
+      with:
+          name: libs-*
+  

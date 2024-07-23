@@ -200,7 +200,7 @@ jobs:
         path: libs
 
     - name: Set the version env
-      run: echo VERSION=${GITHUB_REF#refs/tags/}  >> $GITHUB_ENV
+      run: echo VERSION=${GITHUB_REF#refs/tags/v}  >> $GITHUB_ENV
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
