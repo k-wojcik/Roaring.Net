@@ -16,32 +16,40 @@ public unsafe class Roaring32Bitmap : IDisposable
     public nuint PortableSerializedBytes => NativeMethods.roaring_bitmap_portable_size_in_bytes(_pointer);
 
     //Creation/Destruction
+    public Roaring32Bitmap() => _pointer = NativeMethods.roaring_bitmap_create_with_capacity(0);
 
-    public Roaring32Bitmap()
+    public Roaring32Bitmap(uint capacity) => _pointer = NativeMethods.roaring_bitmap_create_with_capacity(capacity);
+
+    private Roaring32Bitmap(IntPtr pointer) => _pointer = pointer;
+
+    public static Roaring32Bitmap FromRange(uint min, uint max, uint step = 1)
     {
-        _pointer = NativeMethods.roaring_bitmap_create_with_capacity(0);
+        if (min >= max)
+        {
+            throw new ArgumentOutOfRangeException(nameof(min), min, "The minimum value cannot be greater than or equal to the maximum value.");
+        }
+        
+        if (step == 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(step), step, "The step cannot be equal to 0.");
+        }
+
+        return new(NativeMethods.roaring_bitmap_from_range(min, max, step));
     }
 
-    public Roaring32Bitmap(uint capacity)
+    public static Roaring32Bitmap FromValues(params uint[] values) => FromValues(values, 0U, (uint)values.Length);
+
+    public static Roaring32Bitmap FromValues(uint[] values, uint offset, uint count)
     {
-        _pointer = NativeMethods.roaring_bitmap_create_with_capacity(capacity);
-    }
+        if (values.Length < offset + count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(offset), offset, "Offset with count cannot be greater than the number of input elements.");
+        }
 
-    private Roaring32Bitmap(IntPtr pointer)
-    {
-        _pointer = pointer;
-    }
-
-    public static Roaring32Bitmap FromRange(uint min, uint max, uint step = 1) =>
-        new(NativeMethods.roaring_bitmap_from_range(min, max, step));
-
-    public static Roaring32Bitmap FromValues(params uint[] values)
-        => FromValues(values, 0, values.Length);
-
-    public static Roaring32Bitmap FromValues(uint[] values, int offset, int count)
-    {
         fixed (uint* valuePtr = values)
-            return new Roaring32Bitmap(NativeMethods.roaring_bitmap_of_ptr((uint)count, valuePtr + offset));
+        {
+            return new Roaring32Bitmap(NativeMethods.roaring_bitmap_of_ptr(count, valuePtr + offset));
+        }
     }
 
     protected virtual void Dispose(bool disposing)
@@ -53,10 +61,7 @@ public unsafe class Roaring32Bitmap : IDisposable
         }
     }
 
-    ~Roaring32Bitmap()
-    {
-        Dispose(false);
-    }
+    ~Roaring32Bitmap() => Dispose(false);
 
     public void Dispose()
     {
@@ -64,10 +69,7 @@ public unsafe class Roaring32Bitmap : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    public Roaring32Bitmap Clone()
-    {
-        return new Roaring32Bitmap(NativeMethods.roaring_bitmap_copy(_pointer));
-    }
+    public Roaring32Bitmap Clone() => new(NativeMethods.roaring_bitmap_copy(_pointer));
 
     //List operations
 
