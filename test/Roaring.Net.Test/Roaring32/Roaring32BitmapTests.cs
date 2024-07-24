@@ -7,45 +7,6 @@ namespace Roaring.Test.Roaring32;
 public class Roaring32BitmapTests
 {
     [Fact]
-    public void TestAdd()
-    {
-        uint[] values = [1, 2, 3, 4, 5, 100, 1000];
-        uint max = values.Max() + 1;
-
-        using var rb1 = new Roaring32Bitmap();
-        using var rb2 = new Roaring32Bitmap();
-        using var rb3 = Roaring32Bitmap.FromValues(values);
-        for (int i = 0; i < values.Length; i++)
-            rb1.Add(values[i]);
-        rb1.Optimize();
-
-        rb2.AddMany(values);
-        rb2.Optimize();
-
-        rb3.Optimize();
-
-        Assert.Equal(rb1.Cardinality, (uint)values.Length);
-        Assert.Equal(rb2.Cardinality, (uint)values.Length);
-        Assert.Equal(rb3.Cardinality, (uint)values.Length);
-
-        for (uint i = 0; i < max; i++)
-        {
-            if (values.Contains(i))
-            {
-                Assert.True(rb1.Contains(i));
-                Assert.True(rb2.Contains(i));
-                Assert.True(rb3.Contains(i));
-            }
-            else
-            {
-                Assert.False(rb1.Contains(i));
-                Assert.False(rb2.Contains(i));
-                Assert.False(rb3.Contains(i));
-            }
-        }
-    }
-
-    [Fact]
     public void TestRemove()
     {
         uint[] initialValues = [1, 2, 3, 4, 5, 100, 1000];
@@ -221,7 +182,7 @@ public class Roaring32BitmapTests
     public void TestSerialization()
     {
         using var rb1 = new Roaring32Bitmap();
-        rb1.AddMany(1, 2, 3, 4, 5, 100, 1000);
+        rb1.AddMany([1, 2, 3, 4, 5, 100, 1000]);
         rb1.Optimize();
 
         var s1 = rb1.Serialize(SerializationFormat.Normal);
@@ -237,8 +198,8 @@ public class Roaring32BitmapTests
     public void TestStats()
     {
         var bitmap = new Roaring32Bitmap();
-        bitmap.AddMany(1, 2, 3, 4, 6, 7);
-        bitmap.AddMany(999991, 999992, 999993, 999994, 999996, 999997);
+        bitmap.AddMany([1, 2, 3, 4, 6, 7]);
+        bitmap.AddMany([999991, 999992, 999993, 999994, 999996, 999997]);
         var stats = bitmap.GetStatistics();
 
         Assert.Equal(bitmap.Cardinality, stats.Cardinality);

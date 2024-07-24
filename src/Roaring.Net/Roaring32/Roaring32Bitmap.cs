@@ -24,7 +24,7 @@ public unsafe class Roaring32Bitmap : IDisposable
 
     public static Roaring32Bitmap FromRange(uint min, uint max, uint step = 1)
     {
-        if (min >= max)
+        if (min > max)
         {
             throw new ArgumentOutOfRangeException(nameof(min), min, "The minimum value cannot be greater than or equal to the maximum value.");
         }
@@ -33,11 +33,27 @@ public unsafe class Roaring32Bitmap : IDisposable
         {
             throw new ArgumentOutOfRangeException(nameof(step), step, "The step cannot be equal to 0.");
         }
-
+       
+        if (min == uint.MaxValue)
+        {
+            return FromValues(new[]{ min });
+        }
+        
+        if (max != uint.MaxValue)
+        {
+            max += 1;
+        }
+        else 
+        {
+            var bitmap = new Roaring32Bitmap(NativeMethods.roaring_bitmap_from_range(min, max, step));
+            bitmap.Add(uint.MaxValue);
+            return bitmap;
+        }
+        
         return new(NativeMethods.roaring_bitmap_from_range(min, max, step));
     }
 
-    public static Roaring32Bitmap FromValues(params uint[] values) => FromValues(values, 0U, (uint)values.Length);
+    public static Roaring32Bitmap FromValues(uint[] values) => FromValues(values, 0U, (uint)values.Length);
 
     public static Roaring32Bitmap FromValues(uint[] values, uint offset, uint count)
     {
@@ -73,16 +89,33 @@ public unsafe class Roaring32Bitmap : IDisposable
 
     //List operations
 
-    public void Add(uint value)
-        => NativeMethods.roaring_bitmap_add(_pointer, value);
+    public void Add(uint value) => NativeMethods.roaring_bitmap_add(_pointer, value);
 
-    public void AddMany(params uint[] values)
-        => AddMany(values, 0, (uint)values.Length);
+    public void AddMany(uint[] values) => AddMany(values, 0, (uint)values.Length);
 
     public void AddMany(uint[] values, uint offset, uint count)
     {
+        if (values.Length < offset + count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(offset), offset, "Offset with count cannot be greater than the number of input elements.");
+        }
+        
         fixed (uint* valuePtr = values)
+        {
             NativeMethods.roaring_bitmap_add_many(_pointer, count, valuePtr + offset);
+        }
+    }
+    
+    public bool TryAdd(uint value) => NativeMethods.roaring_bitmap_add_checked(_pointer, value);
+
+    public void AddRange(uint min, uint max)
+    {
+        if (min > max)
+        {
+            throw new ArgumentOutOfRangeException(nameof(min), min, "The minimum value cannot be greater than or equal to the maximum value.");
+        }
+        
+        NativeMethods.roaring_bitmap_add_range_closed(_pointer, min, max);
     }
 
     public void Remove(uint value)

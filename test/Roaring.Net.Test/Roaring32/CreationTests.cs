@@ -29,8 +29,8 @@ public class CreationTests
     }
     
     [Theory]
-    [InlineData(0, 0, 1)]
     [InlineData(1, 0, 1)]
+    [InlineData(10, 5, 1)]
     [InlineData(1, 10, 0)]
     public void FromRange_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint min, uint max, uint step)
     {
@@ -38,15 +38,21 @@ public class CreationTests
         Assert.Throws<ArgumentOutOfRangeException>(() => Roaring32Bitmap.FromRange(min, max, step));
     }
     
-    [Fact]
-    public void FromRange_CorrectRange_BitmapContainsExpectedValues()
+    [Theory]
+    [InlineData(0, 0, 1)]
+    [InlineData(1, 1, 1)]
+    [InlineData(10, 100, 2)]
+    [InlineData(33, 333, 33)]
+    [InlineData(uint.MaxValue - 1, uint.MaxValue, 1)]
+    [InlineData(uint.MaxValue, uint.MaxValue, 1)]
+    public void FromRange_CorrectRange_BitmapContainsExpectedValues(uint min, uint max, uint step)
     {
         // Act
-        using var uut = Roaring32Bitmap.FromRange(10, 100, 2);
+        using var uut = Roaring32Bitmap.FromRange(min, max, step);
 
         // Assert
-        var expected = Enumerable.Range(0, 45)
-            .Select(x=> 10 + (uint)x * 2)
+        var expected = Enumerable.Range(0, (int)Math.Ceiling((max - min + 1) / (double)step))
+            .Select(x=> min + (uint)x * step)
             .ToList();
         var actual = uut.Values.ToList();
         

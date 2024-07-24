@@ -11,7 +11,7 @@ internal static unsafe class NativeMethods
     public static extern IntPtr roaring_bitmap_create_with_capacity(uint capacity);
 
     [DllImport("roaring")]
-    public static extern IntPtr roaring_bitmap_from_range(uint min, uint max, uint step);
+    public static extern IntPtr roaring_bitmap_from_range(ulong min, ulong max, uint step);
 
     [DllImport("roaring")]
     public static extern IntPtr roaring_bitmap_of_ptr(uint count, uint* values);
@@ -41,6 +41,14 @@ internal static unsafe class NativeMethods
     [DllImport("roaring")]
     public static extern void roaring_bitmap_add_many(IntPtr bitmap, uint count, uint* values);
 
+    // TODO roaring_bitmap_add_bulk
+    
+    [DllImport("roaring")]
+    public static extern bool roaring_bitmap_add_checked(IntPtr bitmap, uint value);
+    
+    [DllImport("roaring")]
+    public static extern void roaring_bitmap_add_range_closed(IntPtr bitmap, uint min, uint max);
+    
     [DllImport("roaring")]
     public static extern void roaring_bitmap_remove(IntPtr bitmap, uint value);
 
