@@ -168,17 +168,32 @@ public unsafe class Roaring32Bitmap : IDisposable
 
     public bool Equals(Roaring32Bitmap bitmap)
     {
-        if (bitmap == null) return false;
+        if (bitmap == null)
+        {
+            return false;
+        }
+        
         return NativeMethods.roaring_bitmap_equals(_pointer, bitmap._pointer);
     }
 
-    public bool IsSubset(Roaring32Bitmap bitmap, bool isStrict = false)
+    public bool IsSubset(Roaring32Bitmap bitmap)
     {
-        if (bitmap == null) return false;
-        if (isStrict)
-            return NativeMethods.roaring_bitmap_is_strict_subset(_pointer, bitmap._pointer);
-        else
-            return NativeMethods.roaring_bitmap_is_subset(_pointer, bitmap._pointer);
+        if (bitmap == null)
+        {
+            return false;
+        }
+
+        return NativeMethods.roaring_bitmap_is_subset(_pointer, bitmap._pointer);
+    }
+    
+    public bool IsStrictSubset(Roaring32Bitmap bitmap)
+    {
+        if (bitmap == null)
+        {
+            return false;
+        }
+        
+        return NativeMethods.roaring_bitmap_is_strict_subset(_pointer, bitmap._pointer);
     }
 
     //Bitmap operations
