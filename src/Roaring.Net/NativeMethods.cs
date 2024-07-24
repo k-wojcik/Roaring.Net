@@ -70,7 +70,7 @@ internal static unsafe class NativeMethods
     
     [DllImport("roaring")]
     [return: MarshalAs(UnmanagedType.I1)]
-    public static extern bool roaring_bitmap_contains_range(IntPtr bitmap, uint min, uint max);
+    public static extern bool roaring_bitmap_contains_range(IntPtr bitmap, ulong min, ulong max);
 
     [DllImport("roaring")]
     [return: MarshalAs(UnmanagedType.I1)]

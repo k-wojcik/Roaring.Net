@@ -147,6 +147,8 @@ public class RemoveTests
     [InlineData(200, 300, 100, 350)]
     [InlineData(uint.MaxValue - 100,uint.MaxValue, uint.MaxValue - 1, uint.MaxValue)]
     [InlineData(uint.MaxValue - 100,uint.MaxValue, uint.MaxValue, uint.MaxValue)]
+    [InlineData(uint.MaxValue,uint.MaxValue, uint.MaxValue, uint.MaxValue)]
+    [InlineData(uint.MaxValue - 1,uint.MaxValue, uint.MaxValue, uint.MaxValue)]
     public void RemoveRange_CorrectRange_BitmapRemovesRange(uint minTest, uint maxTest, uint min, uint max)
     {
         // Arrange

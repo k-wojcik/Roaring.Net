@@ -72,6 +72,8 @@ public class ContainsTests
     [InlineData(200, 300, 100, 350, false)]
     [InlineData(uint.MaxValue - 100,uint.MaxValue, uint.MaxValue - 1, uint.MaxValue, true)]
     [InlineData(uint.MaxValue - 100,uint.MaxValue, uint.MaxValue, uint.MaxValue, true)]
+    [InlineData(uint.MaxValue,uint.MaxValue, uint.MaxValue, uint.MaxValue, true)]
+    [InlineData(uint.MaxValue - 1,uint.MaxValue - 1, uint.MaxValue, uint.MaxValue, false)]
     public void ContainsRange_CorrectRange_ReturnsExpectedResult(uint minTest, uint maxTest, uint min, uint max, bool expected)
     {
         // Arrange

@@ -34,23 +34,7 @@ public unsafe class Roaring32Bitmap : IDisposable
             throw new ArgumentOutOfRangeException(nameof(step), step, "The step cannot be equal to 0.");
         }
        
-        if (min == uint.MaxValue)
-        {
-            return FromValues(new[]{ min });
-        }
-        
-        if (max != uint.MaxValue)
-        {
-            max += 1;
-        }
-        else 
-        {
-            var bitmap = new Roaring32Bitmap(NativeMethods.roaring_bitmap_from_range(min, max, step));
-            bitmap.Add(uint.MaxValue);
-            return bitmap;
-        }
-        
-        return new(NativeMethods.roaring_bitmap_from_range(min, max, step));
+        return new(NativeMethods.roaring_bitmap_from_range(min, (ulong)max + 1, step));
     }
 
     public static Roaring32Bitmap FromValues(uint[] values) => FromValues(values, 0U, (uint)values.Length);
@@ -159,13 +143,8 @@ public unsafe class Roaring32Bitmap : IDisposable
         {
             throw new ArgumentOutOfRangeException(nameof(min), min, "The minimum value cannot be greater than the maximum value.");
         }
-        
-        if (max != uint.MaxValue)
-        {
-            max += 1;
-        }
-        
-        return NativeMethods.roaring_bitmap_contains_range(_pointer, min, max);
+     
+        return NativeMethods.roaring_bitmap_contains_range(_pointer, min, (ulong)max + 1);
     }
 
     public bool Equals(Roaring32Bitmap bitmap)
