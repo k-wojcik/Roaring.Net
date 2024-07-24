@@ -77,6 +77,7 @@ public class CreationTests
         // Arrange
         var expected = Enumerable.Range(0, 100)
             .Select(x=> (uint)x)
+            .Concat([uint.MaxValue - 1, uint.MaxValue])
             .ToArray();
         
         // Act

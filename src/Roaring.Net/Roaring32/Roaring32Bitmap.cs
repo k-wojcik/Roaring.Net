@@ -26,7 +26,7 @@ public unsafe class Roaring32Bitmap : IDisposable
     {
         if (min > max)
         {
-            throw new ArgumentOutOfRangeException(nameof(min), min, "The minimum value cannot be greater than or equal to the maximum value.");
+            throw new ArgumentOutOfRangeException(nameof(min), min, "The minimum value cannot be greater than the maximum value.");
         }
         
         if (step == 0)
@@ -118,24 +118,53 @@ public unsafe class Roaring32Bitmap : IDisposable
         NativeMethods.roaring_bitmap_add_range_closed(_pointer, min, max);
     }
 
-    public void Remove(uint value)
-        => NativeMethods.roaring_bitmap_remove(_pointer, value);
+    public void Remove(uint value) => NativeMethods.roaring_bitmap_remove(_pointer, value);
 
-    public void RemoveMany(params uint[] values)
-        => RemoveMany(values, 0, (uint)values.Length);
+    public void RemoveMany(uint[] values) => RemoveMany(values, 0, (uint)values.Length);
 
     public void RemoveMany(uint[] values, uint offset, uint count)
     {
+        if (values.Length < offset + count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(offset), offset, "Offset with count cannot be greater than the number of input elements.");
+        }
+      
         fixed (uint* valuePtr = values)
         {
-            uint* ptr = valuePtr + offset;
-            for (int i = 0; i < count; i++)
-                NativeMethods.roaring_bitmap_remove(_pointer, *ptr++);
+            NativeMethods.roaring_bitmap_remove_many(_pointer, count, valuePtr + offset);
         }
     }
+    
+    public bool TryRemove(uint value) => NativeMethods.roaring_bitmap_remove_checked(_pointer, value);
 
-    public bool Contains(uint value)
-        => NativeMethods.roaring_bitmap_contains(_pointer, value);
+    public void RemoveRange(uint min, uint max)
+    {
+        if (min > max)
+        {
+            throw new ArgumentOutOfRangeException(nameof(min), min, "The minimum value cannot be greater than the maximum value.");
+        }
+        
+        NativeMethods.roaring_bitmap_remove_range_closed(_pointer, min, max);
+    }
+    
+    // TODO roaring_bitmap_contains_bulk
+    
+    public bool Contains(uint value) => NativeMethods.roaring_bitmap_contains(_pointer, value);
+
+    public bool ContainsRange(uint min, uint max)
+    {
+        if (min > max)
+        {
+            throw new ArgumentOutOfRangeException(nameof(min), min, "The minimum value cannot be greater than the maximum value.");
+        }
+        
+        if (max != uint.MaxValue)
+        {
+            max += 1;
+        }
+        
+        return NativeMethods.roaring_bitmap_contains_range(_pointer, min, max);
+    }
 
     public bool Equals(Roaring32Bitmap bitmap)
     {

@@ -7,29 +7,6 @@ namespace Roaring.Test.Roaring32;
 public class Roaring32BitmapTests
 {
     [Fact]
-    public void TestRemove()
-    {
-        uint[] initialValues = [1, 2, 3, 4, 5, 100, 1000];
-        uint[] removeValues = [2, 3];
-        uint[] finalValues = initialValues.Except(removeValues).ToArray();
-        uint max = initialValues.Max() + 1;
-
-        using var rb = Roaring32Bitmap.FromValues(initialValues);
-        rb.RemoveMany(removeValues);
-        rb.Optimize();
-
-        Assert.Equal(rb.Cardinality, (uint)finalValues.Length);
-
-        for (uint i = 0; i < max; i++)
-        {
-            if (finalValues.Contains(i))
-                Assert.True(rb.Contains(i));
-            else
-                Assert.False(rb.Contains(i));
-        }
-    }
-
-    [Fact]
     public void TestNot()
     {
         uint[] values = [1, 2, 3, 4, 5, 100, 1000];

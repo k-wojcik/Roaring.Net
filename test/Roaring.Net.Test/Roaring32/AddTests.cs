@@ -101,13 +101,13 @@ public class AddTests
         Assert.Equal(cardinality, testObject.Bitmap.Cardinality);
     }
     
-    
     [Theory]
     [InlineData(new uint[] {0, 1, 2, 3, 4}, 0, 5)]
-    [InlineData(new uint[] {0, 1, 2, 3, 4},4, 1)]
-    [InlineData(new uint[] {0, 1, 2, 3, 4},3, 2)]
-    [InlineData(new uint[] {0, 1, 2, 3, 4},1, 2)]
-    [InlineData(new uint[] {0, 1, 2, 3, 4},0, 0)]
+    [InlineData(new uint[] {0, 1, 2, 3, 4}, 4, 1)]
+    [InlineData(new uint[] {0, 1, 2, 3, 4}, 3, 2)]
+    [InlineData(new uint[] {0, 1, 2, 3, 4}, 1, 2)]
+    [InlineData(new uint[] {0, 1, 2, 3, 4}, 0, 0)]
+    [InlineData(new uint[] {1, 2, uint.MaxValue}, 0, 3)]
     public void AddMany_WithCorrectOffsetAndCount_AddsValuesToBitmap(uint[] values, uint offset, uint count)
     {
         // Arrange
@@ -121,9 +121,9 @@ public class AddTests
     }
     
     [Theory]
-    [InlineData(new uint[] {0, 1, 2, 3, 4},0, 6)]
-    [InlineData(new uint[] {0, 1, 2, 3, 4},5, 1)]
-    [InlineData(new uint[] {0, 1, 2, 3, 4},4, 2)]
+    [InlineData(new uint[] {0, 1, 2, 3, 4}, 0, 6)]
+    [InlineData(new uint[] {0, 1, 2, 3, 4}, 5, 1)]
+    [InlineData(new uint[] {0, 1, 2, 3, 4}, 4, 2)]
     public void AddMany_OffsetAndCountOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint[] values, uint offset, uint count)
     {
         // Arrange

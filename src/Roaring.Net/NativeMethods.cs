@@ -51,10 +51,23 @@ internal static unsafe class NativeMethods
     
     [DllImport("roaring")]
     public static extern void roaring_bitmap_remove(IntPtr bitmap, uint value);
+    
+    [DllImport("roaring")]
+    public static extern void roaring_bitmap_remove_range_closed(IntPtr bitmap, uint min, uint max);
+    
+    [DllImport("roaring")]
+    public static extern void roaring_bitmap_remove_many(IntPtr bitmap, uint count, uint* values);
+    
+    [DllImport("roaring")]
+    public static extern bool roaring_bitmap_remove_checked(IntPtr bitmap, uint value);
 
     [DllImport("roaring")]
     [return: MarshalAs(UnmanagedType.I1)]
     public static extern bool roaring_bitmap_contains(IntPtr bitmap, uint value);
+    
+    [DllImport("roaring")]
+    [return: MarshalAs(UnmanagedType.I1)]
+    public static extern bool roaring_bitmap_contains_range(IntPtr bitmap, uint min, uint max);
 
     [DllImport("roaring")]
     [return: MarshalAs(UnmanagedType.I1)]

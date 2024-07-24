@@ -15,9 +15,13 @@ internal sealed class Roaring32BitmapTestObject : IDisposable
 
     public static Roaring32BitmapTestObject GetDefault() => GetForRange(0, uint.MaxValue, count: 1000);
 
-    public static Roaring32BitmapTestObject GetEmpty() => GetForRange(0, uint.MaxValue, count: 0);
+    public static Roaring32BitmapTestObject GetEmpty() => new(new Roaring32Bitmap(), []);
 
     public static Roaring32BitmapTestObject GetForCount(uint count) => GetForRange(0, uint.MaxValue, count);
+    
+    public static Roaring32BitmapTestObject GetFromValues(uint[] values) => new(Roaring32Bitmap.FromValues(values), values);
+
+    public static Roaring32BitmapTestObject GetForRange(uint start, uint end) => GetForRange(start, end, end - start + 1);
 
     public static Roaring32BitmapTestObject GetForRange(uint start, uint end, uint count)
     {
@@ -26,16 +30,16 @@ internal sealed class Roaring32BitmapTestObject : IDisposable
             throw new ArgumentOutOfRangeException(nameof(start), start, "Start cannot be greater then end.");
         }
 
-        if (end - start < count)
+        var length = end - start == uint.MaxValue ? uint.MaxValue : end - start + 1;
+        if (length < count)
         {
-            throw new ArgumentOutOfRangeException(nameof(count), count,
-                "Count cannot be greater then start-end range.");
+            throw new ArgumentOutOfRangeException(nameof(count), count, "Count cannot be greater then start-end range.");
         }
 
         uint[] values;
         if (count > 0)
         {
-            uint step = (end - start) / count;
+            uint step = length / count;
 
             values = new uint[count];
 
