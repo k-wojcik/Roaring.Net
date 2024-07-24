@@ -147,6 +147,8 @@ public unsafe class Roaring32Bitmap : IDisposable
         NativeMethods.roaring_bitmap_remove_range_closed(_pointer, min, max);
     }
     
+    public void Clear() => NativeMethods.roaring_bitmap_clear(_pointer);
+
     // TODO roaring_bitmap_contains_bulk
     
     public bool Contains(uint value) => NativeMethods.roaring_bitmap_contains(_pointer, value);

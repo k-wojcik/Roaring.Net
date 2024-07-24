@@ -56,6 +56,9 @@ internal static unsafe class NativeMethods
     public static extern void roaring_bitmap_remove_range_closed(IntPtr bitmap, uint min, uint max);
     
     [DllImport("roaring")]
+    public static extern void roaring_bitmap_clear(IntPtr bitmap);
+    
+    [DllImport("roaring")]
     public static extern void roaring_bitmap_remove_many(IntPtr bitmap, uint count, uint* values);
     
     [DllImport("roaring")]

@@ -164,4 +164,30 @@ public class RemoveTests
         
         Assert.Equal(expected, actual);
     }
+    
+    [Fact]
+    public void Clear_BitmapIsEmpty_DoesNotRemoveValues()
+    {
+        // Arrange
+        using var testObject = Roaring32BitmapTestObject.GetEmpty();
+        
+        // Act
+        testObject.Bitmap.Clear();
+        
+        // Assert
+        Assert.Empty(testObject.Bitmap.Values);
+    }
+    
+    [Fact]
+    public void Clear_BitmapHasValues_RemovesAllValuesFromBitmap()
+    {
+        // Arrange
+        using var testObject = Roaring32BitmapTestObject.GetDefault();
+        
+        // Act
+        testObject.Bitmap.Clear();
+        
+        // Assert
+        Assert.Empty(testObject.Bitmap.Values);
+    }
 }
