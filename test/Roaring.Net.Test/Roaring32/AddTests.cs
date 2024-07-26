@@ -17,7 +17,7 @@ public class AddTests
         
         // Assert
         Assert.Single(testObject.Bitmap.Values, value=> value == 10U);
-        Assert.Equal(1U, testObject.Bitmap.Cardinality);
+        Assert.Equal(1U, testObject.Bitmap.Count);
     }
     
     [Fact]
@@ -25,7 +25,7 @@ public class AddTests
     {
         // Arrange
         using var testObject = Roaring32BitmapTestObject.GetDefault();
-        var cardinality = testObject.Bitmap.Cardinality;
+        var cardinality = testObject.Bitmap.Count;
         Assert.DoesNotContain(testObject.Bitmap.Values, value=> value == 10U);
         
         // Act
@@ -33,7 +33,7 @@ public class AddTests
         
         // Assert
         Assert.Single(testObject.Bitmap.Values, value=> value == 10U);
-        Assert.Equal(cardinality + 1, testObject.Bitmap.Cardinality);
+        Assert.Equal(cardinality + 1, testObject.Bitmap.Count);
     }
     
     [Fact]
@@ -41,7 +41,7 @@ public class AddTests
     {
         // Arrange
         using var testObject = Roaring32BitmapTestObject.GetDefault();
-        var cardinality = testObject.Bitmap.Cardinality;
+        var cardinality = testObject.Bitmap.Count;
         var addedValue = testObject.Bitmap.Values.ToList()[2];
         
         // Act
@@ -49,7 +49,7 @@ public class AddTests
         
         // Assert
         Assert.Single(testObject.Bitmap.Values, value=> value == addedValue);
-        Assert.Equal(cardinality, testObject.Bitmap.Cardinality);
+        Assert.Equal(cardinality, testObject.Bitmap.Count);
     }
     
     [Fact]
@@ -64,7 +64,7 @@ public class AddTests
         // Assert
         Assert.Single(testObject.Bitmap.Values, value=> value == 10U);
         Assert.Single(testObject.Bitmap.Values, value=> value == 11U);
-        Assert.Equal(2U, testObject.Bitmap.Cardinality);
+        Assert.Equal(2U, testObject.Bitmap.Count);
     }
     
     [Fact]
@@ -72,7 +72,7 @@ public class AddTests
     {
         // Arrange
         using var testObject = Roaring32BitmapTestObject.GetDefault();
-        var cardinality = testObject.Bitmap.Cardinality;
+        var cardinality = testObject.Bitmap.Count;
         Assert.DoesNotContain(testObject.Bitmap.Values, value=> value == 10U);
         Assert.DoesNotContain(testObject.Bitmap.Values, value=> value == 11U);
         
@@ -82,7 +82,7 @@ public class AddTests
         // Assert
         Assert.Single(testObject.Bitmap.Values, value=> value == 10U);
         Assert.Single(testObject.Bitmap.Values, value=> value == 11U);
-        Assert.Equal(cardinality + 2, testObject.Bitmap.Cardinality);
+        Assert.Equal(cardinality + 2, testObject.Bitmap.Count);
     }
     
     [Fact]
@@ -90,7 +90,7 @@ public class AddTests
     {
         // Arrange
         using var testObject = Roaring32BitmapTestObject.GetDefault();
-        var cardinality = testObject.Bitmap.Cardinality;
+        var cardinality = testObject.Bitmap.Count;
         var addedValues = testObject.Bitmap.Values.ToList()[2..10].ToArray();
         
         // Act
@@ -98,7 +98,7 @@ public class AddTests
         
         // Assert
         Assert.Contains(testObject.Bitmap.Values, value => addedValues.Contains(value));
-        Assert.Equal(cardinality, testObject.Bitmap.Cardinality);
+        Assert.Equal(cardinality, testObject.Bitmap.Count);
     }
     
     [Theory]
@@ -148,7 +148,7 @@ public class AddTests
         // Assert
         Assert.True(actual);
         Assert.Single(testObject.Bitmap.Values, value=> value == 10U);
-        Assert.Equal(1U, testObject.Bitmap.Cardinality);
+        Assert.Equal(1U, testObject.Bitmap.Count);
     }
     
     [Fact]
@@ -156,7 +156,7 @@ public class AddTests
     {
         // Arrange
         using var testObject = Roaring32BitmapTestObject.GetDefault();
-        var cardinality = testObject.Bitmap.Cardinality;
+        var cardinality = testObject.Bitmap.Count;
         Assert.DoesNotContain(testObject.Bitmap.Values, value=> value == 10U);
         
         // Act
@@ -165,7 +165,7 @@ public class AddTests
         // Assert
         Assert.True(actual);
         Assert.Single(testObject.Bitmap.Values, value=> value == 10U);
-        Assert.Equal(cardinality + 1, testObject.Bitmap.Cardinality);
+        Assert.Equal(cardinality + 1, testObject.Bitmap.Count);
     }
     
     [Fact]
@@ -173,7 +173,7 @@ public class AddTests
     {
         // Arrange
         using var testObject = Roaring32BitmapTestObject.GetDefault();
-        var cardinality = testObject.Bitmap.Cardinality;
+        var cardinality = testObject.Bitmap.Count;
         var addedValue = testObject.Bitmap.Values.ToList()[2];
         
         // Act
@@ -182,7 +182,7 @@ public class AddTests
         // Assert
         Assert.False(actual);
         Assert.Single(testObject.Bitmap.Values, value=> value == addedValue);
-        Assert.Equal(cardinality, testObject.Bitmap.Cardinality);
+        Assert.Equal(cardinality, testObject.Bitmap.Count);
     }
     
     [Theory]

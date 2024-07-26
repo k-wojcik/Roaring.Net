@@ -8,7 +8,7 @@ public unsafe class Roaring32Bitmap : IDisposable
     private readonly IntPtr _pointer;
     private bool _isDisposed;
 
-    public ulong Cardinality => NativeMethods.roaring_bitmap_get_cardinality(_pointer);
+    public ulong Count => NativeMethods.roaring_bitmap_get_cardinality(_pointer);
     public bool IsEmpty => NativeMethods.roaring_bitmap_is_empty(_pointer);
     public uint? Min => IsEmpty ? null : NativeMethods.roaring_bitmap_minimum(_pointer);
     public uint? Max => IsEmpty ? null : NativeMethods.roaring_bitmap_maximum(_pointer);
@@ -179,8 +179,10 @@ public unsafe class Roaring32Bitmap : IDisposable
 
     //Bitmap operations
 
-    public bool Select(uint rank, out uint element)
-        => NativeMethods.roaring_bitmap_select(_pointer, rank, out element);
+    public bool TryGetValue(uint index, out uint value) => NativeMethods.roaring_bitmap_select(_pointer, index, out value);
+    public ulong CountLessOrEqualTo(uint value) => NativeMethods.roaring_bitmap_rank(_pointer, value);
+    public long GetIndex(uint value) => NativeMethods.roaring_bitmap_get_index(_pointer, value);
+    
 
     public Roaring32Bitmap Not(ulong start, ulong end) => new(NativeMethods.roaring_bitmap_flip(_pointer, start, end));
 

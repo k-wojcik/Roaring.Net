@@ -36,9 +36,9 @@ public class Roaring32BitmapTests
         using var result1 = source1.Or(source2);
         using var result2 = source2.Or(source3);
         using var result3 = result1.Or(source3);
-        Assert.Equal(result1.Cardinality, OrCount(values1, values2));
-        Assert.Equal(result2.Cardinality, OrCount(values2, values3));
-        Assert.Equal(result3.Cardinality, OrCount(values1, values2, values3));
+        Assert.Equal(result1.Count, OrCount(values1, values2));
+        Assert.Equal(result2.Count, OrCount(values2, values3));
+        Assert.Equal(result3.Count, OrCount(values1, values2, values3));
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public class Roaring32BitmapTests
         using var source2 = Roaring32Bitmap.FromValues(values3);
         result.IOr(source1);
         result.IOr(source2);
-        Assert.Equal(result.Cardinality, OrCount(values1, values2, values3));
+        Assert.Equal(result.Count, OrCount(values1, values2, values3));
     }
 
     [Fact]
@@ -69,9 +69,9 @@ public class Roaring32BitmapTests
         using var result1 = source1.And(source2);
         using var result2 = source2.And(source3);
         using var result3 = result1.And(source3);
-        Assert.Equal(result1.Cardinality, AndCount(values1, values2));
-        Assert.Equal(result2.Cardinality, AndCount(values2, values3));
-        Assert.Equal(result3.Cardinality, AndCount(values1, values2, values3));
+        Assert.Equal(result1.Count, AndCount(values1, values2));
+        Assert.Equal(result2.Count, AndCount(values2, values3));
+        Assert.Equal(result3.Count, AndCount(values1, values2, values3));
     }
 
     [Fact]
@@ -86,7 +86,7 @@ public class Roaring32BitmapTests
         using var source2 = Roaring32Bitmap.FromValues(values3);
         result.IAnd(source1);
         result.IAnd(source2);
-        Assert.Equal(result.Cardinality, AndCount(values1, values2, values3));
+        Assert.Equal(result.Count, AndCount(values1, values2, values3));
     }
 
     [Fact]
@@ -102,9 +102,9 @@ public class Roaring32BitmapTests
         using var result1 = source1.AndNot(source2);
         using var result2 = source2.AndNot(source3);
         using var result3 = result1.AndNot(source3);
-        Assert.Equal(result1.Cardinality, AndNotCount(values1, values2));
-        Assert.Equal(result2.Cardinality, AndNotCount(values2, values3));
-        Assert.Equal(result3.Cardinality, AndNotCount(values1, values2, values3));
+        Assert.Equal(result1.Count, AndNotCount(values1, values2));
+        Assert.Equal(result2.Count, AndNotCount(values2, values3));
+        Assert.Equal(result3.Count, AndNotCount(values1, values2, values3));
     }
 
     [Fact]
@@ -119,7 +119,7 @@ public class Roaring32BitmapTests
         using var source2 = Roaring32Bitmap.FromValues(values3);
         result.IAndNot(source1);
         result.IAndNot(source2);
-        Assert.Equal(result.Cardinality, AndNotCount(values1, values2, values3));
+        Assert.Equal(result.Count, AndNotCount(values1, values2, values3));
     }
 
     [Fact]
@@ -135,9 +135,9 @@ public class Roaring32BitmapTests
         using var result1 = source1.Xor(source2);
         using var result2 = source2.Xor(source3);
         using var result3 = result1.Xor(source3);
-        Assert.Equal(result1.Cardinality, XorCount(values1, values2));
-        Assert.Equal(result2.Cardinality, XorCount(values2, values3));
-        Assert.Equal(result3.Cardinality, XorCount(values1, values2, values3));
+        Assert.Equal(result1.Count, XorCount(values1, values2));
+        Assert.Equal(result2.Count, XorCount(values2, values3));
+        Assert.Equal(result3.Count, XorCount(values1, values2, values3));
     }
 
     [Fact]
@@ -152,7 +152,7 @@ public class Roaring32BitmapTests
         using var source2 = Roaring32Bitmap.FromValues(values3);
         result.IXor(source1);
         result.IXor(source2);
-        Assert.Equal(result.Cardinality, XorCount(values1, values2, values3));
+        Assert.Equal(result.Count, XorCount(values1, values2, values3));
     }
 
     [Fact]
@@ -179,7 +179,7 @@ public class Roaring32BitmapTests
         bitmap.AddMany([999991, 999992, 999993, 999994, 999996, 999997]);
         var stats = bitmap.GetStatistics();
 
-        Assert.Equal(bitmap.Cardinality, stats.Cardinality);
+        Assert.Equal(bitmap.Count, stats.Cardinality);
         Assert.Equal(2U, stats.ContainerCount);
         Assert.Equal(2U, stats.ArrayContainerCount);
         Assert.Equal(0U, stats.RunContainerCount);

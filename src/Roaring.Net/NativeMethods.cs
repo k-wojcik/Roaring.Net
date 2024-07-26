@@ -75,7 +75,17 @@ internal static unsafe class NativeMethods
     [DllImport("roaring")]
     [return: MarshalAs(UnmanagedType.I1)]
     public static extern bool roaring_bitmap_select(IntPtr bitmap, uint rank, out uint element);
-
+    
+    [DllImport("roaring")]
+    public static extern ulong roaring_bitmap_rank(IntPtr bitmap, uint x);
+    
+    // TODO
+    [DllImport("roaring")]
+    public static extern void roaring_bitmap_rank_many(IntPtr bitmap, uint* begin, uint* end, uint* ans);
+    
+    [DllImport("roaring")]
+    public static extern long roaring_bitmap_get_index(IntPtr bitmap, uint x);
+    
     [DllImport("roaring")]
     [return: MarshalAs(UnmanagedType.I1)]
     public static extern bool roaring_bitmap_equals(IntPtr bitmap1, IntPtr bitmap2);

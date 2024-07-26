@@ -30,7 +30,7 @@ public class RemoveTests
         testObject.Bitmap.Remove(removedValue);
         
         // Assert
-        Assert.Equal((uint)(testObject.Values.Length - 1), testObject.Bitmap.Cardinality);
+        Assert.Equal((uint)(testObject.Values.Length - 1), testObject.Bitmap.Count);
     }
     
     [Fact]
@@ -58,7 +58,7 @@ public class RemoveTests
         testObject.Bitmap.RemoveMany(removedValues);
         
         // Assert
-        Assert.Equal((uint)(testObject.Values.Length - removedValues.Length + 1), testObject.Bitmap.Cardinality);
+        Assert.Equal((uint)(testObject.Values.Length - removedValues.Length + 1), testObject.Bitmap.Count);
     }
     
     [Theory]
@@ -122,7 +122,7 @@ public class RemoveTests
 
         // Assert
         Assert.True(actual);
-        Assert.Equal((uint)(testObject.Values.Length - 1), testObject.Bitmap.Cardinality);
+        Assert.Equal((uint)(testObject.Values.Length - 1), testObject.Bitmap.Count);
     }
     
     [Theory]

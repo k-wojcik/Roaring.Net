@@ -11,7 +11,7 @@ public class PropertiesTests
         using var testObject = Roaring32BitmapTestObject.GetDefault();
 
         // Act
-        var actual = testObject.Bitmap.Cardinality;
+        var actual = testObject.Bitmap.Count;
 
         // Assert
         Assert.Equal((ulong)testObject.Values.Length, actual);
@@ -24,7 +24,7 @@ public class PropertiesTests
         using var testObject = Roaring32BitmapTestObject.GetEmpty();
 
         // Act
-        var actual = testObject.Bitmap.Cardinality;
+        var actual = testObject.Bitmap.Count;
 
         // Assert
         Assert.Equal(0U, actual);
