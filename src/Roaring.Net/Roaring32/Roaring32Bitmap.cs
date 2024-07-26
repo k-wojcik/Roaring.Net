@@ -335,11 +335,13 @@ public unsafe class Roaring32Bitmap : IDisposable
         return values;
     }
 
-    public uint[] ToArray(ulong count)
+    public uint[] Take(ulong count)
     {
         ulong cardinality = NativeMethods.roaring_bitmap_get_cardinality(_pointer);
         if (cardinality < count)
+        {
             count = cardinality;
+        }
 
         uint[] values = new uint[count];
         NativeMethods.roaring_bitmap_to_uint32_array(_pointer, values);

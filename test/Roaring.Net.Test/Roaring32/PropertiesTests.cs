@@ -5,7 +5,7 @@ namespace Roaring.Test.Roaring32;
 public class PropertiesTests
 {
     [Fact]
-    public void Cardinality_BitmapContainsValues_ReturnsCardinalityOfValues()
+    public void Count_BitmapContainsValues_ReturnsCardinalityOfValues()
     {
         // Arrange
         using var testObject = Roaring32BitmapTestObject.GetDefault();
@@ -18,7 +18,7 @@ public class PropertiesTests
     }
 
     [Fact]
-    public void Cardinality_EmptyBitmap_ReturnsZero()
+    public void Count_EmptyBitmap_ReturnsZero()
     {
         // Arrange
         using var testObject = Roaring32BitmapTestObject.GetEmpty();

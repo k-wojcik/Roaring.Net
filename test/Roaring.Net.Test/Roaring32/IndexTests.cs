@@ -9,7 +9,7 @@ public class IndexTests
     [InlineData(new uint[] { 0, 1, 2, 3, 4 }, 4, 4)]
     [InlineData(new uint[] { 4, 3, 2, 1, 0 }, 4, 4)]
     [InlineData(new uint[] { 0, 2, 4, 6, 8 }, 2, 4)]
-    public void TryGetValue_IndexLessThanBitmapSize_ReturnsTrueAndExpectedValue(uint[] values, uint index, uint excepted)
+    public void TryGetValue_IndexLessThanBitmapSize_ReturnsTrueAndExpectedValue(uint[] values, uint index, uint expected)
     {
         // Arrange
         using var testObject = Roaring32BitmapTestObject.GetFromValues(values);
@@ -19,13 +19,13 @@ public class IndexTests
         
         // Assert
         Assert.True(actualReturn);
-        Assert.Equal(excepted, actual);
+        Assert.Equal(expected, actual);
     }
     
     [Theory]
     [InlineData(new uint[]{}, 1, 0)]
     [InlineData(new uint[] { 0, 1, 2, 3, 4 }, 5, 0)]
-    public void TryGetValue_IndexGreaterThanBitmapSize_ReturnsFalseAndZero(uint[] values, uint index, uint excepted)
+    public void TryGetValue_IndexGreaterThanBitmapSize_ReturnsFalseAndZero(uint[] values, uint index, uint expected)
     {
         // Arrange
         using var testObject = Roaring32BitmapTestObject.GetFromValues(values);
@@ -35,7 +35,7 @@ public class IndexTests
         
         // Assert
         Assert.False(actualReturn);
-        Assert.Equal(excepted, actual);
+        Assert.Equal(expected, actual);
     }
     
     [Theory]
@@ -47,7 +47,7 @@ public class IndexTests
     [InlineData(new uint[] { 5, 6, 7, 8, 9 }, 2, 0)]
     [InlineData(new uint[] { 5, 6, 7, 8, 9 }, 7, 3)]
     [InlineData(new uint[] { 5, uint.MaxValue }, uint.MaxValue, 2)]
-    public void CountLessOrEqualTo_ForValues_ReturnsExpectedNumberOfValues(uint[] values, uint testedValue, uint excepted)
+    public void CountLessOrEqualTo_ForValues_ReturnsExpectedNumberOfValues(uint[] values, uint testedValue, uint expected)
     {
         // Arrange
         using var testObject = Roaring32BitmapTestObject.GetFromValues(values);
@@ -56,7 +56,7 @@ public class IndexTests
         var actual = testObject.Bitmap.CountLessOrEqualTo(testedValue);
         
         // Assert
-        Assert.Equal(excepted, actual);
+        Assert.Equal(expected, actual);
     }
     
     [Theory]
@@ -68,7 +68,7 @@ public class IndexTests
     [InlineData(new uint[] { 5, 6, 7, 8, 9 }, 2, -1)]
     [InlineData(new uint[] { 5, 6, 7, 8, 9 }, 7, 2)]
     [InlineData(new uint[] { 5, uint.MaxValue }, uint.MaxValue, 1)]
-    public void GetIndex_ForValues_ReturnsIndexOfValue(uint[] values, uint testedValue, long excepted)
+    public void GetIndex_ForValues_ReturnsIndexOfValue(uint[] values, uint testedValue, long expected)
     {
         // Arrange
         using var testObject = Roaring32BitmapTestObject.GetFromValues(values);
@@ -77,6 +77,6 @@ public class IndexTests
         var actual = testObject.Bitmap.GetIndex(testedValue);
         
         // Assert
-        Assert.Equal(excepted, actual);
+        Assert.Equal(expected, actual);
     }
 }
