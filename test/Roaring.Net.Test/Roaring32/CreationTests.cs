@@ -90,10 +90,40 @@ public class CreationTests
     }
     
     [Fact]
+    public void Ctor_FromValues_InputHasValues_BitmapContainsExpectedValues()
+    {
+        // Arrange
+        var expected = Enumerable.Range(0, 100)
+            .Select(x=> (uint)x)
+            .Concat([uint.MaxValue - 1, uint.MaxValue])
+            .ToArray();
+        
+        // Act
+        using var uut = new Roaring32Bitmap(expected);
+
+        // Assert
+        var actual = uut.Values;
+        
+        Assert.Equal(expected, actual);
+    }
+    
+    [Fact]
     public void FromValues_InputIsEmpty_BitmapIsEmpty()
     {
         // Act
         using var uut = Roaring32Bitmap.FromValues([]);
+
+        // Assert
+        var actual = uut.Values;
+        
+        Assert.Empty(actual);
+    }
+    
+    [Fact]
+    public void Ctor_FromValues_InputIsEmpty_BitmapIsEmpty()
+    {
+        // Act
+        using var uut = new Roaring32Bitmap([]);
 
         // Assert
         var actual = uut.Values;

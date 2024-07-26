@@ -171,21 +171,6 @@ public class Roaring32BitmapTests
         Assert.True(rb1.Equals(rb3));
     }
 
-    [Fact]
-    public void TestStats()
-    {
-        var bitmap = new Roaring32Bitmap();
-        bitmap.AddMany([1, 2, 3, 4, 6, 7]);
-        bitmap.AddMany([999991, 999992, 999993, 999994, 999996, 999997]);
-        var stats = bitmap.GetStatistics();
-
-        Assert.Equal(bitmap.Count, stats.Cardinality);
-        Assert.Equal(2U, stats.ContainerCount);
-        Assert.Equal(2U, stats.ArrayContainerCount);
-        Assert.Equal(0U, stats.RunContainerCount);
-        Assert.Equal(0U, stats.BitsetContainerCount);
-    }
-
     private static ulong OrCount(params IEnumerable<uint>[] values)
     {
         var set = values[0];

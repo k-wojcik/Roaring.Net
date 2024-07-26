@@ -19,6 +19,7 @@ public unsafe class Roaring32Bitmap : IDisposable
     public Roaring32Bitmap() => _pointer = NativeMethods.roaring_bitmap_create_with_capacity(0);
 
     public Roaring32Bitmap(uint capacity) => _pointer = NativeMethods.roaring_bitmap_create_with_capacity(capacity);
+    public Roaring32Bitmap(uint[] values) => _pointer = CreatePtrFromValues(values, 0, (uint)values.Length);
 
     private Roaring32Bitmap(IntPtr pointer) => _pointer = pointer;
 
@@ -39,7 +40,10 @@ public unsafe class Roaring32Bitmap : IDisposable
 
     public static Roaring32Bitmap FromValues(uint[] values) => FromValues(values, 0U, (uint)values.Length);
 
-    public static Roaring32Bitmap FromValues(uint[] values, uint offset, uint count)
+    public static Roaring32Bitmap FromValues(uint[] values, uint offset, uint count) 
+        => new(CreatePtrFromValues(values, offset, count));
+
+    private static IntPtr CreatePtrFromValues(uint[] values, uint offset, uint count)
     {
         if (values.Length < offset + count)
         {
@@ -48,7 +52,7 @@ public unsafe class Roaring32Bitmap : IDisposable
 
         fixed (uint* valuePtr = values)
         {
-            return new Roaring32Bitmap(NativeMethods.roaring_bitmap_of_ptr(count, valuePtr + offset));
+            return NativeMethods.roaring_bitmap_of_ptr(count, valuePtr + offset);
         }
     }
 
