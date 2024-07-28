@@ -1,4 +1,4 @@
-# CRoaring.Net
+# Roaring.Net
 
 A .Net wrapper for [CRoaring](https://github.com/RoaringBitmap/CRoaring) - a C implementation of [RoaringBitmap](https://github.com/RoaringBitmap/RoaringBitmap).
 
@@ -9,22 +9,20 @@ A .Net wrapper for [CRoaring](https://github.com/RoaringBitmap/CRoaring) - a C i
 
 ## Usage
 ```cs
-using (var rb1 = new RoaringBitmap())
-using (var rb2 = new RoaringBitmap())
-{
-	rb1.AddMany(1, 2, 3, 4, 5, 100, 1000);
-	rb1.Optimize();
-	
-	rb2.AddMany(3, 4, 5, 7, 50);
-	rb2.Optimize();
+using var rb1 = new Roaring32Bitmap();
+using var rb2 = new Roaring32Bitmap();
 
-	using (var result = rb1.And(rb2))
-	{
-		Console.WriteLine(result.Contains(2));
-		Console.WriteLine(result.Contains(4));
-		Console.WriteLine(result.Contains(5));
-	}
-}
+rb1.AddMany([1, 2, 3, 4, 5, 100, 1000]);
+rb1.Optimize();
+
+rb2.AddMany([3, 4, 5, 7, 50]);
+rb2.Optimize();
+
+using var result = rb1.And(rb2);
+
+Console.WriteLine(result.Contains(2));
+Console.WriteLine(result.Contains(4));
+Console.WriteLine(result.Contains(5));
 ```
 
 ## Requirements
