@@ -15,7 +15,6 @@ public unsafe class Roaring32Bitmap : IDisposable
     public nuint SerializedBytes => NativeMethods.roaring_bitmap_size_in_bytes(_pointer);
     public nuint PortableSerializedBytes => NativeMethods.roaring_bitmap_portable_size_in_bytes(_pointer);
 
-    //Creation/Destruction
     public Roaring32Bitmap() => _pointer = NativeMethods.roaring_bitmap_create_with_capacity(0);
 
     public Roaring32Bitmap(uint capacity) => _pointer = NativeMethods.roaring_bitmap_create_with_capacity(capacity);
@@ -74,8 +73,6 @@ public unsafe class Roaring32Bitmap : IDisposable
     }
 
     public Roaring32Bitmap Clone() => new(NativeMethods.roaring_bitmap_copy(_pointer));
-
-    //List operations
 
     public void Add(uint value) => NativeMethods.roaring_bitmap_add(_pointer, value);
 
@@ -181,7 +178,6 @@ public unsafe class Roaring32Bitmap : IDisposable
         return NativeMethods.roaring_bitmap_is_strict_subset(_pointer, bitmap._pointer);
     }
 
-    //Bitmap operations
 
     public bool TryGetValue(uint index, out uint value) => NativeMethods.roaring_bitmap_select(_pointer, index, out value);
     public ulong CountLessOrEqualTo(uint value) => NativeMethods.roaring_bitmap_rank(_pointer, value);
@@ -274,8 +270,6 @@ public unsafe class Roaring32Bitmap : IDisposable
     public double GetJaccardIndex(Roaring32Bitmap bitmap)
         => NativeMethods.roaring_bitmap_jaccard_index(_pointer, bitmap._pointer);
 
-    //Optimization/Compression
-
     public bool Optimize()
         => NativeMethods.roaring_bitmap_run_optimize(_pointer);
 
@@ -284,8 +278,6 @@ public unsafe class Roaring32Bitmap : IDisposable
 
     public nuint ShrinkToFit()
         => NativeMethods.roaring_bitmap_shrink_to_fit(_pointer);
-
-    //Serialization
 
     public void CopyTo(uint[] buffer)
         => NativeMethods.roaring_bitmap_to_uint32_array(_pointer, buffer);
@@ -328,7 +320,6 @@ public unsafe class Roaring32Bitmap : IDisposable
         return new Roaring32Bitmap(ptr);
     }
 
-    //Iterators
     public IEnumerable<uint> Values => new Roaring32Enumerator(_pointer);
 
     public uint[] ToArray()
@@ -352,7 +343,6 @@ public unsafe class Roaring32Bitmap : IDisposable
         return values;
     }
 
-    //Other
     public Statistics GetStatistics()
     {
         NativeMethods.roaring_bitmap_statistics(_pointer, out var stats);
