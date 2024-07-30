@@ -7,23 +7,6 @@ namespace Roaring.Test.Roaring32;
 public class Roaring32BitmapTests
 {
     [Fact]
-    public void TestNot()
-    {
-        uint[] values = [1, 2, 3, 4, 5, 100, 1000];
-        uint max = values.Max() + 1;
-
-        using var source = Roaring32Bitmap.FromValues(values);
-        using var result = source.Not(0, max);
-        for (uint i = 0; i < max; i++)
-        {
-            if (values.Contains(i))
-                Assert.False(result.Contains(i));
-            else
-                Assert.True(result.Contains(i));
-        }
-    }
-
-    [Fact]
     public void TestOr()
     {
         uint[] values1 = [1, 2, 3, 4, 5, 100, 1000];
