@@ -211,7 +211,7 @@ public unsafe class Roaring32Bitmap : IDisposable
     public void IAnd(Roaring32Bitmap bitmap)
         => NativeMethods.roaring_bitmap_and_inplace(_pointer, bitmap._pointer);
 
-    public ulong AndCardinality(Roaring32Bitmap bitmap)
+    public ulong AndCount(Roaring32Bitmap bitmap)
         => NativeMethods.roaring_bitmap_and_cardinality(_pointer, bitmap._pointer);
 
     public Roaring32Bitmap AndNot(Roaring32Bitmap bitmap) =>
@@ -220,7 +220,7 @@ public unsafe class Roaring32Bitmap : IDisposable
     public void IAndNot(Roaring32Bitmap bitmap)
         => NativeMethods.roaring_bitmap_andnot_inplace(_pointer, bitmap._pointer);
 
-    public ulong AndNotCardinality(Roaring32Bitmap bitmap)
+    public ulong AndNotCount(Roaring32Bitmap bitmap)
         => NativeMethods.roaring_bitmap_andnot_cardinality(_pointer, bitmap._pointer);
 
     public Roaring32Bitmap Or(Roaring32Bitmap bitmap) =>
