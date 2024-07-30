@@ -94,11 +94,9 @@ internal static unsafe class NativeMethods
     [return: MarshalAs(UnmanagedType.I1)]
     public static extern bool roaring_bitmap_is_subset(IntPtr bitmap1, IntPtr bitmap2);
 
-    public static bool roaring_bitmap_is_strict_subset(IntPtr bitmap1, IntPtr bitmap2)
-    {
-        return roaring_bitmap_get_cardinality(bitmap2) > roaring_bitmap_get_cardinality(bitmap1) &&
-               roaring_bitmap_is_subset(bitmap1, bitmap2);
-    }
+    [DllImport("roaring")]
+    [return: MarshalAs(UnmanagedType.I1)]
+    public static extern bool roaring_bitmap_is_strict_subset(IntPtr bitmap1, IntPtr bitmap2);
 
     [DllImport("roaring")]
     public static extern uint roaring_bitmap_minimum(IntPtr bitmap);
