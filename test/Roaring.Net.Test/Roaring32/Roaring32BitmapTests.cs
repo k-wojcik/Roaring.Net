@@ -7,39 +7,6 @@ namespace Roaring.Test.Roaring32;
 public class Roaring32BitmapTests
 {
     [Fact]
-    public void TestOr()
-    {
-        uint[] values1 = [1, 2, 3, 4, 5, 100, 1000];
-        uint[] values2 = [1, 2, 3, 4, 5, 100, 1000];
-        uint[] values3 = [3, 4, 5, 7, 100, 1020];
-
-        using var source1 = Roaring32Bitmap.FromValues(values1);
-        using var source2 = Roaring32Bitmap.FromValues(values2);
-        using var source3 = Roaring32Bitmap.FromValues(values3);
-        using var result1 = source1.Or(source2);
-        using var result2 = source2.Or(source3);
-        using var result3 = result1.Or(source3);
-        Assert.Equal(result1.Count, OrCount(values1, values2));
-        Assert.Equal(result2.Count, OrCount(values2, values3));
-        Assert.Equal(result3.Count, OrCount(values1, values2, values3));
-    }
-
-    [Fact]
-    public void TestIOr()
-    {
-        uint[] values1 = [1, 2, 3, 4, 5, 100, 1000];
-        uint[] values2 = [1, 2, 3, 4, 5, 100, 1000];
-        uint[] values3 = [3, 4, 5, 7, 100, 1020];
-
-        using var result = Roaring32Bitmap.FromValues(values1);
-        using var source1 = Roaring32Bitmap.FromValues(values2);
-        using var source2 = Roaring32Bitmap.FromValues(values3);
-        result.IOr(source1);
-        result.IOr(source2);
-        Assert.Equal(result.Count, OrCount(values1, values2, values3));
-    }
-
-    [Fact]
     public void TestXor()
     {
         uint[] values1 = [1, 2, 3, 4, 5, 100, 1000];

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Roaring;
 
@@ -225,12 +226,38 @@ public unsafe class Roaring32Bitmap : IDisposable
 
     public Roaring32Bitmap Or(Roaring32Bitmap bitmap) =>
         new(NativeMethods.roaring_bitmap_or(_pointer, bitmap._pointer));
+    
+    public ulong OrCount(Roaring32Bitmap bitmap)
+        => NativeMethods.roaring_bitmap_or_cardinality(_pointer, bitmap._pointer);
+    
+    public Roaring32Bitmap OrMany(Roaring32Bitmap[] bitmaps)
+    {    
+        int length = bitmaps.Length + 1;
+        var pointers = new IntPtr[length];
+        for (int i = 0; i < bitmaps.Length; i++)
+        {
+            pointers[i] = bitmaps[i]._pointer;
+        }
+        pointers[length - 1] = _pointer;
+        
+        return new Roaring32Bitmap(NativeMethods.roaring_bitmap_or_many((uint)pointers.Length, pointers));
+    }
+
+    public Roaring32Bitmap OrManyHeap(Roaring32Bitmap[] bitmaps)
+    {
+        int length = bitmaps.Length + 1;
+        var pointers = new IntPtr[length];
+        for (int i = 0; i < bitmaps.Length; i++)
+        {
+            pointers[i] = bitmaps[i]._pointer;
+        }
+        pointers[length - 1] = _pointer;
+
+        return new Roaring32Bitmap(NativeMethods.roaring_bitmap_or_many_heap((uint)pointers.Length, pointers));
+    }
 
     public void IOr(Roaring32Bitmap bitmap)
         => NativeMethods.roaring_bitmap_or_inplace(_pointer, bitmap._pointer);
-
-    public ulong OrCardinality(Roaring32Bitmap bitmap)
-        => NativeMethods.roaring_bitmap_or_cardinality(_pointer, bitmap._pointer);
 
     public Roaring32Bitmap Xor(Roaring32Bitmap bitmap) =>
         new(NativeMethods.roaring_bitmap_xor(_pointer, bitmap._pointer));
@@ -241,21 +268,6 @@ public unsafe class Roaring32Bitmap : IDisposable
     public ulong XorCardinality(Roaring32Bitmap bitmap)
         => NativeMethods.roaring_bitmap_xor_cardinality(_pointer, bitmap._pointer);
 
-    public static Roaring32Bitmap OrMany(params Roaring32Bitmap[] bitmaps)
-    {
-        var pointers = new IntPtr[bitmaps.Length];
-        for (int i = 0; i < pointers.Length; i++)
-            pointers[i] = bitmaps[i]._pointer;
-        return new Roaring32Bitmap(NativeMethods.roaring_bitmap_or_many((uint)bitmaps.Length, pointers));
-    }
-
-    public static Roaring32Bitmap OrManyHeap(params Roaring32Bitmap[] bitmaps)
-    {
-        var pointers = new IntPtr[bitmaps.Length];
-        for (int i = 0; i < pointers.Length; i++)
-            pointers[i] = bitmaps[i]._pointer;
-        return new Roaring32Bitmap(NativeMethods.roaring_bitmap_or_many_heap((uint)bitmaps.Length, pointers));
-    }
 
     public static Roaring32Bitmap XorMany(params Roaring32Bitmap[] bitmaps)
     {
