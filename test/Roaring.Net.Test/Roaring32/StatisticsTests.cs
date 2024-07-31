@@ -155,7 +155,6 @@ public class StatisticsTests
         Assert.Equal(0U, actual.BitsetContainerValuesCount);
     }
     
-    
     [Fact]
     public void GetStatistics_ForArrayContainerTestData_ReturnsContainerBytes()
     {
