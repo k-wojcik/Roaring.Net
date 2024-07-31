@@ -14,9 +14,9 @@ public class MaintenanceTests
             using var testObject1 = Roaring32BitmapTestObject.GetForRange(0, 10_000);
             using var testObject2 = Roaring32BitmapTestObject.GetForRange(uint.MaxValue - 10_000, uint.MaxValue);
             using var testObject3 = Roaring32BitmapTestObject.GetForRange(uint.MaxValue - 10_000, uint.MaxValue);
+            using var temp = testObject1.Bitmap.LazyOr(testObject2.Bitmap, false);
        
             // Act
-            using var temp = testObject1.Bitmap.LazyOr(testObject2.Bitmap, false);
             using var actual = temp.LazyOr(testObject3.Bitmap, false);
 
             var countBeforeRepair = actual.Count;
@@ -152,6 +152,71 @@ public class MaintenanceTests
 
             // Assert
             Assert.Equal(0x16U, actual);
+        }
+    }
+    
+    public class IsValid
+    {
+        [Fact]
+        public void IsValid_BitmapIsValid_ReturnsTrue()
+        {
+            // Arrange
+            using var testObject = Roaring32BitmapTestObject.GetDefault();
+        
+            // Act
+            var actual = testObject.Bitmap.IsValid();
+
+            // Assert
+            Assert.True(actual);
+        }
+        
+        [Fact]
+        public void IsValid_BitmapIsNotValid_ReturnsFalse()
+        {
+            // Arrange
+            using var testObject1 = Roaring32BitmapTestObject.GetForRange(0, 10_000);
+            using var testObject2 = Roaring32BitmapTestObject.GetForRange(uint.MaxValue - 10_000, uint.MaxValue);
+            using var testObject3 = Roaring32BitmapTestObject.GetForRange(uint.MaxValue - 10_000, uint.MaxValue);
+            using var temp = testObject1.Bitmap.LazyOr(testObject2.Bitmap, false);
+            using var bitmap = temp.LazyOr(testObject3.Bitmap, false);
+            
+            // Act
+            var actual = bitmap.IsValid();
+
+            // Assert
+            Assert.False(actual);
+        }
+        
+        [Fact]
+        public void IsValid_WithReason_BitmapIsValid_ReturnsTrueAndNullReason()
+        {
+            // Arrange
+            using var testObject = Roaring32BitmapTestObject.GetDefault();
+        
+            // Act
+            var actual = testObject.Bitmap.IsValid(out var reason);
+
+            // Assert
+            Assert.True(actual);
+            Assert.Null(reason);
+        }
+        
+        [Fact]
+        public void IsValid_WithReason_BitmapIsNotValid_ReturnsFalseAndReason()
+        {
+            // Arrange
+            using var testObject1 = Roaring32BitmapTestObject.GetForRange(0, 10_000);
+            using var testObject2 = Roaring32BitmapTestObject.GetForRange(uint.MaxValue - 10_000, uint.MaxValue);
+            using var testObject3 = Roaring32BitmapTestObject.GetForRange(uint.MaxValue - 10_000, uint.MaxValue);
+            using var temp = testObject1.Bitmap.LazyOr(testObject2.Bitmap, false);
+            using var bitmap = temp.LazyOr(testObject3.Bitmap, false);
+            
+            // Act
+            var actual = bitmap.IsValid(out var reason);
+
+            // Assert
+            Assert.False(actual);
+            Assert.Equal("cardinality is incorrect", reason);
         }
     }
 }

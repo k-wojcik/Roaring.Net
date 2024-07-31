@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Roaring;
 
@@ -374,5 +375,14 @@ public unsafe class Roaring32Bitmap : IDisposable
     {
         NativeMethods.roaring_bitmap_statistics(_pointer, out var stats);
         return stats;
+    }
+
+    public bool IsValid() => IsValid(out _);
+    
+    public bool IsValid(out string reason)
+    {
+        var result =  NativeMethods.roaring_bitmap_internal_validate(_pointer, out var reasonPtr);
+        reason = Marshal.PtrToStringAnsi(reasonPtr);
+        return result;
     }
 }

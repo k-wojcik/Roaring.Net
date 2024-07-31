@@ -261,4 +261,8 @@ internal static unsafe class NativeMethods
 
     [DllImport("roaring")]
     public static extern void roaring_bitmap_statistics(IntPtr bitmap, out Statistics stats);
+    
+    [DllImport("roaring")]
+    [return: MarshalAs(UnmanagedType.I1)]
+    public static extern bool roaring_bitmap_internal_validate(IntPtr bitmap, out IntPtr reasonPtr);
 }
