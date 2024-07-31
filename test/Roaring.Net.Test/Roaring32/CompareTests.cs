@@ -6,9 +6,6 @@ public class CompareTests
 {
     public class Equals
     {
-
-
-
         [Fact]
         public void Equals_SameBitmap_ReturnsTrue()
         {
@@ -200,6 +197,37 @@ public class CompareTests
         
             // Act
             var actual = testObject1.Bitmap.IsStrictSubset(testObject2.Bitmap);
+        
+            // Assert
+            Assert.False(actual);
+        }
+    }
+    
+    public class HasIntersects
+    {
+        [Fact]
+        public void HasIntersection_IntersectsWithAtLeastOneValue_ReturnsTrue()
+        {
+            // Arrange
+            using var testObject1 = Roaring32BitmapTestObject.GetFromValues([0, 10, uint.MaxValue, 1]);
+            using var testObject2 = Roaring32BitmapTestObject.GetFromValues([5, 10, 11]);
+        
+            // Act
+            var actual = testObject1.Bitmap.HasIntersection(testObject2.Bitmap);
+        
+            // Assert
+            Assert.True(actual);
+        }
+        
+        [Fact]
+        public void HasIntersection_NoValuesIntersects_ReturnsFalse()
+        {
+            // Arrange
+            using var testObject1 = Roaring32BitmapTestObject.GetFromValues([0, 10, uint.MaxValue, 1]);
+            using var testObject2 = Roaring32BitmapTestObject.GetFromValues([5, 12, 11]);
+        
+            // Act
+            var actual = testObject1.Bitmap.HasIntersection(testObject2.Bitmap);
         
             // Assert
             Assert.False(actual);

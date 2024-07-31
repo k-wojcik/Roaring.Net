@@ -1,11 +1,46 @@
-﻿using Xunit;
+﻿using System.Linq;
+using Xunit;
 
 namespace Roaring.Test.Roaring32;
 
-public class PropertiesTests
+public class MetricsTests
 {
+    public class GetJaccardIndex
+    {
+        [Fact]
+        public void GetJaccardIndex_ForNotEmptyBitmaps_ReturnsJaccardIndex()
+        {
+            // Arrange
+            using var testObject1 = Roaring32BitmapTestObject.GetFromValues([1, 2, 3, int.MaxValue]);
+            using var testObject2 = Roaring32BitmapTestObject.GetFromValues([1, 2, 3, 5]);
+
+            // Act
+            var actual = testObject1.Bitmap.GetJaccardIndex(testObject2.Bitmap);
+
+            // Assert
+            var intersectCount = testObject1.Values.Intersect(testObject2.Values).Count();
+            var unionCount = testObject1.Values.Union(testObject2.Values).Count();
+            
+            Assert.Equal(intersectCount / (double)unionCount, actual);
+        }
+        
+        [Fact]
+        public void GetJaccardIndex_ForEmptyBitmaps_ReturnsNaN()
+        {
+            // Arrange
+            using var testObject1 = Roaring32BitmapTestObject.GetEmpty();
+            using var testObject2 = Roaring32BitmapTestObject.GetEmpty();
+
+            // Act
+            var actual = testObject1.Bitmap.GetJaccardIndex(testObject2.Bitmap);
+
+            // Assert
+            Assert.Equal(double.NaN, actual);
+        }
+    }
+
     public class IsEmpty
-    {  
+    {
         [Fact]
         public void IsEmpty_BitmapContainsValues_ReturnsFalse()
         {
@@ -32,7 +67,7 @@ public class PropertiesTests
             Assert.True(actual);
         }
     }
-    
+
     public class Min
     {
         [Fact]
@@ -64,7 +99,6 @@ public class PropertiesTests
 
     public class Max
     {
-    
         [Fact]
         public void Max_BitmapContainsValues_ReturnsMaxValue()
         {
@@ -91,7 +125,7 @@ public class PropertiesTests
             Assert.Null(actual);
         }
     }
-    
+
     public class SerializedBytes
     {
         [Fact]

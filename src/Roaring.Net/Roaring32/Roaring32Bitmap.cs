@@ -295,9 +295,11 @@ public unsafe class Roaring32Bitmap : IDisposable
     public void RepairAfterLazy()
         => NativeMethods.roaring_bitmap_repair_after_lazy(_pointer);
 
-    public bool Intersects(Roaring32Bitmap bitmap)
+    public bool HasIntersection(Roaring32Bitmap bitmap)
         => NativeMethods.roaring_bitmap_intersect(_pointer, bitmap._pointer);
 
+    // TODO roaring_bitmap_intersect_with_range
+    
     public double GetJaccardIndex(Roaring32Bitmap bitmap)
         => NativeMethods.roaring_bitmap_jaccard_index(_pointer, bitmap._pointer);
 
