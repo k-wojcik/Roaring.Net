@@ -319,7 +319,6 @@ public unsafe class Roaring32Bitmap : IDisposable
         switch (format)
         {
             case SerializationFormat.Normal:
-            default:
                 buffer = new byte[NativeMethods.roaring_bitmap_size_in_bytes(_pointer)];
                 NativeMethods.roaring_bitmap_serialize(_pointer, buffer);
                 break;
@@ -327,6 +326,8 @@ public unsafe class Roaring32Bitmap : IDisposable
                 buffer = new byte[NativeMethods.roaring_bitmap_portable_size_in_bytes(_pointer)];
                 NativeMethods.roaring_bitmap_portable_serialize(_pointer, buffer);
                 break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(format), format, "Not supported serialization format");
         }
 
         return buffer;
@@ -334,20 +335,18 @@ public unsafe class Roaring32Bitmap : IDisposable
 
     public static Roaring32Bitmap Deserialize(byte[] buffer, SerializationFormat format = SerializationFormat.Normal)
     {
-        IntPtr ptr;
-        switch (format)
+        var ptr = format switch
         {
-            case SerializationFormat.Normal:
-            default:
-                ptr = NativeMethods.roaring_bitmap_deserialize(buffer);
-                break;
-            case SerializationFormat.Portable:
-                ptr = NativeMethods.roaring_bitmap_portable_deserialize(buffer);
-                break;
-        }
+            SerializationFormat.Normal => NativeMethods.roaring_bitmap_deserialize(buffer),
+            SerializationFormat.Portable => NativeMethods.roaring_bitmap_portable_deserialize(buffer),
+            _ => throw new ArgumentOutOfRangeException(nameof(format), format, "Not supported serialization format")
+        };
 
         if (ptr == IntPtr.Zero)
+        {
             throw new InvalidOperationException("Deserialization failed");
+        }
+        
         return new Roaring32Bitmap(ptr);
     }
 
