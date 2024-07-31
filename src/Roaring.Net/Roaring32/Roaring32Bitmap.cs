@@ -14,7 +14,6 @@ public unsafe class Roaring32Bitmap : IDisposable
     public uint? Max => IsEmpty ? null : NativeMethods.roaring_bitmap_maximum(_pointer);
     public nuint SerializedBytes => NativeMethods.roaring_bitmap_size_in_bytes(_pointer);
     public nuint PortableSerializedBytes => NativeMethods.roaring_bitmap_portable_size_in_bytes(_pointer);
-
     public Roaring32Bitmap() => _pointer = NativeMethods.roaring_bitmap_create_with_capacity(0);
 
     public Roaring32Bitmap(uint capacity) => _pointer = NativeMethods.roaring_bitmap_create_with_capacity(capacity);
@@ -133,8 +132,6 @@ public unsafe class Roaring32Bitmap : IDisposable
     }
     
     public void Clear() => NativeMethods.roaring_bitmap_clear(_pointer);
-
-    // TODO roaring_bitmap_contains_bulk
     
     public bool Contains(uint value) => NativeMethods.roaring_bitmap_contains(_pointer, value);
 
@@ -297,8 +294,6 @@ public unsafe class Roaring32Bitmap : IDisposable
 
     public bool HasIntersection(Roaring32Bitmap bitmap)
         => NativeMethods.roaring_bitmap_intersect(_pointer, bitmap._pointer);
-
-    // TODO roaring_bitmap_intersect_with_range
     
     public double GetJaccardIndex(Roaring32Bitmap bitmap)
         => NativeMethods.roaring_bitmap_jaccard_index(_pointer, bitmap._pointer);
