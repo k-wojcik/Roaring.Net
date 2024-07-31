@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace Roaring;
 
@@ -258,36 +257,40 @@ public unsafe class Roaring32Bitmap : IDisposable
 
     public void IOr(Roaring32Bitmap bitmap)
         => NativeMethods.roaring_bitmap_or_inplace(_pointer, bitmap._pointer);
+    
+    public Roaring32Bitmap LazyOr(Roaring32Bitmap bitmap, bool bitsetConversion) =>
+        new(NativeMethods.roaring_bitmap_lazy_or(_pointer, bitmap._pointer, bitsetConversion));
 
+    public void ILazyOr(Roaring32Bitmap bitmap, bool bitsetConversion)
+        => NativeMethods.roaring_bitmap_lazy_or_inplace(_pointer, bitmap._pointer, bitsetConversion);
+    
     public Roaring32Bitmap Xor(Roaring32Bitmap bitmap) =>
         new(NativeMethods.roaring_bitmap_xor(_pointer, bitmap._pointer));
 
     public void IXor(Roaring32Bitmap bitmap)
         => NativeMethods.roaring_bitmap_xor_inplace(_pointer, bitmap._pointer);
 
-    public ulong XorCardinality(Roaring32Bitmap bitmap)
+    public ulong XorCount(Roaring32Bitmap bitmap)
         => NativeMethods.roaring_bitmap_xor_cardinality(_pointer, bitmap._pointer);
-
-
-    public static Roaring32Bitmap XorMany(params Roaring32Bitmap[] bitmaps)
+    
+    public Roaring32Bitmap XorMany(params Roaring32Bitmap[] bitmaps)
     {
-        var pointers = new IntPtr[bitmaps.Length];
-        for (int i = 0; i < pointers.Length; i++)
+        int length = bitmaps.Length + 1;
+        var pointers = new IntPtr[length];
+        for (int i = 0; i < bitmaps.Length; i++)
+        {
             pointers[i] = bitmaps[i]._pointer;
-        return new Roaring32Bitmap(NativeMethods.roaring_bitmap_xor_many((uint)bitmaps.Length, pointers));
+        }
+        pointers[length - 1] = _pointer;
+        
+        return new Roaring32Bitmap(NativeMethods.roaring_bitmap_xor_many((uint)pointers.Length, pointers));
     }
+    
+    public Roaring32Bitmap LazyXor(Roaring32Bitmap bitmap)
+        => new(NativeMethods.roaring_bitmap_lazy_xor(_pointer, bitmap._pointer));
 
-    public Roaring32Bitmap LazyOr(Roaring32Bitmap bitmap, bool bitsetConversion) =>
-        new(NativeMethods.roaring_bitmap_lazy_or(_pointer, bitmap._pointer, bitsetConversion));
-
-    public void ILazyOr(Roaring32Bitmap bitmap, bool bitsetConversion)
-        => NativeMethods.roaring_bitmap_lazy_or_inplace(_pointer, bitmap._pointer, bitsetConversion);
-
-    public Roaring32Bitmap LazyXor(Roaring32Bitmap bitmap, bool bitsetConversion)
-        => new(NativeMethods.roaring_bitmap_lazy_xor(_pointer, bitmap._pointer, bitsetConversion));
-
-    public void ILazyXor(Roaring32Bitmap bitmap, bool bitsetConversion)
-        => NativeMethods.roaring_bitmap_lazy_xor_inplace(_pointer, bitmap._pointer, bitsetConversion);
+    public void ILazyXor(Roaring32Bitmap bitmap)
+        => NativeMethods.roaring_bitmap_lazy_xor_inplace(_pointer, bitmap._pointer);
 
     public void RepairAfterLazy()
         => NativeMethods.roaring_bitmap_repair_after_lazy(_pointer);

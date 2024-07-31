@@ -164,10 +164,10 @@ internal static unsafe class NativeMethods
     public static extern void roaring_bitmap_lazy_or_inplace(IntPtr bitmap1, IntPtr bitmap2, bool bitsetConversion);
 
     [DllImport("roaring")]
-    public static extern IntPtr roaring_bitmap_lazy_xor(IntPtr bitmap1, IntPtr bitmap2, bool bitsetConversion);
+    public static extern IntPtr roaring_bitmap_lazy_xor(IntPtr bitmap1, IntPtr bitmap2);
 
     [DllImport("roaring")]
-    public static extern void roaring_bitmap_lazy_xor_inplace(IntPtr bitmap1, IntPtr bitmap2, bool bitsetConversion);
+    public static extern void roaring_bitmap_lazy_xor_inplace(IntPtr bitmap1, IntPtr bitmap2);
 
     [DllImport("roaring")]
     public static extern IntPtr roaring_bitmap_repair_after_lazy(IntPtr bitmap);
