@@ -211,7 +211,7 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --no-restore --configuration Release -p:Version="${{ env.VERSION }}"
+      run: dotnet build --no-restore --configuration Release -p:Version="${{ env.VERSION }}" /p:TreatWarningsAsErrors=true
 
     - name: Test
       run: dotnet test --no-build --configuration Release

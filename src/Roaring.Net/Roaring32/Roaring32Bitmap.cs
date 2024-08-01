@@ -15,12 +15,22 @@ public unsafe class Roaring32Bitmap : IDisposable
     public uint? Max => IsEmpty ? null : NativeMethods.roaring_bitmap_maximum(_pointer);
     public nuint SerializedBytes => NativeMethods.roaring_bitmap_size_in_bytes(_pointer);
     public nuint PortableSerializedBytes => NativeMethods.roaring_bitmap_portable_size_in_bytes(_pointer);
-    public Roaring32Bitmap() => _pointer = NativeMethods.roaring_bitmap_create_with_capacity(0);
+    public Roaring32Bitmap() => _pointer = CheckBitmapPointer(NativeMethods.roaring_bitmap_create_with_capacity(0));
 
-    public Roaring32Bitmap(uint capacity) => _pointer = NativeMethods.roaring_bitmap_create_with_capacity(capacity);
+    public Roaring32Bitmap(uint capacity) => _pointer = CheckBitmapPointer(NativeMethods.roaring_bitmap_create_with_capacity(capacity));
     public Roaring32Bitmap(uint[] values) => _pointer = CreatePtrFromValues(values, 0, (uint)values.Length);
 
     private Roaring32Bitmap(IntPtr pointer) => _pointer = pointer;
+
+    private static IntPtr CheckBitmapPointer(IntPtr? pointer)
+    {
+        if (pointer == null || pointer == IntPtr.Zero)
+        {
+            throw new InvalidOperationException("Cannot allocate bitmap.");
+        }
+        
+        return pointer.Value;
+    }
 
     public static Roaring32Bitmap FromRange(uint min, uint max, uint step = 1)
     {
@@ -34,7 +44,7 @@ public unsafe class Roaring32Bitmap : IDisposable
             throw new ArgumentOutOfRangeException(nameof(step), step, "The step cannot be equal to 0.");
         }
        
-        return new(NativeMethods.roaring_bitmap_from_range(min, (ulong)max + 1, step));
+        return new(CheckBitmapPointer(NativeMethods.roaring_bitmap_from_range(min, (ulong)max + 1, step)));
     }
 
     public static Roaring32Bitmap FromValues(uint[] values) => FromValues(values, 0U, (uint)values.Length);
@@ -51,7 +61,7 @@ public unsafe class Roaring32Bitmap : IDisposable
 
         fixed (uint* valuePtr = values)
         {
-            return NativeMethods.roaring_bitmap_of_ptr(count, valuePtr + offset);
+            return CheckBitmapPointer(NativeMethods.roaring_bitmap_of_ptr(count, valuePtr + offset));
         }
     }
 
@@ -72,7 +82,7 @@ public unsafe class Roaring32Bitmap : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    public Roaring32Bitmap Clone() => new(NativeMethods.roaring_bitmap_copy(_pointer));
+    public Roaring32Bitmap Clone() => new(CheckBitmapPointer(NativeMethods.roaring_bitmap_copy(_pointer)));
 
     public void Add(uint value) => NativeMethods.roaring_bitmap_add(_pointer, value);
 
@@ -146,7 +156,7 @@ public unsafe class Roaring32Bitmap : IDisposable
         return NativeMethods.roaring_bitmap_contains_range(_pointer, min, (ulong)max + 1);
     }
 
-    public bool ValueEquals(Roaring32Bitmap bitmap)
+    public bool ValueEquals(Roaring32Bitmap? bitmap)
     {
         if (bitmap == null)
         {
@@ -156,7 +166,7 @@ public unsafe class Roaring32Bitmap : IDisposable
         return NativeMethods.roaring_bitmap_equals(_pointer, bitmap._pointer);
     }
 
-    public bool IsSubsetOf(Roaring32Bitmap bitmap)
+    public bool IsSubsetOf(Roaring32Bitmap? bitmap)
     {
         if (bitmap == null)
         {
@@ -166,7 +176,7 @@ public unsafe class Roaring32Bitmap : IDisposable
         return NativeMethods.roaring_bitmap_is_subset(_pointer, bitmap._pointer);
     }
 
-    public bool IsProperSubsetOf(Roaring32Bitmap bitmap)
+    public bool IsProperSubsetOf(Roaring32Bitmap? bitmap)
     {
         if (bitmap == null)
         {
@@ -176,7 +186,7 @@ public unsafe class Roaring32Bitmap : IDisposable
         return NativeMethods.roaring_bitmap_is_strict_subset(_pointer, bitmap._pointer);
     }
     
-    public bool IsSupersetOf(Roaring32Bitmap bitmap)
+    public bool IsSupersetOf(Roaring32Bitmap? bitmap)
     {
         if (bitmap == null)
         {
@@ -192,7 +202,7 @@ public unsafe class Roaring32Bitmap : IDisposable
         return NativeMethods.roaring_bitmap_is_subset(bitmap._pointer, _pointer);
     }
     
-    public bool IsProperSupersetOf(Roaring32Bitmap bitmap)
+    public bool IsProperSupersetOf(Roaring32Bitmap? bitmap)
     {
         if (bitmap == null)
         {
@@ -212,7 +222,7 @@ public unsafe class Roaring32Bitmap : IDisposable
     public ulong CountLessOrEqualTo(uint value) => NativeMethods.roaring_bitmap_rank(_pointer, value);
     public long GetIndex(uint value) => NativeMethods.roaring_bitmap_get_index(_pointer, value);
 
-    public Roaring32Bitmap Not() => new(NativeMethods.roaring_bitmap_flip(_pointer, uint.MinValue, uint.MaxValue + 1UL));
+    public Roaring32Bitmap Not() => new(CheckBitmapPointer(NativeMethods.roaring_bitmap_flip(_pointer, uint.MinValue, uint.MaxValue + 1UL)));
     public void INot() => NativeMethods.roaring_bitmap_flip_inplace(_pointer, uint.MinValue, uint.MaxValue + 1UL);
 
     public Roaring32Bitmap Not(ulong start, ulong end)
@@ -222,7 +232,7 @@ public unsafe class Roaring32Bitmap : IDisposable
             throw new ArgumentOutOfRangeException(nameof(start), start, "The start value cannot be greater than the end value.");
         }
      
-        return new(NativeMethods.roaring_bitmap_flip(_pointer, start, end + 1));
+        return new(CheckBitmapPointer(NativeMethods.roaring_bitmap_flip(_pointer, start, end + 1)));
     }
 
     public void INot(ulong start, ulong end)
@@ -321,7 +331,7 @@ public unsafe class Roaring32Bitmap : IDisposable
 
     public void ILazyXor(Roaring32Bitmap bitmap)
         => NativeMethods.roaring_bitmap_lazy_xor_inplace(_pointer, bitmap._pointer);
-
+    
     public void RepairAfterLazy()
         => NativeMethods.roaring_bitmap_repair_after_lazy(_pointer);
 
@@ -411,7 +421,7 @@ public unsafe class Roaring32Bitmap : IDisposable
 
     public bool IsValid() => IsValid(out _);
     
-    public bool IsValid(out string reason)
+    public bool IsValid(out string? reason)
     {
         var result =  NativeMethods.roaring_bitmap_internal_validate(_pointer, out var reasonPtr);
         reason = Marshal.PtrToStringAnsi(reasonPtr);

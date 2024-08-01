@@ -227,18 +227,20 @@ internal static unsafe class NativeMethods
 
     public static bool roaring_iterate(IntPtr bitmap, Func<uint, bool> iterator)
     {
-        return roaring_iterate(bitmap, (v, t) => iterator(v), IntPtr.Zero);
+        return roaring_iterate(bitmap, (v, _) => iterator(v), IntPtr.Zero);
     }
 
     public delegate bool IteratorDelegate(uint value, IntPtr tag);
 
     [DllImport("roaring")]
     [return: MarshalAs(UnmanagedType.I1)]
+    // ReSharper disable once InconsistentNaming
     public static extern bool roaring_iterate64(IntPtr bitmap, IteratorDelegate iterator, ulong high_bits, IntPtr tag);
 
+    // ReSharper disable once InconsistentNaming
     public static bool roaring_iterate64(IntPtr bitmap, Func<uint, bool> iterator, ulong high_bits)
     {
-        return roaring_iterate64(bitmap, (v, t) => iterator(v), high_bits, IntPtr.Zero);
+        return roaring_iterate64(bitmap, (v, _) => iterator(v), high_bits, IntPtr.Zero);
     }
 
     public delegate bool IteratorDelegate64(uint value, IntPtr tag);

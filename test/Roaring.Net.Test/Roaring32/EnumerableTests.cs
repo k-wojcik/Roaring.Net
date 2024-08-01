@@ -185,7 +185,7 @@ public class EnumerableTests
         public void Values_Destructor_InvokesDispose()
         {
             // Arrange
-            WeakReference<IEnumerable<uint>> weakReference = null;
+            WeakReference<IEnumerable<uint>>? weakReference = null;
             var dispose = () =>
             {
                 using var testObject = Roaring32BitmapTestObject.GetDefault();
@@ -199,6 +199,7 @@ public class EnumerableTests
             GC.WaitForPendingFinalizers();
 
             // Assert
+            Assert.NotNull(weakReference);
             weakReference.TryGetTarget(out var target);
             Assert.Throws<ObjectDisposedException>(() => target?.GetEnumerator().Current);
         }

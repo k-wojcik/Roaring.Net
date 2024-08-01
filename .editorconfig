@@ -1,0 +1,10 @@
+# Code files
+[*.{cs}]
+
+# Simplify name (IDE0001)
+dotnet_diagnostic.IDE0001.severity = warning
+
+# 'var' preferences (IDE0007 and IDE0008)
+dotnet_diagnostic.IDE0008.severity = warning
+
+dotnet_diagnostic.IDE0090.severity = warning

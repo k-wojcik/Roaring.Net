@@ -27,7 +27,13 @@ internal sealed unsafe class Roaring32Enumerator : IEnumerator<uint>, IEnumerabl
 
     public Roaring32Enumerator(IntPtr bitmap)
     {
-        _iterator = (NativeMethods.Iterator*)NativeMethods.roaring_iterator_create(bitmap);
+        var ptr = NativeMethods.roaring_iterator_create(bitmap);
+        if (ptr == IntPtr.Zero)
+        {
+            throw new InvalidOperationException("Cannot allocate iterator.");
+        }
+        
+        _iterator = (NativeMethods.Iterator*)ptr;
         _isFirst = true;
     }
 
