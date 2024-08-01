@@ -22,14 +22,14 @@ public unsafe class Roaring32Bitmap : IDisposable
 
     private Roaring32Bitmap(IntPtr pointer) => _pointer = pointer;
 
-    private static IntPtr CheckBitmapPointer(IntPtr? pointer)
+    private static IntPtr CheckBitmapPointer(IntPtr pointer)
     {
-        if (pointer == null || pointer == IntPtr.Zero)
+        if (pointer == IntPtr.Zero)
         {
             throw new InvalidOperationException("Cannot allocate bitmap.");
         }
         
-        return pointer.Value;
+        return pointer;
     }
 
     public static Roaring32Bitmap FromRange(uint min, uint max, uint step = 1)
