@@ -4,230 +4,428 @@ namespace Roaring.Test.Roaring32;
 
 public class CompareTests
 {
-    public class Equals
+    public class ValueEquals
     {
         [Fact]
-        public void Equals_SameBitmap_ReturnsTrue()
+        public void ValueEquals_SameBitmap_ReturnsTrue()
         {
             // Arrange
             using var testObject = Roaring32BitmapTestObject.GetEmpty();
 
             // Act
-            var actual = testObject.Bitmap.Equals(testObject.Bitmap);
+            var actual = testObject.Bitmap.ValueEquals(testObject.Bitmap);
 
             // Assert
             Assert.True(actual);
         }
 
         [Fact]
-        public void Equals_BitmapsHaveSameValues_ReturnsTrue()
+        public void ValueEquals_BitmapsHaveSameValues_ReturnsTrue()
         {
             // Arrange
             using var testObject1 = Roaring32BitmapTestObject.GetFromValues([0, 10]);
             using var testObject2 = Roaring32BitmapTestObject.GetFromValues([0, 10]);
 
             // Act
-            var actual = testObject1.Bitmap.Equals(testObject2.Bitmap);
+            var actual = testObject1.Bitmap.ValueEquals(testObject2.Bitmap);
 
             // Assert
             Assert.True(actual);
         }
 
         [Fact]
-        public void Equals_BitmapsHaveDifferentValues_ReturnsFalse()
+        public void ValueEquals_BitmapsHaveDifferentValues_ReturnsFalse()
         {
             // Arrange
             using var testObject1 = Roaring32BitmapTestObject.GetFromValues([0, 10]);
             using var testObject2 = Roaring32BitmapTestObject.GetFromValues([0, 10, 20]);
 
             // Act
-            var actual = testObject1.Bitmap.Equals(testObject2.Bitmap);
+            var actual = testObject1.Bitmap.ValueEquals(testObject2.Bitmap);
 
             // Assert
             Assert.False(actual);
         }
 
         [Fact]
-        public void Equals_BitmapIsNull_ReturnsFalse()
+        public void ValueEquals_BitmapIsNull_ReturnsFalse()
         {
             // Arrange
             using var testObject1 = Roaring32BitmapTestObject.GetEmpty();
 
             // Act
-            var actual = testObject1.Bitmap.Equals(null);
+            var actual = testObject1.Bitmap.ValueEquals(null);
 
             // Assert
             Assert.False(actual);
         }
     }
 
-    public class IsSubset
+    public class IsSubsetOf
     {
         [Fact]
-        public void IsSubset_BitmapIsNull_ReturnsFalse()
+        public void IsSubsetOf_BitmapIsNull_ReturnsFalse()
         {
             // Arrange
             using var testObject = Roaring32BitmapTestObject.GetEmpty();
 
             // Act
-            var actual = testObject.Bitmap.IsSubset(null);
+            var actual = testObject.Bitmap.IsSubsetOf(null);
 
             // Assert
             Assert.False(actual);
         }
 
         [Fact]
-        public void IsSubset_SameBitmap_ReturnsTrue()
+        public void IsSubsetOf_SameBitmap_ReturnsTrue()
         {
             // Arrange
             using var testObject = Roaring32BitmapTestObject.GetEmpty();
 
             // Act
-            var actual = testObject.Bitmap.IsSubset(testObject.Bitmap);
+            var actual = testObject.Bitmap.IsSubsetOf(testObject.Bitmap);
+
+            // Assert
+            Assert.True(actual);
+        }
+        
+        [Fact]
+        public void IsSubsetOf_EmptyBitmaps_ReturnsFalse()
+        {
+            // Arrange
+            using var testObject1 = Roaring32BitmapTestObject.GetEmpty();
+            using var testObject2 = Roaring32BitmapTestObject.GetEmpty();
+
+            // Act
+            var actual = testObject1.Bitmap.IsSubsetOf(testObject2.Bitmap);
 
             // Assert
             Assert.True(actual);
         }
 
         [Fact]
-        public void IsSubset_BitmapsHaveSameValues_ReturnsTrue()
+        public void IsSubsetOf_BitmapsHaveSameValues_ReturnsTrue()
         {
             // Arrange
             using var testObject1 = Roaring32BitmapTestObject.GetFromValues([0, 10]);
             using var testObject2 = Roaring32BitmapTestObject.GetFromValues([0, 10]);
 
             // Act
-            var actual = testObject1.Bitmap.IsSubset(testObject2.Bitmap);
+            var actual = testObject1.Bitmap.IsSubsetOf(testObject2.Bitmap);
 
             // Assert
             Assert.True(actual);
         }
 
         [Fact]
-        public void IsSubset_BitmapsIsSubsetOfSecondBitmap_ReturnsTrue()
+        public void IsSubsetOf_SecondBitmapContainsAllValuesOfBitmap_ReturnsTrue()
         {
             // Arrange
             using var testObject1 = Roaring32BitmapTestObject.GetFromValues([0, 10]);
             using var testObject2 = Roaring32BitmapTestObject.GetFromValues([0, 10, 20]);
         
             // Act
-            var actual = testObject1.Bitmap.IsSubset(testObject2.Bitmap);
+            var actual = testObject1.Bitmap.IsSubsetOf(testObject2.Bitmap);
         
             // Assert
             Assert.True(actual);
         }
         
         [Fact]
-        public void IsSubset_SomeValuesMissingInSecondBitmap_ReturnsFalse()
+        public void IsSubsetOf_SecondBitmapNotContainsSomeValuesOfBitmap_ReturnsFalse()
         {
             // Arrange
             using var testObject1 = Roaring32BitmapTestObject.GetFromValues([0, 10]);
             using var testObject2 = Roaring32BitmapTestObject.GetFromValues([0]);
         
             // Act
-            var actual = testObject1.Bitmap.IsSubset(testObject2.Bitmap);
+            var actual = testObject1.Bitmap.IsSubsetOf(testObject2.Bitmap);
         
             // Assert
             Assert.False(actual);
         }
     }
 
-    public class IsStrictSubset
+    public class IsProperSubsetOf
     {
         [Fact]
-        public void IsStrictSubset_BitmapIsNull_ReturnsFalse()
+        public void IsProperSubsetOf_BitmapIsNull_ReturnsFalse()
         {
             // Arrange
             using var testObject = Roaring32BitmapTestObject.GetEmpty();
 
             // Act
-            var actual = testObject.Bitmap.IsStrictSubset(null);
+            var actual = testObject.Bitmap.IsProperSubsetOf(null);
 
             // Assert
             Assert.False(actual);
         }
         
         [Fact]
-        public void IsStrictSubset_SameBitmap_ReturnsFalse()
+        public void IsProperSubsetOf_SameBitmap_ReturnsFalse()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+            using var testObject = Roaring32BitmapTestObject.GetFromValues([1]);
 
             // Act
-            var actual = testObject.Bitmap.IsStrictSubset(testObject.Bitmap);
+            var actual = testObject.Bitmap.IsProperSubsetOf(testObject.Bitmap);
+
+            // Assert
+            Assert.False(actual);
+        }
+        
+        [Fact]
+        public void IsProperSubsetOf_EmptyBitmaps_ReturnsFalse()
+        {
+            // Arrange
+            using var testObject1 = Roaring32BitmapTestObject.GetEmpty();
+            using var testObject2 = Roaring32BitmapTestObject.GetEmpty();
+
+            // Act
+            var actual = testObject1.Bitmap.IsProperSubsetOf(testObject2.Bitmap);
 
             // Assert
             Assert.False(actual);
         }
 
         [Fact]
-        public void IsStrictSubset_BitmapsHaveSameValues_ReturnsFalse()
+        public void IsProperSubsetOf_BitmapsHaveSameValues_ReturnsFalse()
         {
             // Arrange
             using var testObject1 = Roaring32BitmapTestObject.GetFromValues([0, 10]);
             using var testObject2 = Roaring32BitmapTestObject.GetFromValues([0, 10]);
 
             // Act
-            var actual = testObject1.Bitmap.IsStrictSubset(testObject2.Bitmap);
+            var actual = testObject1.Bitmap.IsProperSubsetOf(testObject2.Bitmap);
 
             // Assert
             Assert.False(actual);
         }
     
         [Fact]
-        public void IsStrictSubset_BitmapsIsSubsetOfSecondBitmap_ReturnsTrue()
+        public void IsProperSubsetOf_SecondBitmapContainsAllValuesOfBitmap_ReturnsTrue()
         {
             // Arrange
             using var testObject1 = Roaring32BitmapTestObject.GetFromValues([0, 10]);
             using var testObject2 = Roaring32BitmapTestObject.GetFromValues([0, 10, 20]);
         
             // Act
-            var actual = testObject1.Bitmap.IsStrictSubset(testObject2.Bitmap);
+            var actual = testObject1.Bitmap.IsProperSubsetOf(testObject2.Bitmap);
         
             // Assert
             Assert.True(actual);
         }
     
         [Fact]
-        public void IsStrictSubset_SomeValuesMissingInSecondBitmap_ReturnsFalse()
+        public void IsProperSubsetOf_SecondBitmapNotContainsSomeValuesOfBitmap_ReturnsFalse()
         {
             // Arrange
             using var testObject1 = Roaring32BitmapTestObject.GetFromValues([0, 10]);
             using var testObject2 = Roaring32BitmapTestObject.GetFromValues([0]);
         
             // Act
-            var actual = testObject1.Bitmap.IsStrictSubset(testObject2.Bitmap);
+            var actual = testObject1.Bitmap.IsProperSubsetOf(testObject2.Bitmap);
         
             // Assert
             Assert.False(actual);
         }
     }
     
-    public class HasIntersects
+    public class IsSupersetOf
     {
         [Fact]
-        public void HasIntersection_IntersectsWithAtLeastOneValue_ReturnsTrue()
+        public void IsSupersetOf_BitmapIsNull_ReturnsFalse()
+        {
+            // Arrange
+            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+
+            // Act
+            var actual = testObject.Bitmap.IsSupersetOf(null);
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        public void IsSupersetOf_SameBitmap_ReturnsTrue()
+        {
+            // Arrange
+            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+
+            // Act
+            var actual = testObject.Bitmap.IsSupersetOf(testObject.Bitmap);
+
+            // Assert
+            Assert.True(actual);
+        }
+        
+        [Fact]
+        public void IsSupersetOf_EmptyBitmaps_ReturnsTrue()
+        {
+            // Arrange
+            using var testObject1 = Roaring32BitmapTestObject.GetEmpty();
+            using var testObject2 = Roaring32BitmapTestObject.GetEmpty();
+
+            // Act
+            var actual = testObject1.Bitmap.IsSupersetOf(testObject2.Bitmap);
+
+            // Assert
+            Assert.True(actual);
+        }
+
+        [Fact]
+        public void IsSupersetOf_BitmapsHaveSameValues_ReturnsTrue()
+        {
+            // Arrange
+            using var testObject1 = Roaring32BitmapTestObject.GetFromValues([0, 10]);
+            using var testObject2 = Roaring32BitmapTestObject.GetFromValues([0, 10]);
+
+            // Act
+            var actual = testObject1.Bitmap.IsSubsetOf(testObject2.Bitmap);
+
+            // Assert
+            Assert.True(actual);
+        }
+
+        [Fact]
+        public void IsSupersetOf_BitmapContainsAllValuesOfSecondBitmap_ReturnsTrue()
+        {
+            // Arrange
+            using var testObject1 = Roaring32BitmapTestObject.GetFromValues([0, 10, 20 ]);
+            using var testObject2 = Roaring32BitmapTestObject.GetFromValues([0, 10]);
+        
+            // Act
+            var actual = testObject1.Bitmap.IsSupersetOf(testObject2.Bitmap);
+        
+            // Assert
+            Assert.True(actual);
+        }
+        
+        [Fact]
+        public void IsSupersetOf_BitmapNotContainsSomeValuesOfSecondBitmap_ReturnsFalse()
+        {
+            // Arrange
+            using var testObject1 = Roaring32BitmapTestObject.GetFromValues([0, 10]);
+            using var testObject2 = Roaring32BitmapTestObject.GetFromValues([0, 10, 20]);
+        
+            // Act
+            var actual = testObject1.Bitmap.IsSupersetOf(testObject2.Bitmap);
+        
+            // Assert
+            Assert.False(actual);
+        }
+    }
+    
+    public class IsProperSupersetOf
+    {
+        [Fact]
+        public void IsProperSupersetOf_BitmapIsNull_ReturnsFalse()
+        {
+            // Arrange
+            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+
+            // Act
+            var actual = testObject.Bitmap.IsProperSupersetOf(null);
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        public void IsProperSupersetOf_SameBitmap_ReturnsFalse()
+        {
+            // Arrange
+            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+
+            // Act
+            var actual = testObject.Bitmap.IsProperSupersetOf(testObject.Bitmap);
+
+            // Assert
+            Assert.False(actual);
+        }
+        
+        [Fact]
+        public void IsProperSupersetOf_EmptyBitmaps_ReturnsTrue()
+        {
+            // Arrange
+            using var testObject1 = Roaring32BitmapTestObject.GetEmpty();
+            using var testObject2 = Roaring32BitmapTestObject.GetEmpty();
+
+            // Act
+            var actual = testObject1.Bitmap.IsProperSupersetOf(testObject2.Bitmap);
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        public void IsProperSupersetOf_BitmapsHaveSameValues_ReturnsFalse()
+        {
+            // Arrange
+            using var testObject1 = Roaring32BitmapTestObject.GetFromValues([0, 10]);
+            using var testObject2 = Roaring32BitmapTestObject.GetFromValues([0, 10]);
+
+            // Act
+            var actual = testObject1.Bitmap.IsProperSupersetOf(testObject2.Bitmap);
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        public void IsProperSupersetOf_BitmapContainsAllValuesOfSecondBitmap_ReturnsTrue()
+        {
+            // Arrange
+            using var testObject1 = Roaring32BitmapTestObject.GetFromValues([0, 10, 20]);
+            using var testObject2 = Roaring32BitmapTestObject.GetFromValues([0, 10]);
+        
+            // Act
+            var actual = testObject1.Bitmap.IsProperSupersetOf(testObject2.Bitmap);
+        
+            // Assert
+            Assert.True(actual);
+        }
+        
+        [Fact]
+        public void IsProperSupersetOf_BitmapNotContainsSomeValuesOfSecondBitmap_ReturnsFalse()
+        {
+            // Arrange
+            using var testObject1 = Roaring32BitmapTestObject.GetFromValues([0, 10]);
+            using var testObject2 = Roaring32BitmapTestObject.GetFromValues([0, 10, 20]);
+        
+            // Act
+            var actual = testObject1.Bitmap.IsProperSupersetOf(testObject2.Bitmap);
+        
+            // Assert
+            Assert.False(actual);
+        }
+    }
+    
+    public class Overlaps
+    {
+        [Fact]
+        public void Overlaps_IntersectsWithAtLeastOneValue_ReturnsTrue()
         {
             // Arrange
             using var testObject1 = Roaring32BitmapTestObject.GetFromValues([0, 10, uint.MaxValue, 1]);
             using var testObject2 = Roaring32BitmapTestObject.GetFromValues([5, 10, 11]);
         
             // Act
-            var actual = testObject1.Bitmap.HasIntersection(testObject2.Bitmap);
+            var actual = testObject1.Bitmap.Overlaps(testObject2.Bitmap);
         
             // Assert
             Assert.True(actual);
         }
         
         [Fact]
-        public void HasIntersection_NoValuesIntersects_ReturnsFalse()
+        public void Overlaps_NoValuesIntersects_ReturnsFalse()
         {
             // Arrange
             using var testObject1 = Roaring32BitmapTestObject.GetFromValues([0, 10, uint.MaxValue, 1]);
             using var testObject2 = Roaring32BitmapTestObject.GetFromValues([5, 12, 11]);
         
             // Act
-            var actual = testObject1.Bitmap.HasIntersection(testObject2.Bitmap);
+            var actual = testObject1.Bitmap.Overlaps(testObject2.Bitmap);
         
             // Assert
             Assert.False(actual);

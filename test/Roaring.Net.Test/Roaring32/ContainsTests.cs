@@ -8,9 +8,6 @@ public class ContainsTests
 {
     public class Contains
     {
-
-
-
         [Fact]
         public void Contains_EmptyBitmap_ReturnFalse()
         {

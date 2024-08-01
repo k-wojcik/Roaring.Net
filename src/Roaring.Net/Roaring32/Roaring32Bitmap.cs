@@ -146,17 +146,17 @@ public unsafe class Roaring32Bitmap : IDisposable
         return NativeMethods.roaring_bitmap_contains_range(_pointer, min, (ulong)max + 1);
     }
 
-    public bool Equals(Roaring32Bitmap bitmap)
+    public bool ValueEquals(Roaring32Bitmap bitmap)
     {
         if (bitmap == null)
         {
             return false;
         }
-        
+
         return NativeMethods.roaring_bitmap_equals(_pointer, bitmap._pointer);
     }
 
-    public bool IsSubset(Roaring32Bitmap bitmap)
+    public bool IsSubsetOf(Roaring32Bitmap bitmap)
     {
         if (bitmap == null)
         {
@@ -165,8 +165,8 @@ public unsafe class Roaring32Bitmap : IDisposable
 
         return NativeMethods.roaring_bitmap_is_subset(_pointer, bitmap._pointer);
     }
-    
-    public bool IsStrictSubset(Roaring32Bitmap bitmap)
+
+    public bool IsProperSubsetOf(Roaring32Bitmap bitmap)
     {
         if (bitmap == null)
         {
@@ -175,7 +175,39 @@ public unsafe class Roaring32Bitmap : IDisposable
         
         return NativeMethods.roaring_bitmap_is_strict_subset(_pointer, bitmap._pointer);
     }
+    
+    public bool IsSupersetOf(Roaring32Bitmap bitmap)
+    {
+        if (bitmap == null)
+        {
+            return false;
+        }
 
+        if (NativeMethods.roaring_bitmap_get_cardinality(bitmap._pointer) >
+            NativeMethods.roaring_bitmap_get_cardinality(_pointer))
+        {
+            return false;
+        }
+        
+        return NativeMethods.roaring_bitmap_is_subset(bitmap._pointer, _pointer);
+    }
+    
+    public bool IsProperSupersetOf(Roaring32Bitmap bitmap)
+    {
+        if (bitmap == null)
+        {
+            return false;
+        }
+        
+        if (NativeMethods.roaring_bitmap_get_cardinality(bitmap._pointer) >=
+            NativeMethods.roaring_bitmap_get_cardinality(_pointer))
+        {
+            return false;
+        }
+        
+        return NativeMethods.roaring_bitmap_is_subset(bitmap._pointer, _pointer);
+    }
+    
     public bool TryGetValue(uint index, out uint value) => NativeMethods.roaring_bitmap_select(_pointer, index, out value);
     public ulong CountLessOrEqualTo(uint value) => NativeMethods.roaring_bitmap_rank(_pointer, value);
     public long GetIndex(uint value) => NativeMethods.roaring_bitmap_get_index(_pointer, value);
@@ -293,7 +325,7 @@ public unsafe class Roaring32Bitmap : IDisposable
     public void RepairAfterLazy()
         => NativeMethods.roaring_bitmap_repair_after_lazy(_pointer);
 
-    public bool HasIntersection(Roaring32Bitmap bitmap)
+    public bool Overlaps(Roaring32Bitmap bitmap)
         => NativeMethods.roaring_bitmap_intersect(_pointer, bitmap._pointer);
     
     public double GetJaccardIndex(Roaring32Bitmap bitmap)
