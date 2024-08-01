@@ -202,13 +202,13 @@ public class AddTests
         [Theory]
         [InlineData(1, 0)]
         [InlineData(10, 5)]
-        public void AddRange_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint min, uint max)
+        public void AddRange_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint start, uint end)
         {
             // Arrange
             using var testObject = Roaring32BitmapTestObject.GetEmpty();
 
             // Act && Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.AddRange(min, max));
+            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.AddRange(start, end));
         }
 
         [Theory]
@@ -217,16 +217,16 @@ public class AddTests
         [InlineData(0, 10)]
         [InlineData(uint.MaxValue - 1, uint.MaxValue)]
         [InlineData(uint.MaxValue, uint.MaxValue)]
-        public void AddRange_CorrectRange_BitmapContainsExpectedValues(uint min, uint max)
+        public void AddRange_CorrectRange_BitmapContainsExpectedValues(uint start, uint end)
         {
             // Arrange
             using var testObject = Roaring32BitmapTestObject.GetEmpty();
 
             // Act
-            testObject.Bitmap.AddRange(min, max);
+            testObject.Bitmap.AddRange(start, end);
 
             // Assert
-            var expected = Enumerable.Range((int)min, (int)(max - min + 1)) // 0..10
+            var expected = Enumerable.Range((int)start, (int)(end - start + 1)) // 0..10
                 .Select(x => (uint)x)
                 .ToList();
             var actual = testObject.Bitmap.Values.ToList();

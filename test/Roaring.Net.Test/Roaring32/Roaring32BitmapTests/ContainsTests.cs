@@ -55,13 +55,13 @@ public class ContainsTests
         [Theory]
         [InlineData(1, 0)]
         [InlineData(10, 5)]
-        public void ContainsRange_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint min, uint max)
+        public void ContainsRange_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint start, uint end)
         {
             // Arrange
             using var testObject = Roaring32BitmapTestObject.GetEmpty();
             
             // Act && Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.ContainsRange(min, max));
+            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.ContainsRange(start, end));
         }
         
         [Theory]
@@ -78,13 +78,13 @@ public class ContainsTests
         [InlineData(uint.MaxValue - 100,uint.MaxValue, uint.MaxValue, uint.MaxValue, true)]
         [InlineData(uint.MaxValue,uint.MaxValue, uint.MaxValue, uint.MaxValue, true)]
         [InlineData(uint.MaxValue - 1,uint.MaxValue - 1, uint.MaxValue, uint.MaxValue, false)]
-        public void ContainsRange_CorrectRange_ReturnsExpectedResult(uint minTest, uint maxTest, uint min, uint max, bool expected)
+        public void ContainsRange_CorrectRange_ReturnsExpectedResult(uint startTest, uint endTest, uint start, uint end, bool expected)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetForRange(minTest, maxTest);
+            using var testObject = Roaring32BitmapTestObject.GetForRange(startTest, endTest);
             
             // Act
-            var actual = testObject.Bitmap.ContainsRange(min, max);
+            var actual = testObject.Bitmap.ContainsRange(start, end);
 
             // Assert
             Assert.Equal(expected, actual);

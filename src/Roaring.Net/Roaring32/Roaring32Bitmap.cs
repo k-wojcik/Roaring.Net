@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace Roaring;
 
@@ -26,25 +28,25 @@ public unsafe class Roaring32Bitmap : IDisposable
     {
         if (pointer == IntPtr.Zero)
         {
-            throw new InvalidOperationException("Cannot allocate bitmap.");
+            throw new InvalidOperationException(ExceptionMessages.UnableToAllocateBitmap);
         }
         
         return pointer;
     }
 
-    public static Roaring32Bitmap FromRange(uint min, uint max, uint step = 1)
+    public static Roaring32Bitmap FromRange(uint start, uint end, uint step = 1)
     {
-        if (min > max)
+        if (start > end)
         {
-            throw new ArgumentOutOfRangeException(nameof(min), min, "The minimum value cannot be greater than the maximum value.");
+            throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
         }
         
         if (step == 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(step), step, "The step cannot be equal to 0.");
+            throw new ArgumentOutOfRangeException(nameof(step), step, ExceptionMessages.StepEqualToZero);
         }
        
-        return new(CheckBitmapPointer(NativeMethods.roaring_bitmap_from_range(min, (ulong)max + 1, step)));
+        return new(CheckBitmapPointer(NativeMethods.roaring_bitmap_from_range(start, (ulong)end + 1, step)));
     }
 
     public static Roaring32Bitmap FromValues(uint[] values) => FromValues(values, 0U, (uint)values.Length);
@@ -56,7 +58,7 @@ public unsafe class Roaring32Bitmap : IDisposable
     {
         if (values.Length < offset + count)
         {
-            throw new ArgumentOutOfRangeException(nameof(offset), offset, "Offset with count cannot be greater than the number of input elements.");
+            throw new ArgumentOutOfRangeException(nameof(offset), offset, ExceptionMessages.OffsetWithCountGreaterThanNumberOfValues);
         }
 
         fixed (uint* valuePtr = values)
@@ -92,7 +94,7 @@ public unsafe class Roaring32Bitmap : IDisposable
     {
         if (values.Length < offset + count)
         {
-            throw new ArgumentOutOfRangeException(nameof(offset), offset, "Offset with count cannot be greater than the number of input elements.");
+            throw new ArgumentOutOfRangeException(nameof(offset), offset, ExceptionMessages.OffsetWithCountGreaterThanNumberOfValues);
         }
         
         fixed (uint* valuePtr = values)
@@ -103,14 +105,14 @@ public unsafe class Roaring32Bitmap : IDisposable
     
     public bool TryAdd(uint value) => NativeMethods.roaring_bitmap_add_checked(_pointer, value);
 
-    public void AddRange(uint min, uint max)
+    public void AddRange(uint start, uint end)
     {
-        if (min > max)
+        if (start > end)
         {
-            throw new ArgumentOutOfRangeException(nameof(min), min, "The minimum value cannot be greater than or equal to the maximum value.");
+            throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
         }
         
-        NativeMethods.roaring_bitmap_add_range_closed(_pointer, min, max);
+        NativeMethods.roaring_bitmap_add_range_closed(_pointer, start, end);
     }
 
     public void Remove(uint value) => NativeMethods.roaring_bitmap_remove(_pointer, value);
@@ -121,7 +123,7 @@ public unsafe class Roaring32Bitmap : IDisposable
     {
         if (values.Length < offset + count)
         {
-            throw new ArgumentOutOfRangeException(nameof(offset), offset, "Offset with count cannot be greater than the number of input elements.");
+            throw new ArgumentOutOfRangeException(nameof(offset), offset, ExceptionMessages.OffsetWithCountGreaterThanNumberOfValues);
         }
       
         fixed (uint* valuePtr = values)
@@ -132,28 +134,28 @@ public unsafe class Roaring32Bitmap : IDisposable
     
     public bool TryRemove(uint value) => NativeMethods.roaring_bitmap_remove_checked(_pointer, value);
 
-    public void RemoveRange(uint min, uint max)
+    public void RemoveRange(uint start, uint end)
     {
-        if (min > max)
+        if (start > end)
         {
-            throw new ArgumentOutOfRangeException(nameof(min), min, "The minimum value cannot be greater than the maximum value.");
+            throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
         }
         
-        NativeMethods.roaring_bitmap_remove_range_closed(_pointer, min, max);
+        NativeMethods.roaring_bitmap_remove_range_closed(_pointer, start, end);
     }
     
     public void Clear() => NativeMethods.roaring_bitmap_clear(_pointer);
     
     public bool Contains(uint value) => NativeMethods.roaring_bitmap_contains(_pointer, value);
 
-    public bool ContainsRange(uint min, uint max)
+    public bool ContainsRange(uint start, uint end)
     {
-        if (min > max)
+        if (start > end)
         {
-            throw new ArgumentOutOfRangeException(nameof(min), min, "The minimum value cannot be greater than the maximum value.");
+            throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
         }
      
-        return NativeMethods.roaring_bitmap_contains_range(_pointer, min, (ulong)max + 1);
+        return NativeMethods.roaring_bitmap_contains_range(_pointer, start, (ulong)end + 1);
     }
 
     public bool ValueEquals(Roaring32Bitmap? bitmap)
@@ -229,7 +231,7 @@ public unsafe class Roaring32Bitmap : IDisposable
     {
         if (start > end)
         {
-            throw new ArgumentOutOfRangeException(nameof(start), start, "The start value cannot be greater than the end value.");
+            throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
         }
      
         return new(CheckBitmapPointer(NativeMethods.roaring_bitmap_flip(_pointer, start, end + 1)));
@@ -239,7 +241,7 @@ public unsafe class Roaring32Bitmap : IDisposable
     {
         if (start > end)
         {
-            throw new ArgumentOutOfRangeException(nameof(start), start, "The start value cannot be greater than the end value.");
+            throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
         }
 
         NativeMethods.roaring_bitmap_flip_inplace(_pointer, start, end + 1);
@@ -367,7 +369,7 @@ public unsafe class Roaring32Bitmap : IDisposable
                 NativeMethods.roaring_bitmap_portable_serialize(_pointer, buffer);
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(format), format, "Not supported serialization format");
+                throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat);
         }
 
         return buffer;
@@ -379,12 +381,12 @@ public unsafe class Roaring32Bitmap : IDisposable
         {
             SerializationFormat.Normal => NativeMethods.roaring_bitmap_deserialize(buffer),
             SerializationFormat.Portable => NativeMethods.roaring_bitmap_portable_deserialize(buffer),
-            _ => throw new ArgumentOutOfRangeException(nameof(format), format, "Not supported serialization format")
+            _ => throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat)
         };
 
         if (ptr == IntPtr.Zero)
         {
-            throw new InvalidOperationException("Deserialization failed");
+            throw new InvalidOperationException(ExceptionMessages.DeserializationFailedUnknownReason);
         }
         
         return new Roaring32Bitmap(ptr);

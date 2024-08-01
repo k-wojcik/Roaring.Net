@@ -153,13 +153,13 @@ public class RemoveTests
         [Theory]
         [InlineData(1, 0)]
         [InlineData(10, 5)]
-        public void RemoveRange_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint min, uint max)
+        public void RemoveRange_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint start, uint end)
         {
             // Arrange
             using var testObject = Roaring32BitmapTestObject.GetDefault();
 
             // Act && Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.RemoveRange(min, max));
+            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.RemoveRange(start, end));
         }
 
         [Theory]
@@ -174,16 +174,16 @@ public class RemoveTests
         [InlineData(uint.MaxValue - 100, uint.MaxValue, uint.MaxValue, uint.MaxValue)]
         [InlineData(uint.MaxValue, uint.MaxValue, uint.MaxValue, uint.MaxValue)]
         [InlineData(uint.MaxValue - 1, uint.MaxValue, uint.MaxValue, uint.MaxValue)]
-        public void RemoveRange_CorrectRange_BitmapRemovesRange(uint minTest, uint maxTest, uint min, uint max)
+        public void RemoveRange_CorrectRange_BitmapRemovesRange(uint startTest, uint endTest, uint start, uint end)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetForRange(minTest, maxTest);
+            using var testObject = Roaring32BitmapTestObject.GetForRange(startTest, endTest);
 
             // Act
-            testObject.Bitmap.RemoveRange(min, max);
+            testObject.Bitmap.RemoveRange(start, end);
 
             // Assert
-            var removedValues = Enumerable.Range((int)min, (int)(max - min + 1)) // 0..10
+            var removedValues = Enumerable.Range((int)start, (int)(end - start + 1)) // 0..10
                 .Select(x => (uint)x)
                 .ToList();
             var expected = testObject.Values.Except(removedValues);

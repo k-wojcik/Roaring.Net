@@ -16,7 +16,7 @@ internal sealed unsafe class Roaring32Enumerator : IEnumerator<uint>, IEnumerabl
         {
             if (_isDisposed)
             {
-                throw new ObjectDisposedException("Cannot access a disposed enumerator.");
+                throw new ObjectDisposedException(ExceptionMessages.DisposedEnumerator);
             }
 
             return _iterator->current_value;
@@ -30,7 +30,7 @@ internal sealed unsafe class Roaring32Enumerator : IEnumerator<uint>, IEnumerabl
         var ptr = NativeMethods.roaring_iterator_create(bitmap);
         if (ptr == IntPtr.Zero)
         {
-            throw new InvalidOperationException("Cannot allocate iterator.");
+            throw new InvalidOperationException(ExceptionMessages.UnableToAllocateBitmapIterator);
         }
         
         _iterator = (NativeMethods.Iterator*)ptr;
@@ -41,7 +41,7 @@ internal sealed unsafe class Roaring32Enumerator : IEnumerator<uint>, IEnumerabl
     {
         if (_isDisposed)
         {
-            throw new ObjectDisposedException("Cannot access a disposed enumerator.");
+            throw new ObjectDisposedException(ExceptionMessages.DisposedEnumerator);
         }
 
         if (_isFirst)
@@ -53,7 +53,7 @@ internal sealed unsafe class Roaring32Enumerator : IEnumerator<uint>, IEnumerabl
         return NativeMethods.roaring_uint32_iterator_advance(new IntPtr(_iterator));
     }
 
-    public void Reset() => throw new NotSupportedException();
+    public void Reset() => throw new NotSupportedException(ExceptionMessages.OperationNotSupported);
 
     private void Dispose(bool _)
     {

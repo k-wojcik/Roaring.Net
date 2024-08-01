@@ -95,13 +95,13 @@ public class NotTests
         [Theory]
         [InlineData(1, 0)]
         [InlineData(10, 5)]
-        public void Not_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint min, uint max)
+        public void Not_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint start, uint end)
         {
             // Arrange
             using var testObject = Roaring32BitmapTestObject.GetEmpty();
 
             // Act && Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.Not(min, max));
+            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.Not(start, end));
         }
         
         [Fact]
@@ -152,13 +152,13 @@ public class NotTests
         [Theory]
         [InlineData(1, 0)]
         [InlineData(10, 5)]
-        public void INot_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint min, uint max)
+        public void INot_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint start, uint end)
         {
             // Arrange
             using var testObject = Roaring32BitmapTestObject.GetEmpty();
 
             // Act && Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.INot(min, max));
+            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.INot(start, end));
         }
         
         [Fact]
