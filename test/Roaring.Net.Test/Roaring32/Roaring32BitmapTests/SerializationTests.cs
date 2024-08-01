@@ -18,7 +18,7 @@ public class SerializationTests
             var serializedBitmap = bitmap.Serialize(SerializationFormat.Portable);
 
             // Assert
-            var testData = File.ReadAllBytes("Roaring32/TestData/bitmapwithoutruns.bin");
+            var testData = File.ReadAllBytes("Roaring32/Roaring32BitmapTests/TestData/bitmapwithoutruns.bin");
             Assert.Equal(testData, serializedBitmap);
         }
         
@@ -47,7 +47,7 @@ public class SerializationTests
             var serializedBitmap = bitmap.Serialize(SerializationFormat.Portable);
 
             // Assert
-            var testData = File.ReadAllBytes("Roaring32/TestData/bitmapwithruns.bin");
+            var testData = File.ReadAllBytes("Roaring32/Roaring32BitmapTests/TestData/bitmapwithruns.bin");
             Assert.Equal(testData, serializedBitmap);
         }
         
@@ -139,7 +139,7 @@ public class SerializationTests
         {
             // Arrange
             using var bitmap = GetTestBitmap();
-            var testData = File.ReadAllBytes("Roaring32/TestData/bitmapwithoutruns.bin");
+            var testData = File.ReadAllBytes("Roaring32/Roaring32BitmapTests/TestData/bitmapwithoutruns.bin");
             
             // Act
             var deserializedBitmap = Roaring32Bitmap.Deserialize(testData, SerializationFormat.Portable);
@@ -153,7 +153,7 @@ public class SerializationTests
         {
             // Arrange
             using var bitmap = GetTestBitmap();
-            var testData = File.ReadAllBytes("Roaring32/TestData/bitmapwithruns.bin");
+            var testData = File.ReadAllBytes("Roaring32/Roaring32BitmapTests/TestData/bitmapwithruns.bin");
 
             // Act
             var deserializedBitmap = Roaring32Bitmap.Deserialize(testData, SerializationFormat.Portable);

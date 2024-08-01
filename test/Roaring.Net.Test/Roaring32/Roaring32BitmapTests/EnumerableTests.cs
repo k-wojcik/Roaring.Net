@@ -9,7 +9,6 @@ public class EnumerableTests
 {
     public class Values
     {
-        
         [Fact]
         public void Values_BitmapContainsValues_EnumeratesBitmap()
         {
