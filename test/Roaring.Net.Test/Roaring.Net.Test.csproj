@@ -3,9 +3,10 @@
     <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>Roaring.Test</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TestTargetFramework>net8.0</TestTargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../../src/Roaring.Net/Roaring.Net.csproj" />
+    <ProjectReference Include="../../src/Roaring.Net/Roaring.Net.csproj" SetTargetFramework="TargetFramework=$(TestTargetFramework)"  />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="coverlet.collector">

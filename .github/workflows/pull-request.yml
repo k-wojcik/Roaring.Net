@@ -53,8 +53,11 @@ jobs:
     - name: Build
       run: dotnet build --no-restore --configuration Release /p:TreatWarningsAsErrors=true
 
-    - name: Test
+    - name: Test .NET 8
       run: dotnet test --no-build --configuration Release
+
+    - name: Test .NET 6
+      run: dotnet test --configuration Release /p:TestTargetFramework=net6.0
     
     - uses: geekyeggo/delete-artifact@v5
       with:

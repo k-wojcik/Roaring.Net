@@ -53,8 +53,11 @@ jobs:
     - name: Build
       run: dotnet build --no-restore --configuration Release /p:TreatWarningsAsErrors=true
 
-    - name: Test
+    - name: Test .NET 8
       run: dotnet test --no-build --configuration Release /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+      
+    - name: Test .NET 6
+      run: dotnet test --configuration Release /p:TestTargetFramework=net6.0
     
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.0.1
