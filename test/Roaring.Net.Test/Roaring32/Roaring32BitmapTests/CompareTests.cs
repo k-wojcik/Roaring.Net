@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 
 namespace Roaring.Test.Roaring32;
 
@@ -426,6 +427,58 @@ public class CompareTests
         
             // Act
             var actual = testObject1.Bitmap.Overlaps(testObject2.Bitmap);
+        
+            // Assert
+            Assert.False(actual);
+        }
+    }
+      
+    public class OverlapsRange
+    {
+        [Theory]
+        [InlineData(1, 0)]
+        [InlineData(10, 5)]
+        public void OverlapsRange_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint start, uint end)
+        {
+            // Arrange
+            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+            
+            // Act && Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.OverlapsRange(start, end));
+        }
+        
+        [Theory]
+        [InlineData(new uint[] {0, 10, uint.MaxValue}, 0, 0)]
+        [InlineData(new uint[] {0, 10, uint.MaxValue}, 0, uint.MaxValue)]
+        [InlineData(new uint[] {0, 10, uint.MaxValue}, 0, 9)]
+        [InlineData(new uint[] {0, 10, uint.MaxValue}, 1, 10)]
+        [InlineData(new uint[] {0, 10, uint.MaxValue - 1}, uint.MaxValue - 1, uint.MaxValue)]
+        [InlineData(new uint[] {0, 10, uint.MaxValue}, uint.MaxValue - 1, uint.MaxValue)]
+        [InlineData(new uint[] {0, 10, uint.MaxValue}, uint.MaxValue, uint.MaxValue)]
+        public void OverlapsRange_IntersectsWithAtLeastOneValue_ReturnsTrue(uint[] values, uint start, uint end)
+        {
+            // Arrange
+            using var testObject = Roaring32BitmapTestObject.GetFromValues(values);
+        
+            // Act
+            var actual = testObject.Bitmap.OverlapsRange(start, end);
+        
+            // Assert
+            Assert.True(actual);
+        }
+        
+        [Theory]
+        [InlineData(new uint[] { 0, 10, uint.MaxValue}, 1, 9)]
+        [InlineData(new uint[] { 5, 10, uint.MaxValue}, 0, 4)]
+        [InlineData(new uint[] { 0, 10, uint.MaxValue}, 11, uint.MaxValue - 1)]
+        [InlineData(new uint[] { 0, 10, uint.MaxValue - 1}, uint.MaxValue, uint.MaxValue)]
+        public void OverlapsRange_NoValuesIntersects_ReturnsFalse(uint[] values, uint start, uint end)
+        {
+            // Arrange
+            using var testObject = Roaring32BitmapTestObject.GetFromValues(values);
+        
+            // Act
+            var actual = testObject.Bitmap.OverlapsRange(start, end);
         
             // Assert
             Assert.False(actual);

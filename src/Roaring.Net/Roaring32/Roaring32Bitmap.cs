@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Runtime.InteropServices;
-using System.Threading;
 
 namespace Roaring;
 
@@ -248,14 +246,14 @@ public unsafe class Roaring32Bitmap : IDisposable
         return new(CheckBitmapPointer(NativeMethods.roaring_bitmap_flip(_pointer, start, (ulong)end + 1)));
     }
 
-    public void INotRange(ulong start, ulong end)
+    public void INotRange(uint start, uint end)
     {
         if (start > end)
         {
             throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
         }
 
-        NativeMethods.roaring_bitmap_flip_inplace(_pointer, start, end + 1);
+        NativeMethods.roaring_bitmap_flip_inplace(_pointer, start, (ulong)end + 1);
     }
 
     public Roaring32Bitmap And(Roaring32Bitmap bitmap) =>
@@ -350,6 +348,16 @@ public unsafe class Roaring32Bitmap : IDisposable
 
     public bool Overlaps(Roaring32Bitmap bitmap)
         => NativeMethods.roaring_bitmap_intersect(_pointer, bitmap._pointer);
+    
+    public bool OverlapsRange(uint start, uint end)
+    {
+        if (start > end)
+        {
+            throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
+        }
+        
+        return NativeMethods.roaring_bitmap_intersect_with_range(_pointer, start, (ulong)end + 1);
+    }
     
     public double GetJaccardIndex(Roaring32Bitmap bitmap)
         => NativeMethods.roaring_bitmap_jaccard_index(_pointer, bitmap._pointer);

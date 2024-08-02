@@ -169,6 +169,10 @@ internal static unsafe class NativeMethods
     [DllImport("roaring")]
     [return: MarshalAs(UnmanagedType.I1)]
     public static extern bool roaring_bitmap_intersect(IntPtr bitmap1, IntPtr bitmap2);
+    
+    [DllImport("roaring")]
+    [return: MarshalAs(UnmanagedType.I1)]
+    public static extern bool roaring_bitmap_intersect_with_range(IntPtr bitmap1, ulong x, ulong y);
 
     [DllImport("roaring")]
     public static extern double roaring_bitmap_jaccard_index(IntPtr bitmap1, IntPtr bitmap2);
