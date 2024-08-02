@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Roaring.Test.Roaring32;
@@ -90,28 +91,28 @@ public class NotTests
         }
     }
     
-    public class Not_ForRange
+    public class NotRange
     {
         [Theory]
         [InlineData(1, 0)]
         [InlineData(10, 5)]
-        public void Not_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint start, uint end)
+        public void NotRange_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint start, uint end)
         {
             // Arrange
             using var testObject = Roaring32BitmapTestObject.GetEmpty();
 
             // Act && Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.Not(start, end));
+            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.NotRange(start, end));
         }
         
         [Fact]
-        public void Not_EmptyBitmap_NegatesValuesInBitmap()
+        public void NotRange_EmptyBitmap_NegatesValuesInBitmap()
         {
             // Arrange
             using var testObject = Roaring32BitmapTestObject.GetEmpty();
             
             // Act
-            using var actual = testObject.Bitmap.Not(0, 3);
+            using var actual = testObject.Bitmap.NotRange(0, 3);
             
             // Assert
             Assert.All([0U, 1U, 2U, 3U], value =>
@@ -124,83 +125,98 @@ public class NotTests
             });
             Assert.Equal(4UL, actual.Count);
         }
+
+        public static IEnumerable<object[]> TestData() => RangeTestData();
         
-        [Fact]
-        public void Not_NotEmptyBitmap_NegatesValuesInBitmap()
+        [Theory]
+        [MemberData(nameof(TestData))]
+        public void NotRange_NotEmptyBitmap_NegatesValuesInBitmap(uint[] values, uint start, uint end, uint[] expectedContains, uint[] expectedNotContains)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetFromValues([0, 3, uint.MaxValue]);
+            using var bitmap = new Roaring32Bitmap(values);
             
             // Act
-            using var actual = testObject.Bitmap.Not(0, 4);
+            using var actual = bitmap.NotRange(start, end);
             
             // Assert
-            Assert.All([1U, 2U, 4U, uint.MaxValue], value =>
+            Assert.All(expectedContains, value =>
             {
                 Assert.True(actual.Contains(value));
             });
-            Assert.All([0U, 3U], value =>
+            Assert.All(expectedNotContains, value =>
             {
                 Assert.False(actual.Contains(value));
             });
-            Assert.Equal(4UL, actual.Count);
         }
     }
     
-    public class INot_ForRange
+    public class INotRange
     {
         [Theory]
         [InlineData(1, 0)]
         [InlineData(10, 5)]
-        public void INot_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint start, uint end)
+        public void INotRange_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint start, uint end)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+            using var bitmap = new Roaring32Bitmap();
 
             // Act && Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.INot(start, end));
+            Assert.Throws<ArgumentOutOfRangeException>(() => bitmap.INotRange(start, end));
         }
         
         [Fact]
-        public void INot_EmptyBitmap_NegatesValuesInBitmap()
+        public void INotRange_EmptyBitmap_NegatesValuesInBitmap()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+            using var bitmap = new Roaring32Bitmap();
             
             // Act
-            testObject.Bitmap.INot(0, 3);
+            bitmap.INotRange(0, 3);
             
             // Assert
             Assert.All([0U, 1U, 2U, 3U], value =>
             {
-                Assert.True(testObject.Bitmap.Contains(value));
+                Assert.True(bitmap.Contains(value));
             });
             Assert.All([4U, uint.MaxValue], value =>
             {
-                Assert.False(testObject.Bitmap.Contains(value));
+                Assert.False(bitmap.Contains(value));
             });
-            Assert.Equal(4UL, testObject.Bitmap.Count);
+            Assert.Equal(4UL, bitmap.Count);
         }
         
-        [Fact]
-        public void INot_NotEmptyBitmap_NegatesValuesInBitmap()
+        public static IEnumerable<object[]> TestData() => RangeTestData();
+        
+        [Theory]
+        [MemberData(nameof(TestData))]
+        public void INotRange_NotEmptyBitmap_NegatesValuesInBitmap(uint[] values, uint start, uint end, uint[] expectedContains, uint[] expectedNotContains)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetFromValues([0, 3, uint.MaxValue]);
+            using var bitmap = new Roaring32Bitmap(values);
             
             // Act
-            testObject.Bitmap.INot(0, 4);
+            bitmap.INotRange(start, end);
             
             // Assert
-            Assert.All([1U, 2U, 4U, uint.MaxValue], value =>
+            Assert.All(expectedContains, value =>
             {
-                Assert.True(testObject.Bitmap.Contains(value));
+                Assert.True(bitmap.Contains(value));
             });
-            Assert.All([0U, 3U], value =>
+            Assert.All(expectedNotContains, value =>
             {
-                Assert.False(testObject.Bitmap.Contains(value));
+                Assert.False(bitmap.Contains(value));
             });
-            Assert.Equal(4UL, testObject.Bitmap.Count);
         }
+    }
+    
+    private static IEnumerable<object[]> RangeTestData()
+    {
+        yield return [new uint[] { 0, 1, 2, 3, 4 }, 0, 0, new uint[] { 1, 2, 3, 4 }, new uint[] { 0 }];
+        yield return [new uint[] { 0, 1, 2, 3, 4 }, 0, 4, new uint[] {  }, new uint[] { 0, 1, 2, 3, 4, 5}];
+        yield return [new uint[] { 0, 2, 4, 6, 8 }, 2, 4, new uint[] { 0, 3, 6, 8 }, new uint[] { 1, 2, 4, 5, 7, 9 }];
+        yield return [new uint[] { 0, 2, 4, 6, 8 }, 6, 10, new uint[] { 0, 2, 4, 7, 9, 10  }, new uint[] { 6, 8, 11 }];
+        yield return [new uint[] { 0, 1, 2, 3, 4 }, 4, uint.MaxValue, new uint[] { 0, 1, 2, 3, 5, 6, uint.MaxValue  }, new uint[] { 4 }];
+        yield return [new uint[] { 0, 1, 2, 3, 4, uint.MaxValue }, uint.MinValue, uint.MaxValue, new uint[] { 5, 6, 7  }, new uint[] { 0, 1, 2, 3,4, uint.MaxValue }];
+        yield return [new uint[] { uint.MaxValue - 2, uint.MaxValue }, uint.MinValue, uint.MaxValue, new uint[] { uint.MaxValue - 1  }, new uint[] { uint.MaxValue - 2, uint.MaxValue }];
     }
 }

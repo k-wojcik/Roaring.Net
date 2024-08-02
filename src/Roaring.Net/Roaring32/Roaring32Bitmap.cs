@@ -221,23 +221,34 @@ public unsafe class Roaring32Bitmap : IDisposable
     }
     
     public bool TryGetValue(uint index, out uint value) => NativeMethods.roaring_bitmap_select(_pointer, index, out value);
-    public ulong CountLessOrEqualTo(uint value) => NativeMethods.roaring_bitmap_rank(_pointer, value);
     public long GetIndex(uint value) => NativeMethods.roaring_bitmap_get_index(_pointer, value);
+    
+    public ulong CountLessOrEqualTo(uint value) => NativeMethods.roaring_bitmap_rank(_pointer, value);
+
+    public ulong CountRange(uint start, uint end)
+    {  
+        if (start > end)
+        {
+            throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
+        }
+        
+        return NativeMethods.roaring_bitmap_range_cardinality(_pointer, start, (ulong)end + 1);
+    }
 
     public Roaring32Bitmap Not() => new(CheckBitmapPointer(NativeMethods.roaring_bitmap_flip(_pointer, uint.MinValue, uint.MaxValue + 1UL)));
     public void INot() => NativeMethods.roaring_bitmap_flip_inplace(_pointer, uint.MinValue, uint.MaxValue + 1UL);
 
-    public Roaring32Bitmap Not(ulong start, ulong end)
+    public Roaring32Bitmap NotRange(uint start, uint end)
     {
         if (start > end)
         {
             throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
         }
      
-        return new(CheckBitmapPointer(NativeMethods.roaring_bitmap_flip(_pointer, start, end + 1)));
+        return new(CheckBitmapPointer(NativeMethods.roaring_bitmap_flip(_pointer, start, (ulong)end + 1)));
     }
 
-    public void INot(ulong start, ulong end)
+    public void INotRange(ulong start, ulong end)
     {
         if (start > end)
         {

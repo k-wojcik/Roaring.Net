@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace Roaring;
@@ -22,6 +23,10 @@ internal static unsafe class NativeMethods
 
     [DllImport("roaring")]
     public static extern ulong roaring_bitmap_get_cardinality(IntPtr bitmap);
+    
+    [DllImport("roaring")]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public static extern ulong roaring_bitmap_range_cardinality(IntPtr bitmap, ulong range_start, ulong range_end);
 
     [DllImport("roaring")]
     [return: MarshalAs(UnmanagedType.I1)]
