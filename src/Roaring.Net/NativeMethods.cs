@@ -527,24 +527,24 @@ internal static unsafe partial class NativeMethods
 #endif
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct Iterator
+    public readonly struct Iterator
     {
         public readonly IntPtr parent;
         public readonly IntPtr container;
-        public byte typecode;
-        public int container_index;
-        public uint highbits;
+        public readonly byte typecode;
+        public readonly int container_index;
+        public readonly uint highbits;
 
         public readonly ContainerIt container_it;
 
-        public uint current_value;
-        public bool has_value;
+        public readonly uint current_value;
+        public readonly bool has_value;
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct ContainerIt
+    public readonly struct ContainerIt
     {
-        public int index;
+        public readonly int index;
     }
     
     [return: MarshalAs(UnmanagedType.I1)]
