@@ -7,4 +7,8 @@ dotnet_diagnostic.IDE0001.severity = warning
 # 'var' preferences (IDE0007 and IDE0008)
 dotnet_diagnostic.IDE0008.severity = warning
 
+# Simplify new expression (IDE0090)
 dotnet_diagnostic.IDE0090.severity = warning
+
+# Use LibraryImportAttribute instead of DllImportAttribute to generate p/invoke marshalling code at compile time. (SYSLIB1054)
+dotnet_diagnostic.SYSLIB1054.severity = warning

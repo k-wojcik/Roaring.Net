@@ -5,6 +5,9 @@
     <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
   <PropertyGroup>
     <PackageId>Roaring.Net</PackageId>
     <Version>0.0.0-dev</Version>
