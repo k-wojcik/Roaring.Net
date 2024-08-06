@@ -185,10 +185,10 @@ internal static unsafe partial class NativeMethods
 
 #if NET7_0_OR_GREATER
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_rank_many")]
-    public static partial void roaring_bitmap_rank_many(IntPtr bitmap, uint* begin, uint* end, uint* ans);
+    public static partial void roaring_bitmap_rank_many(IntPtr bitmap, uint* begin, uint* end, [Out] ulong[] ans);
 #else
     [DllImport("roaring")]
-    public static extern void roaring_bitmap_rank_many(IntPtr bitmap, uint* begin, uint* end, uint* ans);
+    public static extern void roaring_bitmap_rank_many(IntPtr bitmap, uint* begin, uint* end, [Out] ulong[] ans);
 #endif
 
 #if NET7_0_OR_GREATER

@@ -43,6 +43,8 @@ public class CountTests
         [InlineData(new uint[] { 4, 3, 2, 1, 0 }, 5, 5)]
         [InlineData(new uint[] { 0, 2, 4, 6, 8 }, 2, 2)]
         [InlineData(new uint[] { 5, 6, 7, 8, 9 }, 2, 0)]
+        [InlineData(new uint[] { 5, 6, 7, 8, 9 }, 4, 0)]
+        [InlineData(new uint[] { 5, 6, 7, 8, 9 }, 5, 1)]
         [InlineData(new uint[] { 5, 6, 7, 8, 9 }, 7, 3)]
         [InlineData(new uint[] { 5, uint.MaxValue }, uint.MaxValue, 2)]
         public void CountLessOrEqualTo_ForValues_ReturnsExpectedNumberOfValues(uint[] values, uint testedValue, uint expected)
@@ -52,6 +54,30 @@ public class CountTests
         
             // Act
             var actual = testObject.Bitmap.CountLessOrEqualTo(testedValue);
+        
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+    }
+    
+    public class CountManyLessOrEqualTo
+    {
+        [Theory]
+        [InlineData(new uint[] { }, new uint[] {  }, new ulong[] {  })]
+        [InlineData(new uint[] { 0, 1, 2, 3, 4 }, new uint[] {  }, new ulong[] {  })]
+        [InlineData(new uint[] { 0, 1, 2, 3, 4 }, new uint[] { 0, 1, 2, 3, 4 }, new ulong[] { 1, 2, 3, 4, 5 })]
+        [InlineData(new uint[] { 0, 1, 2, 3, 4 }, new uint[] { 1, 2, 3, 4, 5 }, new ulong[] { 2, 3, 4, 5, 5 })]
+        [InlineData(new uint[] { 0, 2, 4, 6, 8 }, new uint[] { 5, 6, 7, 8, 9  }, new ulong[] { 3, 4, 4, 5, 5 })]
+        [InlineData(new uint[] { 10, 11, 12 }, new uint[] { 0, 1, 2, 3, 4 }, new ulong[] { 0, 0, 0, 0, 0 })]
+        [InlineData(new uint[] { 0, 1, 2, 3, 4, uint.MaxValue }, new uint[] { 0, 1, 2, 3, 4, uint.MaxValue }, new ulong[] { 1, 2, 3, 4, 5, 6 })]
+        [InlineData(new uint[] { uint.MaxValue - 1, uint.MaxValue }, new uint[] { uint.MaxValue - 1, uint.MaxValue }, new ulong[] { 1, 2 })]
+        public void CountManyLessOrEqualTo_ForValues_ReturnsExpectedNumberOfValues(uint[] values, uint[] testedValues, ulong[] expected)
+        {
+            // Arrange
+            using var testObject = Roaring32BitmapTestObject.GetFromValues(values);
+        
+            // Act
+            var actual = testObject.Bitmap.CountManyLessOrEqualTo(testedValues);
         
             // Assert
             Assert.Equal(expected, actual);
