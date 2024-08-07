@@ -211,7 +211,7 @@ public class InitializationTests
         [InlineData(new uint[] { uint.MaxValue - 1, uint.MaxValue }, new uint[] {  uint.MaxValue },1)]
         [InlineData(new uint[] { 0 }, new uint[] {  uint.MaxValue },uint.MaxValue)]
         [InlineData(new uint[] { uint.MaxValue }, new uint[] { 0 },-uint.MaxValue)]
-        public void CloneWithOffset_CorrectRange_BitmapContainsExpectedValues(uint[] values, uint[] expected, long offset)
+        public void CloneWithOffset_AddsValueToBitmapValues_ReturnsNewBitmapWithExpectedValues(uint[] values, uint[] expected, long offset)
         {
             // Arrange
             using var testObject = Roaring32BitmapTestObject.GetFromValues(values);
@@ -223,6 +223,32 @@ public class InitializationTests
             var actual = actualBitmap.Values.ToList();
             Assert.Equal(expected, actual);
             Assert.Equal(testObject.Bitmap.Values, values);
+        }
+    }
+    
+    public class OverwriteWith
+    {
+        [Theory]
+        [InlineData(new uint[] { })]
+        [InlineData(new uint[] { 0 })]
+        [InlineData(new uint[] { 0, 1, 2, 3, 4 })]
+        [InlineData(new uint[] { 0, 2, 4, 6, 8 })]
+        [InlineData(new uint[] { 0, 1, 2, 3, 4, uint.MaxValue })]
+        [InlineData(new uint[] { uint.MaxValue - 1, uint.MaxValue })]
+        [InlineData(new uint[] { uint.MaxValue })]
+        public void OverwriteWith_SourceBitmap_ReplacesDestinationBitmapAndReturnsTrue(uint[] source)
+        {
+            // Arrange
+            using var sourceObject = Roaring32BitmapTestObject.GetFromValues(source);
+            using var destinationObject = Roaring32BitmapTestObject.GetFromValues([0, 1, 2, 3, 4, uint.MaxValue - 1, uint.MaxValue]);
+
+            // Act
+            var actual = destinationObject.Bitmap.OverwriteWith(sourceObject.Bitmap);
+
+            // Assert
+            Assert.True(actual);
+            Assert.Equal(source, sourceObject.Bitmap.Values);
+            Assert.Equal(source, destinationObject.Bitmap.Values);
         }
     }
 }

@@ -87,6 +87,8 @@ public unsafe class Roaring32Bitmap : IDisposable
     public Roaring32Bitmap CloneWithOffset(long offset) 
         => new(CheckBitmapPointer(NativeMethods.roaring_bitmap_add_offset(_pointer, offset)));
 
+    public bool OverwriteWith(Roaring32Bitmap source) => NativeMethods.roaring_bitmap_overwrite(_pointer, source._pointer);
+    
     public void Add(uint value) => NativeMethods.roaring_bitmap_add(_pointer, value);
 
     public void AddMany(uint[] values) => AddMany(values, 0, (uint)values.Length);

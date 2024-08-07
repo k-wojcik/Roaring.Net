@@ -247,7 +247,7 @@ public class AddTests
         [InlineData(new uint[] { uint.MaxValue - 1, uint.MaxValue }, new uint[] {  uint.MaxValue },1)]
         [InlineData(new uint[] { 0 }, new uint[] {  uint.MaxValue },uint.MaxValue)]
         [InlineData(new uint[] { uint.MaxValue }, new uint[] { 0 },-uint.MaxValue)]
-        public void AddOffset_CorrectRange_BitmapContainsExpectedValues(uint[] values, uint[] expected, long offset)
+        public void AddOffset_AddsValueToBitmapValues_BitmapContainsExpectedValues(uint[] values, uint[] expected, long offset)
         {
             // Arrange
             using var testObject = Roaring32BitmapTestObject.GetFromValues(values);

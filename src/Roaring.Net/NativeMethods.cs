@@ -38,6 +38,15 @@ internal static unsafe partial class NativeMethods
     public static extern IntPtr roaring_bitmap_copy(IntPtr bitmap);
 #endif
     
+    [return: MarshalAs(UnmanagedType.I1)]
+#if NET7_0_OR_GREATER
+    [LibraryImport("roaring", EntryPoint = "roaring_bitmap_overwrite")]
+    public static partial bool roaring_bitmap_overwrite(IntPtr destination, IntPtr source);
+#else
+    [DllImport("roaring")]
+    public static extern bool roaring_bitmap_overwrite(IntPtr destination, IntPtr source);
+#endif
+    
 #if NET7_0_OR_GREATER
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_free")]
     public static partial void roaring_bitmap_free(IntPtr bitmap);
