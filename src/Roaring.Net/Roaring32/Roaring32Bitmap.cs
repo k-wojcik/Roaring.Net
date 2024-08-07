@@ -6,7 +6,7 @@ namespace Roaring;
 
 public unsafe class Roaring32Bitmap : IDisposable
 {
-    private readonly IntPtr _pointer;
+    private IntPtr _pointer;
     private bool _isDisposed;
 
     public ulong Count => NativeMethods.roaring_bitmap_get_cardinality(_pointer);
@@ -83,6 +83,9 @@ public unsafe class Roaring32Bitmap : IDisposable
     }
 
     public Roaring32Bitmap Clone() => new(CheckBitmapPointer(NativeMethods.roaring_bitmap_copy(_pointer)));
+    
+    public Roaring32Bitmap CloneWithOffset(long offset) 
+        => new(CheckBitmapPointer(NativeMethods.roaring_bitmap_add_offset(_pointer, offset)));
 
     public void Add(uint value) => NativeMethods.roaring_bitmap_add(_pointer, value);
 
@@ -112,7 +115,14 @@ public unsafe class Roaring32Bitmap : IDisposable
         
         NativeMethods.roaring_bitmap_add_range_closed(_pointer, start, end);
     }
-
+    
+    public void AddOffset(long offset)
+    {
+        var previousPtr = _pointer;
+        _pointer = NativeMethods.roaring_bitmap_add_offset(_pointer, offset);
+        NativeMethods.roaring_bitmap_free(previousPtr);
+    }
+    
     public void Remove(uint value) => NativeMethods.roaring_bitmap_remove(_pointer, value);
 
     public void RemoveMany(uint[] values) => RemoveMany(values, 0, (uint)values.Length);

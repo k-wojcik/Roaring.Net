@@ -108,6 +108,14 @@ internal static unsafe partial class NativeMethods
 #endif
     
 #if NET7_0_OR_GREATER
+    [LibraryImport("roaring", EntryPoint = "roaring_bitmap_add_offset")]
+    public static partial IntPtr roaring_bitmap_add_offset(IntPtr bitmap, long offset);
+#else
+    [DllImport("roaring")]
+    public static extern IntPtr roaring_bitmap_add_offset(IntPtr bitmap, long offset);
+#endif
+    
+#if NET7_0_OR_GREATER
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_remove")]
     public static partial void roaring_bitmap_remove(IntPtr bitmap, uint value);
 #else

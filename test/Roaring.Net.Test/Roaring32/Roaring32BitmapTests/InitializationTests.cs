@@ -198,4 +198,31 @@ public class InitializationTests
             Assert.Equal(testObject.Bitmap.Values, actual.Values);
         }
     }
+    
+    public class CloneWithOffset
+    {
+        [Theory]
+        [InlineData(new uint[] { }, new uint[] { },10)]
+        [InlineData(new uint[] { 0, 1, 2, 3, 4 },new uint[] { 5, 6, 7, 8, 9 }, 5)]
+        [InlineData(new uint[] { 0, 1, 2, 3, 4 },new uint[] { 0, 1, 2 }, -2)]
+        [InlineData(new uint[] { 0, 1, 2, 3, 4 }, new uint[] { },-5)]
+        [InlineData(new uint[] { 0, 2, 4, 6, 8 }, new uint[] { 10, 12, 14, 16, 18 },10)]
+        [InlineData(new uint[] { 0, 1, 2, 3, 4, uint.MaxValue }, new uint[] { 1, 2, 3, 4, 5 }, 1)]
+        [InlineData(new uint[] { uint.MaxValue - 1, uint.MaxValue }, new uint[] {  uint.MaxValue },1)]
+        [InlineData(new uint[] { 0 }, new uint[] {  uint.MaxValue },uint.MaxValue)]
+        [InlineData(new uint[] { uint.MaxValue }, new uint[] { 0 },-uint.MaxValue)]
+        public void CloneWithOffset_CorrectRange_BitmapContainsExpectedValues(uint[] values, uint[] expected, long offset)
+        {
+            // Arrange
+            using var testObject = Roaring32BitmapTestObject.GetFromValues(values);
+
+            // Act
+            using var actualBitmap = testObject.Bitmap.CloneWithOffset(offset);
+
+            // Assert
+            var actual = actualBitmap.Values.ToList();
+            Assert.Equal(expected, actual);
+            Assert.Equal(testObject.Bitmap.Values, values);
+        }
+    }
 }
