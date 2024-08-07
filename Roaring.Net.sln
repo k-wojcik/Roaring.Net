@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{20F281E9-D851-4848-AF00-F40401AB7E3A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{D65028B1-446E-4FD5-89EC-A82C4CFE321D}"
+	ProjectSection(SolutionItems) = preProject
+		test\Directory.Build.props = test\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Roaring.Net", "src\Roaring.Net\Roaring.Net.csproj", "{59225474-33B9-40FD-B8CB-0B5B753BC31A}"
 EndProject

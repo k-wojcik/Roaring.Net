@@ -2,7 +2,6 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>Roaring.Test</RootNamespace>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TestTargetFramework>net8.0</TestTargetFramework>
   </PropertyGroup>
   <ItemGroup>

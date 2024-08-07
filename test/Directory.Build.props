@@ -2,6 +2,6 @@
 	<Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
     <PropertyGroup>
-        <ExcludeByAttribute>GeneratedCodeAttribute,CompilerGeneratedAttribute</ExcludeByAttribute>
+        <ExcludeByAttribute>GeneratedCodeAttribute</ExcludeByAttribute>
     </PropertyGroup>
 </Project>
