@@ -47,14 +47,14 @@ public unsafe class Roaring32Bitmap : IDisposable
         return new(CheckBitmapPointer(NativeMethods.roaring_bitmap_from_range(start, (ulong)end + 1, step)));
     }
 
-    public static Roaring32Bitmap FromValues(uint[] values) => FromValues(values, 0U, (uint)values.Length);
+    public static Roaring32Bitmap FromValues(uint[] values) => FromValues(values, 0U, (nuint)values.Length);
 
-    public static Roaring32Bitmap FromValues(uint[] values, uint offset, uint count) 
+    public static Roaring32Bitmap FromValues(uint[] values, nuint offset, nuint count) 
         => new(CreatePtrFromValues(values, offset, count));
 
-    private static IntPtr CreatePtrFromValues(uint[] values, uint offset, uint count)
+    private static IntPtr CreatePtrFromValues(uint[] values, nuint offset, nuint count)
     {
-        if (values.Length < offset + count)
+        if ((nuint)values.Length < offset + count)
         {
             throw new ArgumentOutOfRangeException(nameof(offset), offset, ExceptionMessages.OffsetWithCountGreaterThanNumberOfValues);
         }
@@ -91,11 +91,11 @@ public unsafe class Roaring32Bitmap : IDisposable
     
     public void Add(uint value) => NativeMethods.roaring_bitmap_add(_pointer, value);
 
-    public void AddMany(uint[] values) => AddMany(values, 0, (uint)values.Length);
+    public void AddMany(uint[] values) => AddMany(values, 0, (nuint)values.Length);
 
-    public void AddMany(uint[] values, uint offset, uint count)
+    public void AddMany(uint[] values, nuint offset, nuint count)
     {
-        if (values.Length < offset + count)
+        if ((nuint)values.Length < offset + count)
         {
             throw new ArgumentOutOfRangeException(nameof(offset), offset, ExceptionMessages.OffsetWithCountGreaterThanNumberOfValues);
         }
@@ -127,11 +127,11 @@ public unsafe class Roaring32Bitmap : IDisposable
     
     public void Remove(uint value) => NativeMethods.roaring_bitmap_remove(_pointer, value);
 
-    public void RemoveMany(uint[] values) => RemoveMany(values, 0, (uint)values.Length);
+    public void RemoveMany(uint[] values) => RemoveMany(values, 0, (nuint)values.Length);
 
-    public void RemoveMany(uint[] values, uint offset, uint count)
+    public void RemoveMany(uint[] values, nuint offset, nuint count)
     {
-        if (values.Length < offset + count)
+        if ((nuint)values.Length < offset + count)
         {
             throw new ArgumentOutOfRangeException(nameof(offset), offset, ExceptionMessages.OffsetWithCountGreaterThanNumberOfValues);
         }
@@ -317,7 +317,7 @@ public unsafe class Roaring32Bitmap : IDisposable
         }
         pointers[length - 1] = _pointer;
         
-        return new Roaring32Bitmap(NativeMethods.roaring_bitmap_or_many((uint)pointers.Length, pointers));
+        return new Roaring32Bitmap(NativeMethods.roaring_bitmap_or_many((nuint)pointers.Length, pointers));
     }
 
     public Roaring32Bitmap OrManyHeap(Roaring32Bitmap[] bitmaps)
@@ -361,7 +361,7 @@ public unsafe class Roaring32Bitmap : IDisposable
         }
         pointers[length - 1] = _pointer;
         
-        return new Roaring32Bitmap(NativeMethods.roaring_bitmap_xor_many((uint)pointers.Length, pointers));
+        return new Roaring32Bitmap(NativeMethods.roaring_bitmap_xor_many((nuint)pointers.Length, pointers));
     }
     
     public Roaring32Bitmap LazyXor(Roaring32Bitmap bitmap)
@@ -425,6 +425,23 @@ public unsafe class Roaring32Bitmap : IDisposable
     {
         var ptr = format switch
         {
+            SerializationFormat.Normal => NativeMethods.roaring_bitmap_deserialize_safe(buffer, (nuint)buffer.Length),
+            SerializationFormat.Portable => NativeMethods.roaring_bitmap_portable_deserialize_safe(buffer, (nuint)buffer.Length),
+            _ => throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat)
+        };
+
+        if (ptr == IntPtr.Zero)
+        {
+            throw new InvalidOperationException(ExceptionMessages.DeserializationFailedUnknownReason);
+        }
+        
+        return new Roaring32Bitmap(ptr);
+    }
+    
+    public static Roaring32Bitmap DeserializeUnsafe(byte[] buffer, SerializationFormat format = SerializationFormat.Normal)
+    {
+        var ptr = format switch
+        {
             SerializationFormat.Normal => NativeMethods.roaring_bitmap_deserialize(buffer),
             SerializationFormat.Portable => NativeMethods.roaring_bitmap_portable_deserialize(buffer),
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat)
@@ -436,6 +453,17 @@ public unsafe class Roaring32Bitmap : IDisposable
         }
         
         return new Roaring32Bitmap(ptr);
+    }
+    
+    public static nuint GetSerializedSize(byte[] buffer, nuint expectedSize, SerializationFormat format = SerializationFormat.Portable)
+    {
+        var size = format switch
+        {
+            SerializationFormat.Portable => NativeMethods.roaring_bitmap_portable_deserialize_size(buffer, expectedSize),
+            _ => throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat)
+        };
+
+        return size;
     }
 
     public IEnumerable<uint> Values => new Roaring32Enumerator(_pointer);
