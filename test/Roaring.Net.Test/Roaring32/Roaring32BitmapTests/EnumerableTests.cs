@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Xunit;
 
-namespace Roaring.Test.Roaring32;
+namespace CRoaring.Test.Roaring32;
 
 public class EnumerableTests
 {

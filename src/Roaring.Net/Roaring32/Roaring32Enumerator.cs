@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Roaring;
+namespace CRoaring;
 
 internal sealed unsafe class Roaring32Enumerator : IEnumerator<uint>, IEnumerable<uint>
 {

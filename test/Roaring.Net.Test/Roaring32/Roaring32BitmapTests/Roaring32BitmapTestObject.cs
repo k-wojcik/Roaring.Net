@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Roaring.Test.Roaring32;
+namespace CRoaring.Test.Roaring32;
 
 internal sealed class Roaring32BitmapTestObject : IDisposable
 {

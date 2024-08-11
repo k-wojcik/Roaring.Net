@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
-namespace Roaring;
+namespace CRoaring;
 
 internal static unsafe partial class NativeMethods
 {
