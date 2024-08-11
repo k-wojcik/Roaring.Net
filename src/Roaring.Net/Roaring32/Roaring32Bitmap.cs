@@ -11,6 +11,7 @@ public unsafe class Roaring32Bitmap : IDisposable
 
     public ulong Count => NativeMethods.roaring_bitmap_get_cardinality(_pointer);
     public bool IsEmpty => NativeMethods.roaring_bitmap_is_empty(_pointer);
+    public bool IsCopyOnWrite => NativeMethods.roaring_bitmap_get_copy_on_write(_pointer);
     public uint? Min => IsEmpty ? null : NativeMethods.roaring_bitmap_minimum(_pointer);
     public uint? Max => IsEmpty ? null : NativeMethods.roaring_bitmap_maximum(_pointer);
     public nuint SerializedBytes => NativeMethods.roaring_bitmap_size_in_bytes(_pointer);
@@ -499,8 +500,10 @@ public unsafe class Roaring32Bitmap : IDisposable
     
     public bool IsValid(out string? reason)
     {
-        var result =  NativeMethods.roaring_bitmap_internal_validate(_pointer, out var reasonPtr);
+        var result = NativeMethods.roaring_bitmap_internal_validate(_pointer, out var reasonPtr);
         reason = Marshal.PtrToStringAnsi(reasonPtr);
         return result;
     }
+
+    public void SetCopyOnWrite(bool enabled) => NativeMethods.roaring_bitmap_set_copy_on_write(_pointer, enabled);
 }

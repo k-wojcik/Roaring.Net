@@ -73,14 +73,30 @@ internal static unsafe partial class NativeMethods
     public static extern ulong roaring_bitmap_range_cardinality(IntPtr bitmap, ulong range_start, ulong range_end);
 #endif
     
+    [return: MarshalAs(UnmanagedType.I1)]
 #if NET7_0_OR_GREATER
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_is_empty")]
-    [return: MarshalAs(UnmanagedType.I1)]
     public static partial bool roaring_bitmap_is_empty(IntPtr bitmap);
 #else 
     [DllImport("roaring")]
-    [return: MarshalAs(UnmanagedType.I1)]
     public static extern bool roaring_bitmap_is_empty(IntPtr bitmap);
+#endif
+    
+    [return: MarshalAs(UnmanagedType.I1)]
+#if NET7_0_OR_GREATER
+    [LibraryImport("roaring", EntryPoint = "roaring_bitmap_get_copy_on_write")]
+    public static partial bool roaring_bitmap_get_copy_on_write(IntPtr bitmap);
+#else 
+    [DllImport("roaring")]
+    public static extern bool roaring_bitmap_get_copy_on_write(IntPtr bitmap);
+#endif
+    
+#if NET7_0_OR_GREATER
+    [LibraryImport("roaring", EntryPoint = "roaring_bitmap_set_copy_on_write")]
+    public static partial void roaring_bitmap_set_copy_on_write(IntPtr bitmap, [MarshalAs(UnmanagedType.I1)] bool cow);
+#else 
+    [DllImport("roaring")]
+    public static extern void roaring_bitmap_set_copy_on_write(IntPtr bitmap, [MarshalAs(UnmanagedType.I1)] bool cow);
 #endif
     
 #if NET7_0_OR_GREATER

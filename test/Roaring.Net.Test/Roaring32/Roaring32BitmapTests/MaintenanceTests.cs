@@ -219,4 +219,63 @@ public class MaintenanceTests
             Assert.Equal("cardinality is incorrect", reason);
         }
     }
+
+    public class IsCopyOnWrite
+    {
+        [Fact]
+        public void IsCopyOnWrite_Default_ReturnsFalse()
+        {
+            // Arrange
+            using var testObject = Roaring32BitmapTestObject.GetDefault();
+            
+            // Act
+            var actual = testObject.Bitmap.IsCopyOnWrite;
+
+            // Assert
+            Assert.False(actual);
+        }
+        
+        [Fact]
+        public void IsCopyOnWrite_CopyOnWriteEnabled_ReturnsTrue()
+        {
+            // Arrange
+            using var testObject = Roaring32BitmapTestObject.GetDefault();
+            
+            // Act
+            testObject.Bitmap.SetCopyOnWrite(true);
+            var actual = testObject.Bitmap.IsCopyOnWrite;
+            
+            // Assert
+            Assert.True(actual);
+        }
+    }
+    
+    public class SetCopyOnWrite
+    {
+        [Fact]
+        public void SetCopyOnWrite_WithTrue_EnablesCopyOnWrite()
+        {
+            // Arrange
+            using var testObject = Roaring32BitmapTestObject.GetDefault();
+            
+            // Act
+            testObject.Bitmap.SetCopyOnWrite(true);
+            
+            // Assert
+            Assert.True(testObject.Bitmap.IsCopyOnWrite);
+        }
+        
+        [Fact]
+        public void SetCopyOnWrite_WithFalse_DisablesCopyOnWrite()
+        {
+            // Arrange
+            using var testObject = Roaring32BitmapTestObject.GetDefault();
+            
+            // Act
+            testObject.Bitmap.SetCopyOnWrite(false);
+            
+            // Assert
+            Assert.False(testObject.Bitmap.IsCopyOnWrite);
+        }
+    }
 }
