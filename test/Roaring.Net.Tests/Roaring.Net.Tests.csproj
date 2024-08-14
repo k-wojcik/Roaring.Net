@@ -23,10 +23,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <None Update="Roaring32\Roaring32BitmapTests\TestData\bitmapwithoutruns.bin">
+    <None Update="CRoaring\Roaring32BitmapTests\TestData\bitmapwithruns.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Roaring32\Roaring32BitmapTests\TestData\bitmapwithruns.bin">
+    <None Update="CRoaring\Roaring32BitmapTests\TestData\bitmapwithoutruns.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

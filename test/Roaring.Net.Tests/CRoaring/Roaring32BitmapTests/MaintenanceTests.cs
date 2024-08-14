@@ -1,7 +1,8 @@
 ﻿using System.Linq;
+using Roaring.Net.CRoaring;
 using Xunit;
 
-namespace CRoaring.Test.Roaring32;
+namespace Roaring.Net.Tests.CRoaring.Roaring32BitmapTests;
 
 public class MaintenanceTests
 {

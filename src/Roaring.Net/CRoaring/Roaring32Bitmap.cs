@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace CRoaring;
+namespace Roaring.Net.CRoaring;
 
 public unsafe class Roaring32Bitmap : IDisposable
 {

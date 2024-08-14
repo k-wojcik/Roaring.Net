@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CRoaring {
+namespace Roaring.Net {
     using System;
     
     

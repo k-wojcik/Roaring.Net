@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace CRoaring;
+namespace Roaring.Net.CRoaring;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public readonly struct Statistics
