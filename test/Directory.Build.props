@@ -3,5 +3,6 @@
 
     <PropertyGroup>
         <ExcludeByAttribute>GeneratedCodeAttribute</ExcludeByAttribute>
+        <RunSettingsFilePath>$(MSBuildThisFileDirectory)\.runsettings</RunSettingsFilePath>
     </PropertyGroup>
 </Project>

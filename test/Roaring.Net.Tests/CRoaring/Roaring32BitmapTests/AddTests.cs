@@ -12,7 +12,7 @@ public class AddTests
         public void Add_EmptyBitmap_AddsValueToBitmap()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
         
             // Act
             testObject.Bitmap.Add(10);
@@ -26,7 +26,7 @@ public class AddTests
         public void Add_BitmapWithValues_AddsValueToBitmap()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetDefault();
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
             var cardinality = testObject.Bitmap.Count;
             Assert.DoesNotContain(testObject.Bitmap.Values, value=> value == 10U);
         
@@ -42,7 +42,7 @@ public class AddTests
         public void Add_AddedValueExistsInBitmap_ValueIsNotAddedToBitmap()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetDefault();
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
             var cardinality = testObject.Bitmap.Count;
             var addedValue = testObject.Bitmap.Values.ToList()[2];
         
@@ -61,7 +61,7 @@ public class AddTests
         public void AddMany_EmptyBitmap_AddsValuesToBitmap()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
         
             // Act
             testObject.Bitmap.AddMany([10, 11]);
@@ -76,7 +76,7 @@ public class AddTests
         public void AddMany_BitmapWithValues_AddsValueToBitmap()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetDefault();
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
             var cardinality = testObject.Bitmap.Count;
             Assert.DoesNotContain(testObject.Bitmap.Values, value=> value == 10U);
             Assert.DoesNotContain(testObject.Bitmap.Values, value=> value == 11U);
@@ -94,7 +94,7 @@ public class AddTests
         public void AddMany_AddedValueExistsInBitmap_ValueIsNotAddedToBitmap()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetDefault();
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
             var cardinality = testObject.Bitmap.Count;
             var addedValues = testObject.Bitmap.Values.ToList()[2..10].ToArray();
         
@@ -119,7 +119,7 @@ public class AddTests
         public void AddMany_WithCorrectOffsetAndCount_AddsValuesToBitmap(uint[] values, uint offset, uint count)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
         
             // Act
             testObject.Bitmap.AddMany(values, offset, count);
@@ -135,7 +135,7 @@ public class AddTests
         public void AddMany_OffsetAndCountOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint[] values, uint offset, uint count)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
         
             // Act && Assert
             Assert.Throws<ArgumentOutOfRangeException>(() =>
@@ -151,7 +151,7 @@ public class AddTests
         public void TryAdd_EmptyBitmap_AddsValueToBitmapAndReturnsTrue()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
         
             // Act
             var actual = testObject.Bitmap.TryAdd(10);
@@ -166,7 +166,7 @@ public class AddTests
         public void TryAdd_BitmapWithValues_AddsValueToBitmapAndReturnsTrue()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetDefault();
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
             var cardinality = testObject.Bitmap.Count;
             Assert.DoesNotContain(testObject.Bitmap.Values, value=> value == 10U);
         
@@ -183,7 +183,7 @@ public class AddTests
         public void TryAdd_AddedValueExistsInBitmap_ValueIsNotAddedToBitmapAndReturnsFalse()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetDefault();
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
             var cardinality = testObject.Bitmap.Count;
             var addedValue = testObject.Bitmap.Values.ToList()[2];
         
@@ -205,7 +205,7 @@ public class AddTests
         public void AddRange_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint start, uint end)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
 
             // Act && Assert
             Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.AddRange(start, end));
@@ -220,7 +220,7 @@ public class AddTests
         public void AddRange_CorrectRange_BitmapContainsExpectedValues(uint start, uint end)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
 
             // Act
             testObject.Bitmap.AddRange(start, end);
@@ -250,7 +250,7 @@ public class AddTests
         public void AddOffset_AddsValueToBitmapValues_BitmapContainsExpectedValues(uint[] values, uint[] expected, long offset)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetFromValues(values);
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetFromValues(values);
 
             // Act
             testObject.Bitmap.AddOffset(offset);

@@ -6,43 +6,46 @@ namespace Roaring.Net.Tests.CRoaring.Roaring32BitmapTests;
 
 public class StatisticsTests
 {
-    [Fact]
-    public void GetStatistics_ForTestData_ReturnsCount()
+    [Theory]
+    [InlineTestObject]
+    public void GetStatistics_ForTestData_ReturnsCount(IRoaring32BitmapTestObjectFactory factory)
     {
         // Arrange
         uint[] values = [1, 2, 3, 4, 6, 7, 999991, 999992, 999993, 999994, 999996, 999997];
-        using var bitmap = new Roaring32Bitmap(values);
+        using var testObject = factory.GetFromValues(values);
         
         // Act
-        var actual = bitmap.GetStatistics();
+        var actual = testObject.ReadOnlyBitmap.GetStatistics();
 
         // Assert
         Assert.Equal((ulong)values.Length, actual.Count);
     }
     
-    [Fact]
-    public void GetStatistics_ForTestData_ReturnsMinMax()
+    [Theory]
+    [InlineTestObject]
+    public void GetStatistics_ForTestData_ReturnsMinMax(IRoaring32BitmapTestObjectFactory factory)
     {
         // Arrange
         uint[] values = [1, 2, 3, 4, 6, 7, 999991, 999992, 999993, 999994, 999996, 999997];
-        using var bitmap = new Roaring32Bitmap(values);
+        using var testObject = factory.GetFromValues(values);
         
         // Act
-        var actual = bitmap.GetStatistics();
+        var actual = testObject.ReadOnlyBitmap.GetStatistics();
 
         // Assert
         Assert.Equal(1U, actual.MinValue);
         Assert.Equal(999997U, actual.MaxValue);
     }
     
-    [Fact]
-    public void GetStatistics_ForEmpty_ReturnsZeroForContainerCount()
+    [Theory]
+    [InlineTestObject]
+    public void GetStatistics_ForEmpty_ReturnsZeroForContainerCount(IRoaring32BitmapTestObjectFactory factory)
     {
         // Arrange
-        using var bitmap = new Roaring32Bitmap([]);
+        using var testObject = factory.GetEmpty();
         
         // Act
-        var actual = bitmap.GetStatistics();
+        var actual = testObject.ReadOnlyBitmap.GetStatistics();
 
         // Assert
         Assert.Equal(0U, actual.ContainerCount);

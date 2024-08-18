@@ -45,4 +45,10 @@
     <data name="OperationNotSupported" xml:space="preserve">
         <value>The operation is not supported.</value>
     </data>
+    <data name="BitmapMemorySizeEqualToZero" xml:space="preserve">
+        <value>The size of memory cannot be zero.</value>
+    </data>
+    <data name="BitmapMemoryDisposed" xml:space="preserve">
+        <value>Cannot access a disposed, unallocated memory.</value>
+    </data>
 </root>

@@ -8,42 +8,45 @@ public class ContainsTests
 {
     public class Contains
     {
-        [Fact]
-        public void Contains_EmptyBitmap_ReturnFalse()
+        [Theory]
+        [InlineTestObject]
+        public void Contains_EmptyBitmap_ReturnFalse(IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+            using var testObject = factory.GetEmpty();
 
             // Act
-            var actual = testObject.Bitmap.Contains(10);
+            var actual = testObject.ReadOnlyBitmap.Contains(10);
 
             // Assert
             Assert.False(actual);
         }
 
-        [Fact]
-        public void Contains_BitmapHasValue_ReturnsTrue()
+        [Theory]
+        [InlineTestObject]
+        public void Contains_BitmapHasValue_ReturnsTrue(IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetDefault();
+            using var testObject = factory.GetDefault();
             var value = testObject.Values.First();
 
             // Act
-            var actual = testObject.Bitmap.Contains(value);
+            var actual = testObject.ReadOnlyBitmap.Contains(value);
 
             // Assert
             Assert.True(actual);
         }
 
-        [Fact]
-        public void Contains_BitmapDoesNotHaveValue_ReturnsFalse()
+        [Theory]
+        [InlineTestObject]
+        public void Contains_BitmapDoesNotHaveValue_ReturnsFalse(IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetDefault();
-            Assert.DoesNotContain(testObject.Bitmap.Values, value => value == 10U);
+            using var testObject = factory.GetDefault();
+            Assert.DoesNotContain(testObject.Values, value => value == 10U);
 
             // Act
-            var actual = testObject.Bitmap.Contains(10U);
+            var actual = testObject.ReadOnlyBitmap.Contains(10U);
 
             // Assert
             Assert.False(actual);
@@ -53,38 +56,38 @@ public class ContainsTests
     public class ContainsRange
     {
         [Theory]
-        [InlineData(1, 0)]
-        [InlineData(10, 5)]
-        public void ContainsRange_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint start, uint end)
+        [InlineTestObject(1, 0)]
+        [InlineTestObject(10, 5)]
+        public void ContainsRange_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint start, uint end, IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+            using var testObject = factory.GetEmpty();
             
             // Act && Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.ContainsRange(start, end));
+            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.ReadOnlyBitmap.ContainsRange(start, end));
         }
         
         [Theory]
-        [InlineData(0, 0, 0, 0, true)]
-        [InlineData(0, 1, 0, 0, true)]
-        [InlineData(0, 100, 0, 0, true)]
-        [InlineData(0,100, 1, 1, true)]
-        [InlineData(0, 100, 0, 10, true)]
-        [InlineData(200, 300, 0, 10, false)]
-        [InlineData(200, 300, 150, 250, false)]
-        [InlineData(200, 300, 250, 350, false)]
-        [InlineData(200, 300, 100, 350, false)]
-        [InlineData(uint.MaxValue - 100,uint.MaxValue, uint.MaxValue - 1, uint.MaxValue, true)]
-        [InlineData(uint.MaxValue - 100,uint.MaxValue, uint.MaxValue, uint.MaxValue, true)]
-        [InlineData(uint.MaxValue,uint.MaxValue, uint.MaxValue, uint.MaxValue, true)]
-        [InlineData(uint.MaxValue - 1,uint.MaxValue - 1, uint.MaxValue, uint.MaxValue, false)]
-        public void ContainsRange_CorrectRange_ReturnsExpectedResult(uint startTest, uint endTest, uint start, uint end, bool expected)
+        [InlineTestObject(0, 0, 0, 0, true)]
+        [InlineTestObject(0, 1, 0, 0, true)]
+        [InlineTestObject(0, 100, 0, 0, true)]
+        [InlineTestObject(0,100, 1, 1, true)]
+        [InlineTestObject(0, 100, 0, 10, true)]
+        [InlineTestObject(200, 300, 0, 10, false)]
+        [InlineTestObject(200, 300, 150, 250, false)]
+        [InlineTestObject(200, 300, 250, 350, false)]
+        [InlineTestObject(200, 300, 100, 350, false)]
+        [InlineTestObject(uint.MaxValue - 100,uint.MaxValue, uint.MaxValue - 1, uint.MaxValue, true)]
+        [InlineTestObject(uint.MaxValue - 100,uint.MaxValue, uint.MaxValue, uint.MaxValue, true)]
+        [InlineTestObject(uint.MaxValue,uint.MaxValue, uint.MaxValue, uint.MaxValue, true)]
+        [InlineTestObject(uint.MaxValue - 1,uint.MaxValue - 1, uint.MaxValue, uint.MaxValue, false)]
+        public void ContainsRange_CorrectRange_ReturnsExpectedResult(uint startTest, uint endTest, uint start, uint end, bool expected, IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetForRange(startTest, endTest);
+            using var testObject = factory.GetForRange(startTest, endTest);
             
             // Act
-            var actual = testObject.Bitmap.ContainsRange(start, end);
+            var actual = testObject.ReadOnlyBitmap.ContainsRange(start, end);
 
             // Assert
             Assert.Equal(expected, actual);

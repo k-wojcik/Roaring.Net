@@ -1,0 +1,17 @@
+<RunSettings>
+  <RunConfiguration>
+    <EnvironmentVariables>
+      <!-- Temporary fix for 
+            https://github.com/dotnet/runtime/issues/104123, 
+            https://github.com/dotnet/runtime/issues/104415
+     
+            use of TestObjectMatrix generates AccessViolationException
+            "Fatal error. System.AccessViolationException: Attempted to read or write protected memory. This is often an indication that other memory is corrupt.
+            at System.Runtime.CompilerServices.CastHelpers.IsInstanceOfClass(Void*, System.Object)"      
+       --> 
+      <DOTNET_ReadyToRun>0</DOTNET_ReadyToRun>
+      <DOTNET_TailCallOpt>0</DOTNET_TailCallOpt>
+      <!-- Temporary fix for - end -->
+    </EnvironmentVariables>
+  </RunConfiguration>
+</RunSettings>

@@ -60,6 +60,24 @@ namespace Roaring.Net {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot access a disposed, unallocated memory..
+        /// </summary>
+        internal static string BitmapMemoryDisposed {
+            get {
+                return ResourceManager.GetString("BitmapMemoryDisposed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The size of memory cannot be zero..
+        /// </summary>
+        internal static string BitmapMemorySizeEqualToZero {
+            get {
+                return ResourceManager.GetString("BitmapMemorySizeEqualToZero", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Deserialization failed for an unknown reason..
         /// </summary>
         internal static string DeserializationFailedUnknownReason {

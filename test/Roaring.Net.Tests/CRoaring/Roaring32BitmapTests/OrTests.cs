@@ -8,20 +8,21 @@ public class OrTests
     public class Or
     {
         [Theory]
-        [InlineData(new uint[]{  }, new uint[]{  })]
-        [InlineData(new uint[]{ 1 }, new uint[]{ 1 })]
-        [InlineData(new uint[]{ 1 }, new uint[]{  })]
-        [InlineData(new uint[]{  }, new uint[]{ 1 })]
-        [InlineData(new uint[]{ 0, 1, 2 }, new uint[]{ 1, uint.MaxValue })]
-        [InlineData(new uint[]{ 0, 1, 2, uint.MaxValue }, new uint[]{ 0, 2, uint.MaxValue })]
-        public void Or_BitmapsWithDifferentValues_ReturnsUnionOfBitmaps(uint[] values1, uint[] values2)
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{ 1 }, new uint[]{ 1 })]
+        [InlineMatrixTestObject(new uint[]{ 1 }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{ 1 })]
+        [InlineMatrixTestObject(new uint[]{ 0, 1, 2 }, new uint[]{ 1, uint.MaxValue })]
+        [InlineMatrixTestObject(new uint[]{ 0, 1, 2, uint.MaxValue }, new uint[]{ 0, 2, uint.MaxValue })]
+        public void Or_BitmapsWithDifferentValues_ReturnsUnionOfBitmaps(uint[] values1, uint[] values2, 
+            TestObjectMatrix<IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory> matrix)
         {
             // Arrange
-            using var testObject1 = Roaring32BitmapTestObject.GetFromValues(values1);
-            using var testObject2 = Roaring32BitmapTestObject.GetFromValues(values2);
+            using var testObject1 = matrix.X.GetFromValues(values1);
+            using var testObject2 = matrix.Y.GetFromValues(values2);
        
             // Act
-            using var actual = testObject1.Bitmap.Or(testObject2.Bitmap);
+            using var actual = testObject1.ReadOnlyBitmap.Or(testObject2.Bitmap);
             
             // Assert
             Assert.Equal(values1.Union(values2), actual.Values);
@@ -31,20 +32,21 @@ public class OrTests
     public class OrCount
     {
         [Theory]
-        [InlineData(new uint[]{  }, new uint[]{  })]
-        [InlineData(new uint[]{ 1 }, new uint[]{ 1 })]
-        [InlineData(new uint[]{ 1 }, new uint[]{  })]
-        [InlineData(new uint[]{  }, new uint[]{ 1 })]
-        [InlineData(new uint[]{ 0, 1, 2 }, new uint[]{ 1, uint.MaxValue })]
-        [InlineData(new uint[]{ 0, 1, 2, uint.MaxValue }, new uint[]{ 0, 2, uint.MaxValue })]
-        public void Or_BitmapsWithDifferentValues_ReturnsCountAfterUnionOfBitmaps(uint[] values1, uint[] values2)
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{ 1 }, new uint[]{ 1 })]
+        [InlineMatrixTestObject(new uint[]{ 1 }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{ 1 })]
+        [InlineMatrixTestObject(new uint[]{ 0, 1, 2 }, new uint[]{ 1, uint.MaxValue })]
+        [InlineMatrixTestObject(new uint[]{ 0, 1, 2, uint.MaxValue }, new uint[]{ 0, 2, uint.MaxValue })]
+        public void Or_BitmapsWithDifferentValues_ReturnsCountAfterUnionOfBitmaps(uint[] values1, uint[] values2, 
+            TestObjectMatrix<IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory> matrix)
         {
             // Arrange
-            using var testObject1 = Roaring32BitmapTestObject.GetFromValues(values1);
-            using var testObject2 = Roaring32BitmapTestObject.GetFromValues(values2);
+            using var testObject1 = matrix.X.GetFromValues(values1);
+            using var testObject2 = matrix.Y.GetFromValues(values2);
        
             // Act
-            var actual = testObject1.Bitmap.OrCount(testObject2.Bitmap);
+            var actual = testObject1.ReadOnlyBitmap.OrCount(testObject2.Bitmap);
             
             // Assert
             Assert.Equal((ulong)values1.Union(values2).Count(), actual);
@@ -54,22 +56,23 @@ public class OrTests
     public class OrMany
     {
         [Theory]
-        [InlineData(new uint[]{  }, new uint[]{  }, new uint[]{  })]
-        [InlineData(new uint[]{ 1 }, new uint[]{ 1 }, new uint[]{ 1 })]
-        [InlineData(new uint[]{ 1 }, new uint[]{  }, new uint[]{  })]
-        [InlineData(new uint[]{  }, new uint[]{ 1 }, new uint[]{  })]
-        [InlineData(new uint[]{  }, new uint[]{  }, new uint[]{ 1 })]
-        [InlineData(new uint[]{ 0, 1, 2 }, new uint[]{ 1, uint.MaxValue }, new uint[]{ 3, 5 })]
-        [InlineData(new uint[]{ 0, 1, 2, uint.MaxValue }, new uint[]{ 0, 2, uint.MaxValue }, new uint[]{ 5, uint.MaxValue })]
-        public void OrMany_BitmapsWithDifferentValues_ReturnsUnionOfBitmaps(uint[] values1, uint[] values2, uint[] values3)
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{  }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{ 1 }, new uint[]{ 1 }, new uint[]{ 1 })]
+        [InlineMatrixTestObject(new uint[]{ 1 }, new uint[]{  }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{ 1 }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{  }, new uint[]{ 1 })]
+        [InlineMatrixTestObject(new uint[]{ 0, 1, 2 }, new uint[]{ 1, uint.MaxValue }, new uint[]{ 3, 5 })]
+        [InlineMatrixTestObject(new uint[]{ 0, 1, 2, uint.MaxValue }, new uint[]{ 0, 2, uint.MaxValue }, new uint[]{ 5, uint.MaxValue })]
+        public void OrMany_BitmapsWithDifferentValues_ReturnsUnionOfBitmaps(uint[] values1, uint[] values2, uint[] values3, 
+            TestObjectMatrix<IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory> matrix)
         {
             // Arrange
-            using var testObject1 = Roaring32BitmapTestObject.GetFromValues(values1);
-            using var testObject2 = Roaring32BitmapTestObject.GetFromValues(values2);
-            using var testObject3 = Roaring32BitmapTestObject.GetFromValues(values3);
+            using var testObject1 = matrix.X.GetFromValues(values1);
+            using var testObject2 = matrix.Y.GetFromValues(values2);
+            using var testObject3 = matrix.Z.GetFromValues(values3);
        
             // Act
-            var actual = testObject1.Bitmap.OrMany([testObject2.Bitmap, testObject3.Bitmap]);
+            var actual = testObject1.ReadOnlyBitmap.OrMany([testObject2.Bitmap, testObject3.Bitmap]);
             
             // Assert
             Assert.Equal(values1.Union(values2).Union(values3).Order(), actual.Values);
@@ -79,22 +82,23 @@ public class OrTests
     public class OrManyHeap
     {
         [Theory]
-        [InlineData(new uint[]{  }, new uint[]{  }, new uint[]{  })]
-        [InlineData(new uint[]{ 1 }, new uint[]{ 1 }, new uint[]{ 1 })]
-        [InlineData(new uint[]{ 1 }, new uint[]{  }, new uint[]{  })]
-        [InlineData(new uint[]{  }, new uint[]{ 1 }, new uint[]{  })]
-        [InlineData(new uint[]{  }, new uint[]{  }, new uint[]{ 1 })]
-        [InlineData(new uint[]{ 0, 1, 2 }, new uint[]{ 1, uint.MaxValue }, new uint[]{ 3, 5 })]
-        [InlineData(new uint[]{ 0, 1, 2, uint.MaxValue }, new uint[]{ 0, 2, uint.MaxValue }, new uint[]{ 5, uint.MaxValue })]
-        public void OrManyHeap_BitmapsWithDifferentValues_ReturnsUnionOfBitmaps(uint[] values1, uint[] values2, uint[] values3)
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{  }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{ 1 }, new uint[]{ 1 }, new uint[]{ 1 })]
+        [InlineMatrixTestObject(new uint[]{ 1 }, new uint[]{  }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{ 1 }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{  }, new uint[]{ 1 })]
+        [InlineMatrixTestObject(new uint[]{ 0, 1, 2 }, new uint[]{ 1, uint.MaxValue }, new uint[]{ 3, 5 })]
+        [InlineMatrixTestObject(new uint[]{ 0, 1, 2, uint.MaxValue }, new uint[]{ 0, 2, uint.MaxValue }, new uint[]{ 5, uint.MaxValue })]
+        public void OrManyHeap_BitmapsWithDifferentValues_ReturnsUnionOfBitmaps(uint[] values1, uint[] values2, uint[] values3, 
+            TestObjectMatrix<IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory> matrix)
         {
             // Arrange
-            using var testObject1 = Roaring32BitmapTestObject.GetFromValues(values1);
-            using var testObject2 = Roaring32BitmapTestObject.GetFromValues(values2);
-            using var testObject3 = Roaring32BitmapTestObject.GetFromValues(values3);
+            using var testObject1 = matrix.X.GetFromValues(values1);
+            using var testObject2 = matrix.Y.GetFromValues(values2);
+            using var testObject3 = matrix.Z.GetFromValues(values3);
        
             // Act
-            var actual = testObject1.Bitmap.OrManyHeap([testObject2.Bitmap, testObject3.Bitmap]);
+            var actual = testObject1.ReadOnlyBitmap.OrManyHeap([testObject2.Bitmap, testObject3.Bitmap]);
             
             // Assert
             Assert.Equal(values1.Union(values2).Union(values3).Order(), actual.Values);
@@ -113,8 +117,8 @@ public class OrTests
         public void IOr_BitmapsWithDifferentValues_ReturnsUnionOfBitmaps(uint[] values1, uint[] values2)
         {
             // Arrange
-            using var testObject1 = Roaring32BitmapTestObject.GetFromValues(values1);
-            using var testObject2 = Roaring32BitmapTestObject.GetFromValues(values2);
+            using var testObject1 = Roaring32BitmapTestObjectFactory.Default.GetFromValues(values1);
+            using var testObject2 = Roaring32BitmapTestObjectFactory.Default.GetFromValues(values2);
        
             // Act
             testObject1.Bitmap.IOr(testObject2.Bitmap);
@@ -127,20 +131,22 @@ public class OrTests
     public class LazyOr
     {
         [Theory]
-        [InlineData(new uint[]{  }, new uint[]{  })]
-        [InlineData(new uint[]{ 1 }, new uint[]{ 1 })]
-        [InlineData(new uint[]{ 1 }, new uint[]{  })]
-        [InlineData(new uint[]{  }, new uint[]{ 1 })]
-        [InlineData(new uint[]{ 0, 1, 2 }, new uint[]{ 1, uint.MaxValue })]
-        [InlineData(new uint[]{ 0, 1, 2, uint.MaxValue }, new uint[]{ 0, 2, uint.MaxValue })]
-        public void LazyOr_BitmapsWithDifferentValues_ReturnsUnionOfBitmaps(uint[] values1, uint[] values2)
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{ 1 }, new uint[]{ 1 })]
+        [InlineMatrixTestObject(new uint[]{ 1 }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{ 1 })]
+        [InlineMatrixTestObject(new uint[]{ 0, 1, 2 }, new uint[]{ 1, uint.MaxValue })]
+        [InlineMatrixTestObject(new uint[]{ 0, 1, 2, uint.MaxValue }, new uint[]{ 0, 2, uint.MaxValue })]
+        public void LazyOr_BitmapsWithDifferentValues_ReturnsUnionOfBitmaps(uint[] values1, uint[] values2, 
+            TestObjectMatrix<IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory> matrix)
         {
             // Arrange
-            using var testObject1 = Roaring32BitmapTestObject.GetFromValues(values1);
-            using var testObject2 = Roaring32BitmapTestObject.GetFromValues(values2);
+            using var testObject1 = matrix.X.GetFromValues(values1);
+            using var testObject2 = matrix.Y.GetFromValues(values2);
        
             // Act
-            using var actual = testObject1.Bitmap.LazyOr(testObject2.Bitmap, true);
+            using var actual = testObject1.ReadOnlyBitmap.LazyOr(testObject2.Bitmap, true);
+            actual.RepairAfterLazy();
             
             // Assert
             Assert.Equal(values1.Union(values2), actual.Values);
@@ -159,11 +165,12 @@ public class OrTests
         public void IOr_BitmapsWithDifferentValues_ReturnsUnionOfBitmaps(uint[] values1, uint[] values2)
         {
             // Arrange
-            using var testObject1 = Roaring32BitmapTestObject.GetFromValues(values1);
-            using var testObject2 = Roaring32BitmapTestObject.GetFromValues(values2);
+            using var testObject1 = Roaring32BitmapTestObjectFactory.Default.GetFromValues(values1);
+            using var testObject2 = Roaring32BitmapTestObjectFactory.Default.GetFromValues(values2);
        
             // Act
             testObject1.Bitmap.ILazyOr(testObject2.Bitmap, true);
+            testObject1.Bitmap.RepairAfterLazy();
             
             // Assert
             Assert.Equal(values1.Union(values2), testObject1.Bitmap.Values);

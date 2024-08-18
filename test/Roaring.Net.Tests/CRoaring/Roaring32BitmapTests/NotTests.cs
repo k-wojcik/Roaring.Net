@@ -9,32 +9,34 @@ public class NotTests
 {
     public class Not_ForWholeBitmap
     {
-        [Fact]
-        public void Not_EmptyBitmap_NegatesValuesInBitmap()
+        [Theory]
+        [InlineTestObject]
+        public void Not_EmptyBitmap_NegatesValuesInBitmap(IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+            using var testObject = factory.GetEmpty();
             
             // Act
-            using var actual = testObject.Bitmap.Not();
+            using var actual = testObject.ReadOnlyBitmap.Not();
             
             // Assert
             Assert.All([uint.MinValue, 1U, 2U, 1000U, uint.MaxValue], value =>
             {
                 Assert.True(actual.Contains(value));
             });
-            Assert.Equal(0U, testObject.Bitmap.And(actual).Count);
+            Assert.Equal(0U, testObject.ReadOnlyBitmap.And(actual).Count);
             Assert.Equal(uint.MaxValue + 1UL, actual.Count);
         }
         
-        [Fact]
-        public void Not_NotEmptyBitmap_NegatesValuesInBitmap()
+        [Theory]
+        [InlineTestObject]
+        public void Not_NotEmptyBitmap_NegatesValuesInBitmap(IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetFromValues([0, 3, uint.MaxValue]);
+            using var testObject = factory.GetFromValues([0, 3, uint.MaxValue]);
             
             // Act
-            using var actual = testObject.Bitmap.Not();
+            using var actual = testObject.ReadOnlyBitmap.Not();
             
             // Assert
             Assert.All(testObject.Values, value =>
@@ -46,7 +48,7 @@ public class NotTests
             {
                 Assert.True(actual.Contains(value));
             });
-            Assert.Equal(0U, testObject.Bitmap.And(actual).Count);
+            Assert.Equal(0U, testObject.ReadOnlyBitmap.And(actual).Count);
             Assert.Equal(uint.MaxValue - 2UL, actual.Count);
         }
     }
@@ -57,7 +59,7 @@ public class NotTests
         public void INot_EmptyBitmap_NegatesValuesInBitmap()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
             
             // Act
             testObject.Bitmap.INot();
@@ -74,7 +76,7 @@ public class NotTests
         public void INot_NotEmptyBitmap_NegatesValuesInBitmap()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetFromValues([0, 3, uint.MaxValue]);
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetFromValues([0, 3, uint.MaxValue]);
             
             // Act
             testObject.Bitmap.INot();
@@ -95,25 +97,26 @@ public class NotTests
     public class NotRange
     {
         [Theory]
-        [InlineData(1, 0)]
-        [InlineData(10, 5)]
-        public void NotRange_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint start, uint end)
+        [InlineTestObject(1, 0)]
+        [InlineTestObject(10, 5)]
+        public void NotRange_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint start, uint end, IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+            using var testObject = factory.GetEmpty();
 
             // Act && Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.NotRange(start, end));
+            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.ReadOnlyBitmap.NotRange(start, end));
         }
         
-        [Fact]
-        public void NotRange_EmptyBitmap_NegatesValuesInBitmap()
+        [Theory]
+        [InlineTestObject]
+        public void NotRange_EmptyBitmap_NegatesValuesInBitmap(IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetEmpty();
+            using var testObject = factory.GetEmpty();
             
             // Act
-            using var actual = testObject.Bitmap.NotRange(0, 3);
+            using var actual = testObject.ReadOnlyBitmap.NotRange(0, 3);
             
             // Assert
             Assert.All([0U, 1U, 2U, 3U], value =>

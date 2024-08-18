@@ -12,9 +12,9 @@ public class MaintenanceTests
         public void RepairAfterLazy_BitmapIsInconsistent_RepairsBitmap()
         {
             // Arrange
-            using var testObject1 = Roaring32BitmapTestObject.GetForRange(0, 10_000);
-            using var testObject2 = Roaring32BitmapTestObject.GetForRange(uint.MaxValue - 10_000, uint.MaxValue);
-            using var testObject3 = Roaring32BitmapTestObject.GetForRange(uint.MaxValue - 10_000, uint.MaxValue);
+            using var testObject1 = Roaring32BitmapTestObjectFactory.Default.GetForRange(0, 10_000);
+            using var testObject2 = Roaring32BitmapTestObjectFactory.Default.GetForRange(uint.MaxValue - 10_000, uint.MaxValue);
+            using var testObject3 = Roaring32BitmapTestObjectFactory.Default.GetForRange(uint.MaxValue - 10_000, uint.MaxValue);
             using var temp = testObject1.Bitmap.LazyOr(testObject2.Bitmap, false);
        
             // Act
@@ -158,27 +158,29 @@ public class MaintenanceTests
     
     public class IsValid
     {
-        [Fact]
-        public void IsValid_BitmapIsValid_ReturnsTrue()
+        [Theory]
+        [InlineTestObject]
+        public void IsValid_BitmapIsValid_ReturnsTrue(IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetDefault();
+            using var testObject = factory.GetDefault();
         
             // Act
-            var actual = testObject.Bitmap.IsValid();
+            var actual = testObject.ReadOnlyBitmap.IsValid();
 
             // Assert
             Assert.True(actual);
         }
         
-        [Fact]
-        public void IsValid_BitmapIsNotValid_ReturnsFalse()
+        [Theory]
+        [InlineMatrixTestObject]
+        public void IsValid_BitmapIsNotValid_ReturnsFalse(TestObjectMatrix<IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory> matrix)
         {
             // Arrange
-            using var testObject1 = Roaring32BitmapTestObject.GetForRange(0, 10_000);
-            using var testObject2 = Roaring32BitmapTestObject.GetForRange(uint.MaxValue - 10_000, uint.MaxValue);
-            using var testObject3 = Roaring32BitmapTestObject.GetForRange(uint.MaxValue - 10_000, uint.MaxValue);
-            using var temp = testObject1.Bitmap.LazyOr(testObject2.Bitmap, false);
+            using var testObject1 = matrix.X.GetForRange(0, 10_000);
+            using var testObject2 = matrix.Y.GetForRange(uint.MaxValue - 10_000, uint.MaxValue);
+            using var testObject3 = matrix.Z.GetForRange(uint.MaxValue - 10_000, uint.MaxValue);
+            using var temp = testObject1.ReadOnlyBitmap.LazyOr(testObject2.Bitmap, false);
             using var bitmap = temp.LazyOr(testObject3.Bitmap, false);
             
             // Act
@@ -188,28 +190,30 @@ public class MaintenanceTests
             Assert.False(actual);
         }
         
-        [Fact]
-        public void IsValid_WithReason_BitmapIsValid_ReturnsTrueAndNullReason()
+        [Theory]
+        [InlineTestObject]
+        public void IsValid_WithReason_BitmapIsValid_ReturnsTrueAndNullReason(IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetDefault();
+            using var testObject = factory.GetDefault();
         
             // Act
-            var actual = testObject.Bitmap.IsValid(out var reason);
+            var actual = testObject.ReadOnlyBitmap.IsValid(out var reason);
 
             // Assert
             Assert.True(actual);
             Assert.Null(reason);
         }
         
-        [Fact]
-        public void IsValid_WithReason_BitmapIsNotValid_ReturnsFalseAndReason()
+        [Theory]
+        [InlineMatrixTestObject]
+        public void IsValid_WithReason_BitmapIsNotValid_ReturnsFalseAndReason(TestObjectMatrix<IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory> matrix)
         {
             // Arrange
-            using var testObject1 = Roaring32BitmapTestObject.GetForRange(0, 10_000);
-            using var testObject2 = Roaring32BitmapTestObject.GetForRange(uint.MaxValue - 10_000, uint.MaxValue);
-            using var testObject3 = Roaring32BitmapTestObject.GetForRange(uint.MaxValue - 10_000, uint.MaxValue);
-            using var temp = testObject1.Bitmap.LazyOr(testObject2.Bitmap, false);
+            using var testObject1 = matrix.X.GetForRange(0, 10_000);
+            using var testObject2 = matrix.Y.GetForRange(uint.MaxValue - 10_000, uint.MaxValue);
+            using var testObject3 = matrix.Z.GetForRange(uint.MaxValue - 10_000, uint.MaxValue);
+            using var temp = testObject1.ReadOnlyBitmap.LazyOr(testObject2.Bitmap, false);
             using var bitmap = temp.LazyOr(testObject3.Bitmap, false);
             
             // Act
@@ -227,7 +231,7 @@ public class MaintenanceTests
         public void IsCopyOnWrite_Default_ReturnsFalse()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetDefault();
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
             
             // Act
             var actual = testObject.Bitmap.IsCopyOnWrite;
@@ -240,7 +244,7 @@ public class MaintenanceTests
         public void IsCopyOnWrite_CopyOnWriteEnabled_ReturnsTrue()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetDefault();
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
             
             // Act
             testObject.Bitmap.SetCopyOnWrite(true);
@@ -257,7 +261,7 @@ public class MaintenanceTests
         public void SetCopyOnWrite_WithTrue_EnablesCopyOnWrite()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetDefault();
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
             
             // Act
             testObject.Bitmap.SetCopyOnWrite(true);
@@ -270,7 +274,7 @@ public class MaintenanceTests
         public void SetCopyOnWrite_WithFalse_DisablesCopyOnWrite()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObject.GetDefault();
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
             
             // Act
             testObject.Bitmap.SetCopyOnWrite(false);

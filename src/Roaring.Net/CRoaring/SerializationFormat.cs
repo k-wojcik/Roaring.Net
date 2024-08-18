@@ -3,5 +3,6 @@
 public enum SerializationFormat
 {
     Normal,
-    Portable
+    Portable,
+    Frozen,
 }

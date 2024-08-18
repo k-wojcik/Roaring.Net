@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <TestTargetFramework>net8.0</TestTargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/Roaring.Net/Roaring.Net.csproj" SetTargetFramework="TargetFramework=$(TestTargetFramework)"  />
@@ -23,10 +24,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <None Update="CRoaring\Roaring32BitmapTests\TestData\bitmapwithruns.bin">
+    <None Update="CRoaring\TestData\bitmapwithruns.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="CRoaring\Roaring32BitmapTests\TestData\bitmapwithoutruns.bin">
+    <None Update="CRoaring\TestData\bitmapwithoutruns.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

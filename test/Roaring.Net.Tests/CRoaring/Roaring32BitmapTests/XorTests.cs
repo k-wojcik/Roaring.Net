@@ -8,20 +8,21 @@ public class XorTests
     public class Xor
     {
         [Theory]
-        [InlineData(new uint[]{  }, new uint[]{  })]
-        [InlineData(new uint[]{ 1 }, new uint[]{ 1 })]
-        [InlineData(new uint[]{ 1 }, new uint[]{  })]
-        [InlineData(new uint[]{  }, new uint[]{ 1 })]
-        [InlineData(new uint[]{ 0, 1, 2 }, new uint[]{ 1, uint.MaxValue })]
-        [InlineData(new uint[]{ 0, 1, 2, uint.MaxValue }, new uint[]{ 0, 2, uint.MaxValue })]
-        public void Xor_BitmapsWithDifferentValues_ReturnsSymmetricDifferenceOfBitmaps(uint[] values1, uint[] values2)
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{ 1 }, new uint[]{ 1 })]
+        [InlineMatrixTestObject(new uint[]{ 1 }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{ 1 })]
+        [InlineMatrixTestObject(new uint[]{ 0, 1, 2 }, new uint[]{ 1, uint.MaxValue })]
+        [InlineMatrixTestObject(new uint[]{ 0, 1, 2, uint.MaxValue }, new uint[]{ 0, 2, uint.MaxValue })]
+        public void Xor_BitmapsWithDifferentValues_ReturnsSymmetricDifferenceOfBitmaps(uint[] values1, uint[] values2, 
+            TestObjectMatrix<IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory> matrix)
         {
             // Arrange
-            using var testObject1 = Roaring32BitmapTestObject.GetFromValues(values1);
-            using var testObject2 = Roaring32BitmapTestObject.GetFromValues(values2);
+            using var testObject1 = matrix.X.GetFromValues(values1);
+            using var testObject2 = matrix.Y.GetFromValues(values2);
        
             // Act
-            using var actual = testObject1.Bitmap.Xor(testObject2.Bitmap);
+            using var actual = testObject1.ReadOnlyBitmap.Xor(testObject2.Bitmap);
             
             // Assert
             Assert.Equal(values1.Union(values2).Except(values1.Intersect(values2)), actual.Values);
@@ -31,20 +32,21 @@ public class XorTests
     public class XorCount
     {
         [Theory]
-        [InlineData(new uint[]{  }, new uint[]{  })]
-        [InlineData(new uint[]{ 1 }, new uint[]{ 1 })]
-        [InlineData(new uint[]{ 1 }, new uint[]{  })]
-        [InlineData(new uint[]{  }, new uint[]{ 1 })]
-        [InlineData(new uint[]{ 0, 1, 2 }, new uint[]{ 1, uint.MaxValue })]
-        [InlineData(new uint[]{ 0, 1, 2, uint.MaxValue }, new uint[]{ 0, 2, uint.MaxValue })]
-        public void XorCount_BitmapsWithDifferentValues_ReturnsSymmetricDifferenceOfBitmaps(uint[] values1, uint[] values2)
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{ 1 }, new uint[]{ 1 })]
+        [InlineMatrixTestObject(new uint[]{ 1 }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{ 1 })]
+        [InlineMatrixTestObject(new uint[]{ 0, 1, 2 }, new uint[]{ 1, uint.MaxValue })]
+        [InlineMatrixTestObject(new uint[]{ 0, 1, 2, uint.MaxValue }, new uint[]{ 0, 2, uint.MaxValue })]
+        public void XorCount_BitmapsWithDifferentValues_ReturnsSymmetricDifferenceOfBitmaps(uint[] values1, uint[] values2, 
+            TestObjectMatrix<IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory> matrix)
         {
             // Arrange
-            using var testObject1 = Roaring32BitmapTestObject.GetFromValues(values1);
-            using var testObject2 = Roaring32BitmapTestObject.GetFromValues(values2);
+            using var testObject1 = matrix.X.GetFromValues(values1);
+            using var testObject2 = matrix.Y.GetFromValues(values2);
        
             // Act
-            var actual = testObject1.Bitmap.XorCount(testObject2.Bitmap);
+            var actual = testObject1.ReadOnlyBitmap.XorCount(testObject2.Bitmap);
             
             // Assert
             Assert.Equal((uint)values1.Union(values2).Except(values1.Intersect(values2)).Count(), actual);
@@ -63,8 +65,8 @@ public class XorTests
         public void IXor_BitmapsWithDifferentValues_ReturnsSymmetricDifferenceOfBitmaps(uint[] values1, uint[] values2)
         {
             // Arrange
-            using var testObject1 = Roaring32BitmapTestObject.GetFromValues(values1);
-            using var testObject2 = Roaring32BitmapTestObject.GetFromValues(values2);
+            using var testObject1 = Roaring32BitmapTestObjectFactory.Default.GetFromValues(values1);
+            using var testObject2 = Roaring32BitmapTestObjectFactory.Default.GetFromValues(values2);
        
             // Act
             testObject1.Bitmap.IXor(testObject2.Bitmap);
@@ -77,22 +79,23 @@ public class XorTests
     public class XorMany
     {
         [Theory]
-        [InlineData(new uint[]{  }, new uint[]{  }, new uint[]{  })]
-        [InlineData(new uint[]{ 1 }, new uint[]{ 1 }, new uint[]{ 1 })]
-        [InlineData(new uint[]{ 1 }, new uint[]{  }, new uint[]{  })]
-        [InlineData(new uint[]{  }, new uint[]{ 1 }, new uint[]{  })]
-        [InlineData(new uint[]{  }, new uint[]{  }, new uint[]{ 1 })]
-        [InlineData(new uint[]{ 0, 1, 2 }, new uint[]{ 1, uint.MaxValue }, new uint[]{ 3, 5 })]
-        [InlineData(new uint[]{ 0, 1, 2, uint.MaxValue }, new uint[]{ 0, 2, uint.MaxValue }, new uint[]{ 5, uint.MaxValue })]
-        public void XorMany_BitmapsWithDifferentValues_ReturnsSymmetricDifferenceOfBitmaps(uint[] values1, uint[] values2, uint[] values3)
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{  }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{ 1 }, new uint[]{ 1 }, new uint[]{ 1 })]
+        [InlineMatrixTestObject(new uint[]{ 1 }, new uint[]{  }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{ 1 }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{  }, new uint[]{ 1 })]
+        [InlineMatrixTestObject(new uint[]{ 0, 1, 2 }, new uint[]{ 1, uint.MaxValue }, new uint[]{ 3, 5 })]
+        [InlineMatrixTestObject(new uint[]{ 0, 1, 2, uint.MaxValue }, new uint[]{ 0, 2, uint.MaxValue }, new uint[]{ 5, uint.MaxValue })]
+        public void XorMany_BitmapsWithDifferentValues_ReturnsSymmetricDifferenceOfBitmaps(uint[] values1, uint[] values2, uint[] values3, 
+            TestObjectMatrix<IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory> matrix)
         {
             // Arrange
-            using var testObject1 = Roaring32BitmapTestObject.GetFromValues(values1);
-            using var testObject2 = Roaring32BitmapTestObject.GetFromValues(values2);
-            using var testObject3 = Roaring32BitmapTestObject.GetFromValues(values3);
+            using var testObject1 = matrix.X.GetFromValues(values1);
+            using var testObject2 = matrix.Y.GetFromValues(values2);
+            using var testObject3 = matrix.Z.GetFromValues(values3);
        
             // Act
-            var actual = testObject1.Bitmap.XorMany([testObject2.Bitmap, testObject3.Bitmap]);
+            var actual = testObject1.ReadOnlyBitmap.XorMany([testObject2.Bitmap, testObject3.Bitmap]);
             
             // Assert
             var tempSet = values1.Union(values2).Except(values1.Intersect(values2)).ToList();
@@ -104,20 +107,22 @@ public class XorTests
     public class LazyXor
     {
         [Theory]
-        [InlineData(new uint[]{  }, new uint[]{  })]
-        [InlineData(new uint[]{ 1 }, new uint[]{ 1 })]
-        [InlineData(new uint[]{ 1 }, new uint[]{  })]
-        [InlineData(new uint[]{  }, new uint[]{ 1 })]
-        [InlineData(new uint[]{ 0, 1, 2 }, new uint[]{ 1, uint.MaxValue })]
-        [InlineData(new uint[]{ 0, 1, 2, uint.MaxValue }, new uint[]{ 0, 2, uint.MaxValue })]
-        public void Xor_BitmapsWithDifferentValues_ReturnsSymmetricDifferenceOfBitmaps(uint[] values1, uint[] values2)
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{ 1 }, new uint[]{ 1 })]
+        [InlineMatrixTestObject(new uint[]{ 1 }, new uint[]{  })]
+        [InlineMatrixTestObject(new uint[]{  }, new uint[]{ 1 })]
+        [InlineMatrixTestObject(new uint[]{ 0, 1, 2 }, new uint[]{ 1, uint.MaxValue })]
+        [InlineMatrixTestObject(new uint[]{ 0, 1, 2, uint.MaxValue }, new uint[]{ 0, 2, uint.MaxValue })]
+        public void Xor_BitmapsWithDifferentValues_ReturnsSymmetricDifferenceOfBitmaps(uint[] values1, uint[] values2, 
+            TestObjectMatrix<IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory> matrix)
         {
             // Arrange
-            using var testObject1 = Roaring32BitmapTestObject.GetFromValues(values1);
-            using var testObject2 = Roaring32BitmapTestObject.GetFromValues(values2);
+            using var testObject1 = matrix.X.GetFromValues(values1);
+            using var testObject2 = matrix.Y.GetFromValues(values2);
        
             // Act
-            using var actual = testObject1.Bitmap.LazyXor(testObject2.Bitmap);
+            using var actual = testObject1.ReadOnlyBitmap.LazyXor(testObject2.Bitmap);
+            actual.RepairAfterLazy();
             
             // Assert
             Assert.Equal(values1.Union(values2).Except(values1.Intersect(values2)), actual.Values);
@@ -135,11 +140,12 @@ public class XorTests
         public void Xor_BitmapsWithDifferentValues_ReturnsSymmetricDifferenceOfBitmaps(uint[] values1, uint[] values2)
         {
             // Arrange
-            using var testObject1 = Roaring32BitmapTestObject.GetFromValues(values1);
-            using var testObject2 = Roaring32BitmapTestObject.GetFromValues(values2);
+            using var testObject1 = Roaring32BitmapTestObjectFactory.Default.GetFromValues(values1);
+            using var testObject2 = Roaring32BitmapTestObjectFactory.Default.GetFromValues(values2);
        
             // Act
             testObject1.Bitmap.ILazyXor(testObject2.Bitmap);
+            testObject1.Bitmap.RepairAfterLazy();
             
             // Assert
             Assert.Equal(values1.Union(values2).Except(values1.Intersect(values2)), testObject1.Bitmap.Values);
