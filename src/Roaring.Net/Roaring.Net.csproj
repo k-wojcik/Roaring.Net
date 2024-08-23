@@ -28,6 +28,14 @@
       <Pack>true</Pack>
       <PackagePath>runtimes/win-x86/native</PackagePath>
     </Content>
+    <Content Include="../../libs/arm32-windows/*.dll">
+      <Pack>true</Pack>
+      <PackagePath>runtimes/win-arm32/native</PackagePath>
+    </Content>
+    <Content Include="../../libs/arm64-windows/*.dll">
+      <Pack>true</Pack>
+      <PackagePath>runtimes/win-arm64/native</PackagePath>
+    </Content>    
     <Content Include="../../libs/x64-linux/*.so">
       <Pack>true</Pack>
       <PackagePath>runtimes/linux-x64/native</PackagePath>

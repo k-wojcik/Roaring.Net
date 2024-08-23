@@ -57,7 +57,7 @@ jobs:
       with:
         name: libs-osx-arm64
         path: |
-          libs/**/*.dylib          
+          libs/**/*.dylib
 
   build-linux-x64:
     runs-on: ubuntu-latest
@@ -178,9 +178,55 @@ jobs:
         path: |
           libs/**/*.dll
 
+  windows-arm:
+    runs-on: windows-latest
+    env:
+        VCPKG_DISABLE_METRICS: 1
+        VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
+    steps:
+    - uses: actions/checkout@v4
+    - name: vcpkg arm32-windows
+      uses: lukka/run-vcpkg@v11
+      env:
+        VCPKG_DEFAULT_TRIPLET: arm-windows
+      with:
+        doNotCache: false
+        runVcpkgInstall: true 
+    - name: copy lib
+      run: mkdir -p libs/arm32-windows/ && cp vcpkg_installed/arm-windows/bin/roaring.dll libs/arm32-windows/
+    - name: Upload lib to artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: libs-windows-arm32
+        path: |
+          libs/**/*.dll
+
+  windows-arm64:
+    runs-on: windows-latest
+    env:
+        VCPKG_DISABLE_METRICS: 1
+        VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed    
+    steps:
+    - uses: actions/checkout@v4
+    - name: vcpkg arm64-windows
+      uses: lukka/run-vcpkg@v11
+      env:
+        VCPKG_DEFAULT_TRIPLET: arm64-windows
+      with:
+        doNotCache: false
+        runVcpkgInstall: true 
+    - name: copy lib
+      run: mkdir -p libs/arm64-windows/ && cp vcpkg_installed/arm64-windows/bin/roaring.dll libs/arm64-windows/
+    - name: Upload lib to artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: libs-windows-arm64
+        path: |
+          libs/**/*.dll
+
   build-dotnet:
     runs-on: ubuntu-latest
-    needs: [build-linux-x64, build-linux-arm64, build-linux-arm, build-osx-x64, build-osx-arm64, windows-x64, windows-x86]
+    needs: [build-linux-x64, build-linux-arm64, build-linux-arm, build-osx-x64, build-osx-arm64, windows-x64, windows-x86, windows-arm, windows-arm64]
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:

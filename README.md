@@ -7,6 +7,18 @@ A .Net wrapper for [CRoaring](https://github.com/RoaringBitmap/CRoaring) - a C i
 [![NuGet Version](https://img.shields.io/nuget/vpre/Roaring.Net)](https://www.nuget.org/packages/Roaring.Net)
 [![codecov](https://codecov.io/github/k-wojcik/Roaring.Net/graph/badge.svg?token=ITL13NZGAH)](https://codecov.io/github/k-wojcik/Roaring.Net)
 
+## Support
+### Supported runtimes
+| Platform/Architecture |      **x86**       |      **x64**       |      **arm**       |     **arm64**      |
+|:---------------------:|:------------------:|:------------------:|:------------------:|:------------------:|
+|      **windows**      | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+|       **linux**       |                    | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+|        **osx**        |                    | :white_check_mark: |                    | :white_check_mark: |
+
+### Supported frameworks
+* .NET 8
+* .NET 6
+
 ## Usage
 ```cs
 using var rb1 = new Roaring32Bitmap();
