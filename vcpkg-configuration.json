@@ -1,4 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg-configuration.schema.json",
-  "overlay-triplets": [ "./build/vcpkg/triplets" ]
+  "overlay-triplets": [
+    "./build/vcpkg/triplets"
+  ]
 }
