@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Roaring.Net.CRoaring;
 using Xunit;
 
 namespace Roaring.Net.Tests.CRoaring.Roaring32BitmapTests;
@@ -91,6 +92,71 @@ public class ContainsTests
 
             // Assert
             Assert.Equal(expected, actual);
+        }
+    }
+    
+    public class ContainsBulk
+    {
+        [Fact]
+        public void ContainsBulk_DifferentBitmaps_ThrowsArgumentException()
+        {
+            // Arrange
+            using var testObject1 = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+            using var testObject2 = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+            using var context = BulkContext.For(testObject1.Bitmap);
+            
+            // Act && Assert
+            Assert.Throws<ArgumentException>(() =>
+            {
+                testObject2.Bitmap.ContainsBulk(context, 10);
+            });
+        }
+        
+        [Theory]
+        [InlineTestObject]
+        public void ContainsBulk_EmptyBitmap_ReturnFalse(IRoaring32BitmapTestObjectFactory factory)
+        {
+            // Arrange
+            using var testObject = factory.GetEmpty();
+            using var context = BulkContext.For(testObject.Bitmap);
+
+            // Act
+            var actual = testObject.ReadOnlyBitmap.ContainsBulk(context, 10);
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Theory]
+        [InlineTestObject]
+        public void ContainsBulk_BitmapHasValue_ReturnsTrue(IRoaring32BitmapTestObjectFactory factory)
+        {
+            // Arrange
+            using var testObject = factory.GetDefault();
+            var value = testObject.Values.First();
+            using var context = BulkContext.For(testObject.Bitmap);
+
+            // Act
+            var actual = testObject.ReadOnlyBitmap.ContainsBulk(context, value);
+
+            // Assert
+            Assert.True(actual);
+        }
+
+        [Theory]
+        [InlineTestObject]
+        public void ContainsBulk_BitmapDoesNotHaveValue_ReturnsFalse(IRoaring32BitmapTestObjectFactory factory)
+        {
+            // Arrange
+            using var testObject = factory.GetDefault();
+            Assert.DoesNotContain(testObject.Values, value => value == 10U);
+            using var context = BulkContext.For(testObject.Bitmap);
+
+            // Act
+            var actual = testObject.ReadOnlyBitmap.ContainsBulk(context, 10U);
+
+            // Assert
+            Assert.False(actual);
         }
     }
 }

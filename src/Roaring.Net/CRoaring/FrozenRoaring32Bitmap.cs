@@ -50,6 +50,16 @@ public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoarin
     ~FrozenRoaring32Bitmap() => Dispose(false);
     
     public bool Contains(uint value) => _bitmap.Contains(value);
+    
+    public bool ContainsBulk(BulkContext context, uint value)
+    {
+        if (context.Bitmap != this)
+        {
+            throw new ArgumentException(ExceptionMessages.BulkContextBelongsToOtherBitmap, nameof(context));
+        }
+        
+        return NativeMethods.roaring_bitmap_contains_bulk(Pointer, context.Pointer, value);
+    }
 
     public bool ContainsRange(uint start, uint end) => _bitmap.ContainsRange(start, end);
     

@@ -730,4 +730,21 @@ internal static unsafe partial class NativeMethods
     [DllImport("roaring")]
     public static extern bool roaring_bitmap_internal_validate(IntPtr bitmap, out IntPtr reasonPtr);
 #endif
+    
+#if NET7_0_OR_GREATER
+    [LibraryImport("roaring", EntryPoint = "roaring_bitmap_add_bulk")]
+    public static partial void roaring_bitmap_add_bulk(IntPtr bitmap, IntPtr context, uint value);
+#else
+    [DllImport("roaring")]
+    public static extern void roaring_bitmap_add_bulk(IntPtr bitmap, IntPtr context, uint value);
+#endif
+    
+    [return: MarshalAs(UnmanagedType.I1)]
+#if NET7_0_OR_GREATER
+    [LibraryImport("roaring", EntryPoint = "roaring_bitmap_contains_bulk")]
+    public static partial bool roaring_bitmap_contains_bulk(IntPtr bitmap, IntPtr context, uint value);
+#else
+    [DllImport("roaring")]
+    public static extern bool roaring_bitmap_contains_bulk(IntPtr bitmap, IntPtr context, uint value);
+#endif
 }

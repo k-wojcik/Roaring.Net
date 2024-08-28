@@ -78,6 +78,15 @@ namespace Roaring.Net {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The passed context is belongs to another bitmap..
+        /// </summary>
+        internal static string BulkContextBelongsToOtherBitmap {
+            get {
+                return ResourceManager.GetString("BulkContextBelongsToOtherBitmap", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Deserialization failed for an unknown reason..
         /// </summary>
         internal static string DeserializationFailedUnknownReason {

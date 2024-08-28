@@ -51,4 +51,7 @@
     <data name="BitmapMemoryDisposed" xml:space="preserve">
         <value>Cannot access a disposed, unallocated memory.</value>
     </data>
+    <data name="BulkContextBelongsToOtherBitmap" xml:space="preserve">
+        <value>The passed context is belongs to another bitmap.</value>
+    </data>
 </root>

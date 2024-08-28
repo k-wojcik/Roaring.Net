@@ -118,6 +118,16 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
         Pointer = NativeMethods.roaring_bitmap_add_offset(Pointer, offset);
         NativeMethods.roaring_bitmap_free(previousPtr);
     }
+
+    public void AddBulk(BulkContext context, uint value)
+    {
+        if (context.Bitmap != this)
+        {
+            throw new ArgumentException(ExceptionMessages.BulkContextBelongsToOtherBitmap, nameof(context));
+        }
+        
+        NativeMethods.roaring_bitmap_add_bulk(Pointer, context.Pointer, value);
+    }
     
     public void Remove(uint value) => NativeMethods.roaring_bitmap_remove(Pointer, value);
 
@@ -160,6 +170,16 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
         }
      
         return NativeMethods.roaring_bitmap_contains_range(Pointer, start, (ulong)end + 1);
+    }
+
+    public bool ContainsBulk(BulkContext context, uint value)
+    {
+        if (context.Bitmap != this)
+        {
+            throw new ArgumentException(ExceptionMessages.BulkContextBelongsToOtherBitmap, nameof(context));
+        }
+        
+        return NativeMethods.roaring_bitmap_contains_bulk(Pointer, context.Pointer, value);
     }
 
     public bool ValueEquals(Roaring32BitmapBase? bitmap)

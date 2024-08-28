@@ -48,7 +48,10 @@ internal interface IReadOnlyRoaring32Bitmap : IDisposable
     bool OverlapsRange(uint start, uint end);
 
     double GetJaccardIndex(Roaring32BitmapBase bitmap);
+
     bool Contains(uint value);
+
+    bool ContainsBulk(BulkContext context, uint value);
     
     bool ContainsRange(uint start, uint end);
     

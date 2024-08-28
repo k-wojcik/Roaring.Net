@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Roaring.Net.CRoaring;
 using Xunit;
 
 namespace Roaring.Net.Tests.CRoaring.Roaring32BitmapTests;
@@ -258,6 +259,73 @@ public class AddTests
             // Assert
             var actual = testObject.Bitmap.Values.ToList();
             Assert.Equal(expected, actual);
+        }
+    }
+    
+    public class AddBulk
+    {
+        [Fact]
+        public void AddBulk_DifferentBitmaps_ThrowsArgumentException()
+        {
+            // Arrange
+            using var testObject1 = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+            using var testObject2 = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+            using var context = BulkContext.For(testObject1.Bitmap);
+            
+            // Act && Assert
+            Assert.Throws<ArgumentException>(() =>
+            {
+                testObject2.Bitmap.AddBulk(context, 10);
+            });
+        }
+        
+        [Fact]
+        public void AddBulk_EmptyBitmap_AddsValueToBitmap()
+        {
+            // Arrange
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+            using var context = BulkContext.For(testObject.Bitmap);
+            
+            // Act
+            testObject.Bitmap.AddBulk(context, 10);
+        
+            // Assert
+            Assert.Single(testObject.Bitmap.Values, value=> value == 10U);
+            Assert.Equal(1U, testObject.Bitmap.Count);
+        }
+    
+        [Fact]
+        public void AddBulk_BitmapWithValues_AddsValueToBitmap()
+        {
+            // Arrange
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
+            var cardinality = testObject.Bitmap.Count;
+            Assert.DoesNotContain(testObject.Bitmap.Values, value=> value == 10U);
+            using var context = BulkContext.For(testObject.Bitmap);
+        
+            // Act
+            testObject.Bitmap.AddBulk(context, 10);
+        
+            // Assert
+            Assert.Single(testObject.Bitmap.Values, value=> value == 10U);
+            Assert.Equal(cardinality + 1, testObject.Bitmap.Count);
+        }
+    
+        [Fact]
+        public void AddBulk_AddedValueExistsInBitmap_ValueIsNotAddedToBitmap()
+        {
+            // Arrange
+            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
+            var cardinality = testObject.Bitmap.Count;
+            var addedValue = testObject.Bitmap.Values.ToList()[2];
+            using var context = BulkContext.For(testObject.Bitmap);
+        
+            // Act
+            testObject.Bitmap.AddBulk(context, addedValue);
+        
+            // Assert
+            Assert.Single(testObject.Bitmap.Values, value=> value == addedValue);
+            Assert.Equal(cardinality, testObject.Bitmap.Count);
         }
     }
 }
