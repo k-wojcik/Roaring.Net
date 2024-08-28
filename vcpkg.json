@@ -1,5 +1,5 @@
 {
-  "builtin-baseline": "821100d967e1737d96414a308e3f7cbe0d1abf18",
+  "builtin-baseline": "b6fcbeaa7f8f7729d625ba808f4bce7432b05072",
   "dependencies": [
     "roaring"
   ],
