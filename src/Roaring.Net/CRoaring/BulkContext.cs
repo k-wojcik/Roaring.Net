@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Roaring.Net.CRoaring;
 
-public sealed class BulkContext : IDisposable
+public sealed unsafe class BulkContext : IDisposable
 {
     internal Roaring32BitmapBase Bitmap { get; }
     
@@ -13,7 +14,9 @@ public sealed class BulkContext : IDisposable
 
     public BulkContext(Roaring32BitmapBase bitmap)
     {
-        Pointer = Marshal.AllocHGlobal(Marshal.SizeOf<BulkContextInternal>());
+        var size = Marshal.SizeOf<BulkContextInternal>();
+        Pointer = Marshal.AllocHGlobal(size);
+        Unsafe.InitBlockUnaligned(Pointer.ToPointer(), 0, (uint)size);
         Bitmap = bitmap;
     }
 
