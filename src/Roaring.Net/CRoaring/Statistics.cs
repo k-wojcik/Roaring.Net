@@ -21,9 +21,9 @@ public readonly struct Statistics
 
     public readonly uint MaxValue;
     public readonly uint MinValue;
-    
+
     [Obsolete]
     private readonly ulong ValueSum;
-    
+
     public readonly ulong Count;
 }

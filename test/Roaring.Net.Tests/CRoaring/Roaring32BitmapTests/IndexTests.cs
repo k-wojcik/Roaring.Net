@@ -14,33 +14,33 @@ public class IndexTests
         public void TryGetValue_IndexLessThanBitmapSize_ReturnsTrueAndExpectedValue(uint[] values, uint index, uint expected, IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using var testObject = factory.GetFromValues(values);
-        
+            using IRoaring32BitmapTestObject testObject = factory.GetFromValues(values);
+
             // Act
             var actualReturn = testObject.ReadOnlyBitmap.TryGetValue(index, out uint actual);
-        
+
             // Assert
             Assert.True(actualReturn);
             Assert.Equal(expected, actual);
         }
-    
+
         [Theory]
-        [InlineTestObject(new uint[]{}, 1, 0)]
+        [InlineTestObject(new uint[] { }, 1, 0)]
         [InlineTestObject(new uint[] { 0, 1, 2, 3, 4 }, 5, 0)]
         public void TryGetValue_IndexGreaterThanBitmapSize_ReturnsFalseAndZero(uint[] values, uint index, uint expected, IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using var testObject = factory.GetFromValues(values);
-        
+            using IRoaring32BitmapTestObject testObject = factory.GetFromValues(values);
+
             // Act
             var actualReturn = testObject.ReadOnlyBitmap.TryGetValue(index, out uint actual);
-        
+
             // Assert
             Assert.False(actualReturn);
             Assert.Equal(expected, actual);
-        } 
+        }
     }
-    
+
     public class GetIndex
     {
         [Theory]
@@ -55,11 +55,11 @@ public class IndexTests
         public void GetIndex_ForValues_ReturnsIndexOfValue(uint[] values, uint testedValue, long expected, IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using var testObject = factory.GetFromValues(values);
-        
+            using IRoaring32BitmapTestObject testObject = factory.GetFromValues(values);
+
             // Act
             var actual = testObject.ReadOnlyBitmap.GetIndex(testedValue);
-        
+
             // Assert
             Assert.Equal(expected, actual);
         }

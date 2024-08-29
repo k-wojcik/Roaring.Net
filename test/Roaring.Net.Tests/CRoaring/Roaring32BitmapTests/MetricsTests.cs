@@ -12,8 +12,8 @@ public class MetricsTests
         public void GetJaccardIndex_ForNotEmptyBitmaps_ReturnsJaccardIndex(TestObjectMatrix<IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory> matrix)
         {
             // Arrange
-            using var testObject1 = matrix.X.GetFromValues([1, 2, 3, int.MaxValue]);
-            using var testObject2 = matrix.Y.GetFromValues([1, 2, 3, 5]);
+            using IRoaring32BitmapTestObject testObject1 = matrix.X.GetFromValues([1, 2, 3, int.MaxValue]);
+            using IRoaring32BitmapTestObject testObject2 = matrix.Y.GetFromValues([1, 2, 3, 5]);
 
             // Act
             var actual = testObject1.ReadOnlyBitmap.GetJaccardIndex(testObject2.Bitmap);
@@ -21,17 +21,17 @@ public class MetricsTests
             // Assert
             var intersectCount = testObject1.Values.Intersect(testObject2.Values).Count();
             var unionCount = testObject1.Values.Union(testObject2.Values).Count();
-            
+
             Assert.Equal(intersectCount / (double)unionCount, actual);
         }
-        
+
         [Theory]
         [InlineMatrixTestObject]
         public void GetJaccardIndex_ForEmptyBitmaps_ReturnsNaN(TestObjectMatrix<IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory> matrix)
         {
             // Arrange
-            using var testObject1 = matrix.X.GetEmpty();
-            using var testObject2 = matrix.Y.GetEmpty();
+            using IRoaring32BitmapTestObject testObject1 = matrix.X.GetEmpty();
+            using IRoaring32BitmapTestObject testObject2 = matrix.Y.GetEmpty();
 
             // Act
             var actual = testObject1.ReadOnlyBitmap.GetJaccardIndex(testObject2.Bitmap);
@@ -48,7 +48,7 @@ public class MetricsTests
         public void IsEmpty_BitmapContainsValues_ReturnsFalse(IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using var testObject = factory.GetDefault();
+            using IRoaring32BitmapTestObject testObject = factory.GetDefault();
 
             // Act
             var actual = testObject.ReadOnlyBitmap.IsEmpty;
@@ -62,7 +62,7 @@ public class MetricsTests
         public void IsEmpty_EmptyBitmap_ReturnsTrue(IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using var testObject = factory.GetEmpty();
+            using IRoaring32BitmapTestObject testObject = factory.GetEmpty();
 
             // Act
             var actual = testObject.ReadOnlyBitmap.IsEmpty;
@@ -79,7 +79,7 @@ public class MetricsTests
         public void Min_BitmapContainsValues_ReturnsMinValue(IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using var testObject = factory.GetForRange(start: 10, end: uint.MaxValue, count: 1000);
+            using IRoaring32BitmapTestObject testObject = factory.GetForRange(start: 10, end: uint.MaxValue, count: 1000);
 
             // Act
             var actual = testObject.ReadOnlyBitmap.Min;
@@ -93,7 +93,7 @@ public class MetricsTests
         public void Min_EmptyBitmap_ReturnsNull(IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using var testObject = factory.GetEmpty();
+            using IRoaring32BitmapTestObject testObject = factory.GetEmpty();
 
             // Act
             uint? actual = testObject.ReadOnlyBitmap.Min;
@@ -110,7 +110,7 @@ public class MetricsTests
         public void Max_BitmapContainsValues_ReturnsMaxValue(IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using var testObject = factory.GetForRange(start: 0, end: 1001, count: 1001);
+            using IRoaring32BitmapTestObject testObject = factory.GetForRange(start: 0, end: 1001, count: 1001);
 
             // Act
             var actual = testObject.ReadOnlyBitmap.Max;
@@ -124,7 +124,7 @@ public class MetricsTests
         public void Max_EmptyBitmap_ReturnsNull(IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using var testObject = factory.GetEmpty();
+            using IRoaring32BitmapTestObject testObject = factory.GetEmpty();
 
             // Act
             uint? actual = testObject.ReadOnlyBitmap.Max;

@@ -14,34 +14,34 @@ public unsafe class ConvertTests
         public void ToBitmap_Always_CreatesNewInstanceOfBitmap()
         {
             // Act
-            using var testObject = FrozenRoaring32BitmapTestObjectFactory.Default.GetDefault();
+            using FrozenRoaring32BitmapTestObject testObject = FrozenRoaring32BitmapTestObjectFactory.Default.GetDefault();
 
             // Act
-            var actual = testObject.Bitmap.ToBitmap();
+            Roaring32Bitmap actual = testObject.Bitmap.ToBitmap();
 
             // Assert
             Assert.Equal(testObject.Bitmap.Values, actual.Values);
         }
-        
+
         [Fact]
         public void ToBitmap_DestroyOriginalBitmap_NewBitmapIsSillUsable()
         {
             // Act
-            var testObject = FrozenRoaring32BitmapTestObjectFactory.Default.GetDefault();
+            FrozenRoaring32BitmapTestObject testObject = FrozenRoaring32BitmapTestObjectFactory.Default.GetDefault();
             var expectedValues = testObject.Bitmap.Values.ToList();
-            
+
             // Act
-            var actual = testObject.Bitmap.ToBitmap();
+            Roaring32Bitmap actual = testObject.Bitmap.ToBitmap();
             NativeMemory.Clear(testObject.Bitmap.Memory.MemoryPtr, testObject.Bitmap.Memory.Size);
             testObject.Dispose();
 
             // Assert
             Assert.Equal(expectedValues, actual.Values);
-            
-            using var opBitmap = Roaring32BitmapTestObjectFactory.Default.GetForCount(100);
+
+            using Roaring32BitmapTestObject opBitmap = Roaring32BitmapTestObjectFactory.Default.GetForCount(100);
             actual.IOr(opBitmap.Bitmap);
-            Assert.Equal(expectedValues.Concat(opBitmap.Values).OrderBy(x=> x).Distinct(), actual.Values);
-            
+            Assert.Equal(expectedValues.Concat(opBitmap.Values).OrderBy(x => x).Distinct(), actual.Values);
+
             actual.Clear();
             Assert.True(actual.IsEmpty);
         }
@@ -63,35 +63,35 @@ public unsafe class ConvertTests
             uint[] expected, long offset)
         {
             // Arrange
-            using var testObject = FrozenRoaring32BitmapTestObjectFactory.Default.GetFromValues(values);
+            using FrozenRoaring32BitmapTestObject testObject = FrozenRoaring32BitmapTestObjectFactory.Default.GetFromValues(values);
 
             // Act
-            using var actualBitmap = testObject.Bitmap.ToBitmapWithOffset(offset);
+            using Roaring32Bitmap actualBitmap = testObject.Bitmap.ToBitmapWithOffset(offset);
 
             // Assert
             var actual = actualBitmap.Values.ToList();
             Assert.Equal(expected, actual);
             Assert.Equal(testObject.Bitmap.Values, values);
         }
-        
+
         [Fact]
         public void ToBitmapWithOffset_DestroyOriginalBitmap_NewBitmapIsSillUsable()
         {
             // Act
-            var testObject = FrozenRoaring32BitmapTestObjectFactory.Default.GetDefault();
+            FrozenRoaring32BitmapTestObject testObject = FrozenRoaring32BitmapTestObjectFactory.Default.GetDefault();
             var expectedValues = testObject.Bitmap.Values.ToList();
-            
+
             // Act
-            var actual = testObject.Bitmap.ToBitmapWithOffset(0);
+            Roaring32Bitmap actual = testObject.Bitmap.ToBitmapWithOffset(0);
             testObject.Dispose();
 
             // Assert
             Assert.Equal(expectedValues, actual.Values);
-            
-            using var opBitmap = Roaring32BitmapTestObjectFactory.Default.GetForCount(100);
+
+            using Roaring32BitmapTestObject opBitmap = Roaring32BitmapTestObjectFactory.Default.GetForCount(100);
             actual.IOr(opBitmap.Bitmap);
-            Assert.Equal(expectedValues.Concat(opBitmap.Values).OrderBy(x=> x).Distinct(), actual.Values);
-            
+            Assert.Equal(expectedValues.Concat(opBitmap.Values).OrderBy(x => x).Distinct(), actual.Values);
+
             actual.Clear();
             Assert.True(actual.IsEmpty);
         }

@@ -1,5 +1,4 @@
-﻿using System;
-using Roaring.Net.CRoaring;
+﻿using Roaring.Net.CRoaring;
 using Roaring.Net.Tests.CRoaring.TestData;
 using Xunit;
 
@@ -11,10 +10,10 @@ public class DisposeTests
     {
         [Fact]
         public void Dispose_InvokedMoreThanOnce_BlocksRedundantCalls()
-        {   
+        {
             // Arrange
-            var bitmap = SerializationTestBitmap.GetTestBitmap();
-            
+            Roaring32Bitmap bitmap = SerializationTestBitmap.GetTestBitmap();
+
             // Act && Assert
             bitmap.Dispose();
             bitmap.Dispose();

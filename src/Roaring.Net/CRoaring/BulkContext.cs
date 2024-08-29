@@ -7,7 +7,7 @@ namespace Roaring.Net.CRoaring;
 public sealed unsafe class BulkContext : IDisposable
 {
     internal Roaring32BitmapBase Bitmap { get; }
-    
+
     internal readonly IntPtr Pointer;
 
     private bool _isDisposed;
@@ -28,9 +28,9 @@ public sealed unsafe class BulkContext : IDisposable
         {
             return;
         }
-        
+
         Marshal.FreeHGlobal(Pointer);
-        
+
         _isDisposed = true;
     }
 

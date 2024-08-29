@@ -10,16 +10,16 @@ namespace Roaring.Net.Tests.CRoaring;
 public class InlineTestObjectAttribute(params object[] data) : DataAttribute
 {
     private static readonly object[] FactoriesObjects = TestObjectFactories.Instances.Cast<object>().ToArray().ToArray();
-    
-    public override IEnumerable<object[]> GetData(MethodInfo testMethod) 
+
+    public override IEnumerable<object[]> GetData(MethodInfo testMethod)
         => GetMatrix(testMethod).Select(item => data.Append(item).ToArray());
 
     private static object[] GetMatrix(MethodInfo testMethod)
     {
-        var parameter = testMethod.GetParameters().Last();
+        ParameterInfo parameter = testMethod.GetParameters().Last();
         return parameter.ParameterType switch
         {
-            _ when parameter.ParameterType == typeof(IRoaring32BitmapTestObjectFactory) 
+            _ when parameter.ParameterType == typeof(IRoaring32BitmapTestObjectFactory)
                 => FactoriesObjects,
             _ => throw new InvalidOperationException("Not supported parameter type")
         };

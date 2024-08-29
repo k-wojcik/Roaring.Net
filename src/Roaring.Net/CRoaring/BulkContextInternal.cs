@@ -7,10 +7,10 @@ namespace Roaring.Net.CRoaring;
 internal struct BulkContextInternal
 {
     public readonly IntPtr container;
-    
+
     public readonly int idx;
-    
+
     public readonly ushort key;
-    
+
     public readonly byte typecode;
 }

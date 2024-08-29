@@ -13,12 +13,12 @@ internal abstract class Roaring32BitmapTestObjectFactoryBase<TBitmap, TTestObjec
     IRoaring32BitmapTestObject IRoaring32BitmapTestObjectFactory.GetFromValues(uint[] values) => GetFromValues(values);
     IRoaring32BitmapTestObject IRoaring32BitmapTestObjectFactory.GetForRange(uint start, uint end) => GetForRange(start, end);
     IRoaring32BitmapTestObject IRoaring32BitmapTestObjectFactory.GetForRange(uint start, uint end, uint count) => GetForRange(start, end, count);
-    
+
     public virtual TTestObject GetDefault() => GetForRange(0, uint.MaxValue, count: 1000);
     public virtual TTestObject GetEmpty() => CreateBitmapObject(new Roaring32Bitmap(), []);
 
     public virtual TTestObject GetForCount(uint count) => GetForRange(0, uint.MaxValue, count);
-    
+
     public virtual TTestObject GetFromValues(uint[] values) => CreateBitmapObject(Roaring32Bitmap.FromValues(values), values);
 
     public virtual TTestObject GetForRange(uint start, uint end) => GetForRange(start, end, end - start + 1);

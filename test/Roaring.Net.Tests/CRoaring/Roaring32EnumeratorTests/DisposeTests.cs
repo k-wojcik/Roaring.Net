@@ -11,13 +11,13 @@ public class DisposeTests
     {
         [Fact]
         public void Finalizer_InvokedMoreThanOnce_BlocksRedundantCalls()
-        {   
+        {
             // Arrange
-            using var bitmap = SerializationTestBitmap.GetTestBitmap();
+            using Roaring32Bitmap bitmap = SerializationTestBitmap.GetTestBitmap();
             var enumerator = new Roaring32Enumerator(bitmap.Pointer);
-            
-            var finalizer = enumerator.GetType().GetMethod("Finalize", BindingFlags.Instance | BindingFlags.NonPublic);
-            
+
+            MethodInfo? finalizer = enumerator.GetType().GetMethod("Finalize", BindingFlags.Instance | BindingFlags.NonPublic);
+
             // Act && Assert
             Assert.NotNull(finalizer);
             finalizer.Invoke(enumerator, null);

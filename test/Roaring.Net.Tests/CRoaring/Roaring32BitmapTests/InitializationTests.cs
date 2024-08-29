@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Roaring.Net.CRoaring;
 using Xunit;
@@ -18,7 +19,7 @@ public class InitializationTests
                 using var uut = new Roaring32Bitmap(IntPtr.Zero);
             });
         }
-        
+
         [Fact]
         public void Ctor_Default_CreatesBitmapWithZeroCapacity()
         {
@@ -40,25 +41,25 @@ public class InitializationTests
             var actual = uut.GetSerializationBytes();
             Assert.True(actual > 0);
         }
-    
+
         [Fact]
         public void Ctor_FromValues_InputHasValues_BitmapContainsExpectedValues()
         {
             // Arrange
             var expected = Enumerable.Range(0, 100)
-                .Select(x=> (uint)x)
+                .Select(x => (uint)x)
                 .Concat([uint.MaxValue - 1, uint.MaxValue])
                 .ToArray();
-        
+
             // Act
             using var uut = new Roaring32Bitmap(expected);
 
             // Assert
-            var actual = uut.Values;
-        
+            IEnumerable<uint> actual = uut.Values;
+
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         public void Ctor_FromValues_InputIsEmpty_BitmapIsEmpty()
         {
@@ -66,8 +67,8 @@ public class InitializationTests
             using var uut = new Roaring32Bitmap([]);
 
             // Assert
-            var actual = uut.Values;
-        
+            IEnumerable<uint> actual = uut.Values;
+
             Assert.Empty(actual);
         }
     }
@@ -113,7 +114,7 @@ public class InitializationTests
             using var uut = Roaring32Bitmap.FromRange(1, 10, 100);
 
             // Assert
-            var actual = uut.Values;
+            IEnumerable<uint> actual = uut.Values;
 
             Assert.Equal([1], actual);
         }
@@ -134,7 +135,7 @@ public class InitializationTests
             using var uut = Roaring32Bitmap.FromValues(expected);
 
             // Assert
-            var actual = uut.Values;
+            IEnumerable<uint> actual = uut.Values;
 
             Assert.Equal(expected, actual);
         }
@@ -146,11 +147,11 @@ public class InitializationTests
             using var uut = Roaring32Bitmap.FromValues([]);
 
             // Assert
-            var actual = uut.Values;
+            IEnumerable<uint> actual = uut.Values;
 
             Assert.Empty(actual);
-        }   
-        
+        }
+
         [Theory]
         [InlineData(0, 100)]
         [InlineData(99, 1)]
@@ -161,19 +162,19 @@ public class InitializationTests
         {
             // Arrange
             var values = Enumerable.Range(0, 100)
-                .Select(x=> (uint)x)
+                .Select(x => (uint)x)
                 .ToArray();
-        
+
             // Act
             using var uut = Roaring32Bitmap.FromValues(values, offset, count);
 
             // Assert
-            var actual = uut.Values;
-            var expected = values.Skip((int)offset).Take((int)count);
-        
+            IEnumerable<uint> actual = uut.Values;
+            IEnumerable<uint> expected = values.Skip((int)offset).Take((int)count);
+
             Assert.Equal(expected, actual);
         }
-        
+
         [Theory]
         [InlineData(0, 101)]
         [InlineData(100, 1)]
@@ -182,9 +183,9 @@ public class InitializationTests
         {
             // Arrange
             var values = Enumerable.Range(0, 100)
-                .Select(x=> (uint)x)
+                .Select(x => (uint)x)
                 .ToArray();
-        
+
             // Act && Assert
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
@@ -192,43 +193,43 @@ public class InitializationTests
             });
         }
     }
-    
+
     public class Clone
     {
         [Fact]
         public void Clone_Always_CreatesNewInstanceOfBitmap()
         {
             // Act
-            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
 
             // Act
-            var actual = testObject.Bitmap.Clone();
-        
+            Roaring32Bitmap actual = testObject.Bitmap.Clone();
+
             // Assert
             Assert.NotEqual(testObject.Bitmap, actual);
             Assert.Equal(testObject.Bitmap.Values, actual.Values);
         }
     }
-    
+
     public class CloneWithOffset
     {
         [Theory]
-        [InlineData(new uint[] { }, new uint[] { },10)]
-        [InlineData(new uint[] { 0, 1, 2, 3, 4 },new uint[] { 5, 6, 7, 8, 9 }, 5)]
-        [InlineData(new uint[] { 0, 1, 2, 3, 4 },new uint[] { 0, 1, 2 }, -2)]
-        [InlineData(new uint[] { 0, 1, 2, 3, 4 }, new uint[] { },-5)]
-        [InlineData(new uint[] { 0, 2, 4, 6, 8 }, new uint[] { 10, 12, 14, 16, 18 },10)]
+        [InlineData(new uint[] { }, new uint[] { }, 10)]
+        [InlineData(new uint[] { 0, 1, 2, 3, 4 }, new uint[] { 5, 6, 7, 8, 9 }, 5)]
+        [InlineData(new uint[] { 0, 1, 2, 3, 4 }, new uint[] { 0, 1, 2 }, -2)]
+        [InlineData(new uint[] { 0, 1, 2, 3, 4 }, new uint[] { }, -5)]
+        [InlineData(new uint[] { 0, 2, 4, 6, 8 }, new uint[] { 10, 12, 14, 16, 18 }, 10)]
         [InlineData(new uint[] { 0, 1, 2, 3, 4, uint.MaxValue }, new uint[] { 1, 2, 3, 4, 5 }, 1)]
-        [InlineData(new uint[] { uint.MaxValue - 1, uint.MaxValue }, new uint[] {  uint.MaxValue },1)]
-        [InlineData(new uint[] { 0 }, new uint[] {  uint.MaxValue },uint.MaxValue)]
-        [InlineData(new uint[] { uint.MaxValue }, new uint[] { 0 },-uint.MaxValue)]
+        [InlineData(new uint[] { uint.MaxValue - 1, uint.MaxValue }, new uint[] { uint.MaxValue }, 1)]
+        [InlineData(new uint[] { 0 }, new uint[] { uint.MaxValue }, uint.MaxValue)]
+        [InlineData(new uint[] { uint.MaxValue }, new uint[] { 0 }, -uint.MaxValue)]
         public void CloneWithOffset_AddsValueToBitmapValues_ReturnsNewBitmapWithExpectedValues(uint[] values, uint[] expected, long offset)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetFromValues(values);
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetFromValues(values);
 
             // Act
-            using var actualBitmap = testObject.Bitmap.CloneWithOffset(offset);
+            using Roaring32Bitmap actualBitmap = testObject.Bitmap.CloneWithOffset(offset);
 
             // Assert
             var actual = actualBitmap.Values.ToList();
@@ -236,7 +237,7 @@ public class InitializationTests
             Assert.Equal(testObject.Bitmap.Values, values);
         }
     }
-    
+
     public class OverwriteWith
     {
         [Theory]
@@ -250,8 +251,8 @@ public class InitializationTests
         public void OverwriteWith_SourceBitmap_ReplacesDestinationBitmapAndReturnsTrue(uint[] source)
         {
             // Arrange
-            using var sourceObject = Roaring32BitmapTestObjectFactory.Default.GetFromValues(source);
-            using var destinationObject = Roaring32BitmapTestObjectFactory.Default.GetFromValues([0, 1, 2, 3, 4, uint.MaxValue - 1, uint.MaxValue]);
+            using Roaring32BitmapTestObject sourceObject = Roaring32BitmapTestObjectFactory.Default.GetFromValues(source);
+            using Roaring32BitmapTestObject destinationObject = Roaring32BitmapTestObjectFactory.Default.GetFromValues([0, 1, 2, 3, 4, uint.MaxValue - 1, uint.MaxValue]);
 
             // Act
             var actual = destinationObject.Bitmap.OverwriteWith(sourceObject.Bitmap);

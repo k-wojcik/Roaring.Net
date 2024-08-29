@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -15,7 +16,7 @@ public class RemoveTests
         public void Remove_BitmapIsEmpty_DoesNotRemoveValue()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
 
             // Act
             testObject.Bitmap.Remove(uint.MaxValue);
@@ -28,7 +29,7 @@ public class RemoveTests
         public void Remove_BitmapWithValue_RemovesValueFromBitmap()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
             var removedValue = testObject.Values.First();
 
             // Act
@@ -48,7 +49,7 @@ public class RemoveTests
         public void RemoveMany_BitmapIsEmpty_DoesNotRemoveAnyValue()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
 
             // Act
             testObject.Bitmap.RemoveMany([1, 10, uint.MaxValue]);
@@ -61,7 +62,7 @@ public class RemoveTests
         public void RemoveMany_BitmapWithValues_RemovesValuesFromBitmap()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
             testObject.Bitmap.Add(uint.MaxValue);
             var removedValues = testObject.Values.Take(10).Append(uint.MaxValue).ToArray();
 
@@ -88,7 +89,7 @@ public class RemoveTests
         public void RemoveMany_WithCorrectOffsetAndCount_RemovesValuesFromBitmap(uint[] values, uint offset, uint count)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetFromValues(values);
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetFromValues(values);
 
             // Act
             testObject.Bitmap.RemoveMany(values, offset, count);
@@ -106,7 +107,7 @@ public class RemoveTests
             uint offset, uint count)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetFromValues(values);
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetFromValues(values);
 
             // Act && Assert
             Assert.Throws<ArgumentOutOfRangeException>(() => { testObject.Bitmap.RemoveMany(values, offset, count); });
@@ -119,7 +120,7 @@ public class RemoveTests
         public void TryRemove_BitmapIsEmpty_DoesNotRemoveValueAndReturnsFalse()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
 
             // Act
             var actual = testObject.Bitmap.TryRemove(uint.MaxValue);
@@ -133,7 +134,7 @@ public class RemoveTests
         public void TryRemove_BitmapWithValue_RemovesValueFromBitmapAndReturnsTrue()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
             var removedValue = testObject.Values.First();
 
             // Act
@@ -156,7 +157,7 @@ public class RemoveTests
         public void RemoveRange_ArgumentsOutOfAllowedRange_ThrowsArgumentOutOfRangeException(uint start, uint end)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
 
             // Act && Assert
             Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.RemoveRange(start, end));
@@ -177,7 +178,7 @@ public class RemoveTests
         public void RemoveRange_CorrectRange_BitmapRemovesRange(uint startTest, uint endTest, uint start, uint end)
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetForRange(startTest, endTest);
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetForRange(startTest, endTest);
 
             // Act
             testObject.Bitmap.RemoveRange(start, end);
@@ -186,7 +187,7 @@ public class RemoveTests
             var removedValues = Enumerable.Range((int)start, (int)(end - start + 1)) // 0..10
                 .Select(x => (uint)x)
                 .ToList();
-            var expected = testObject.Values.Except(removedValues);
+            IEnumerable<uint> expected = testObject.Values.Except(removedValues);
             var actual = testObject.Bitmap.Values.ToList();
 
             Assert.Equal(expected, actual);
@@ -199,7 +200,7 @@ public class RemoveTests
         public void Clear_BitmapIsEmpty_DoesNotRemoveValues()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
 
             // Act
             testObject.Bitmap.Clear();
@@ -212,7 +213,7 @@ public class RemoveTests
         public void Clear_BitmapHasValues_RemovesAllValuesFromBitmap()
         {
             // Arrange
-            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
 
             // Act
             testObject.Bitmap.Clear();

@@ -8,13 +8,13 @@ internal sealed class FrozenRoaring32BitmapTestObject : IRoaring32BitmapTestObje
     Roaring32BitmapBase IRoaring32BitmapTestObject.Bitmap => Bitmap;
     public FrozenRoaring32Bitmap Bitmap { get; private set; }
     public uint[] Values { get; }
-    
+
     public FrozenRoaring32BitmapTestObject(FrozenRoaring32Bitmap bitmap, uint[] values)
     {
         Bitmap = bitmap;
         Values = values;
     }
-    
+
     public void Dispose()
     {
         Bitmap?.Dispose();

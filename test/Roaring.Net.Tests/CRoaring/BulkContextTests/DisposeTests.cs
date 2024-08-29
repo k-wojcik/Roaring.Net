@@ -11,9 +11,9 @@ public class DisposeTests
     {
         [Fact]
         public void Dispose_InvokedMoreThanOnce_BlocksRedundantCalls()
-        {   
+        {
             // Arrange
-            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
             var context = BulkContext.For(testObject.Bitmap);
 
             // Act && Assert
@@ -21,17 +21,17 @@ public class DisposeTests
             context.Dispose();
         }
     }
-    
+
     public class Finalizer
     {
         [Fact]
         public void Finalizer_InvokedMoreThanOnce_BlocksRedundantCalls()
-        {   
+        {
             // Arrange
-            using var testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
             using var context = BulkContext.For(testObject.Bitmap);
-            var finalizer = context.GetType().GetMethod("Finalize", BindingFlags.Instance | BindingFlags.NonPublic);
-            
+            MethodInfo? finalizer = context.GetType().GetMethod("Finalize", BindingFlags.Instance | BindingFlags.NonPublic);
+
             // Act && Assert
             Assert.NotNull(finalizer);
             finalizer.Invoke(context, null);

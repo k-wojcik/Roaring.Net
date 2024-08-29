@@ -1,5 +1,6 @@
-﻿using System;
+﻿
 using Roaring.Net.CRoaring;
+using System;
 
 namespace Roaring.Net.Tests.CRoaring;
 

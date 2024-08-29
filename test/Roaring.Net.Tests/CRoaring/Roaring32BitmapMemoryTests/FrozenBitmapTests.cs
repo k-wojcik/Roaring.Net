@@ -15,14 +15,14 @@ public class FrozenBitmapTests
             // Arrange
             var bitmapMemory = new Roaring32BitmapMemory(10);
             bitmapMemory.Dispose();
-            
+
             // Act && Assert
             Assert.Throws<ObjectDisposedException>(() =>
             {
                 bitmapMemory.ToFrozen();
             });
         }
-        
+
         [Fact]
         public void ToFrozen_MemorySizeEqualToZero_ThrowsArgumentOutOfRangeException()
         {
@@ -32,7 +32,7 @@ public class FrozenBitmapTests
                 using var bitmapMemory = new Roaring32BitmapMemory(0);
             });
         }
-        
+
         [Fact]
         public void ToFrozen_NotSupportedSerializationFormat_ThrowsArgumentOutOfRangeException()
         {
@@ -43,7 +43,7 @@ public class FrozenBitmapTests
                 bitmapMemory.ToFrozen((SerializationFormat)int.MaxValue);
             });
         }
-        
+
         [Fact]
         public void ToFrozen_InvalidDataCannotDeserialize_ThrowsInvalidOperationException()
         {
@@ -54,36 +54,36 @@ public class FrozenBitmapTests
                 bitmapMemory.ToFrozen();
             });
         }
-        
+
         [Fact]
         public void ToFrozen_FromFrozen_ReturnsValidFrozenBitmap()
         {
             // Arrange
-            using var bitmap = SerializationTestBitmap.GetTestBitmap();
+            using Roaring32Bitmap bitmap = SerializationTestBitmap.GetTestBitmap();
             var serializedBitmap = bitmap.Serialize(SerializationFormat.Frozen);
-            
+
             // Act
             using var bitmapMemory = new Roaring32BitmapMemory((nuint)serializedBitmap.Length);
             serializedBitmap.CopyTo(bitmapMemory.AsSpan());
-            using var frozenBitmap = bitmapMemory.ToFrozen();
-            
+            using FrozenRoaring32Bitmap frozenBitmap = bitmapMemory.ToFrozen();
+
             // Assert
             Assert.Equal(bitmap.Values, frozenBitmap.Values);
             Assert.True(bitmap.IsValid());
         }
-        
+
         [Fact]
         public void ToFrozen_FromPortable_ReturnsValidFrozenBitmap()
         {
             // Arrange
-            using var bitmap = SerializationTestBitmap.GetTestBitmap();
+            using Roaring32Bitmap bitmap = SerializationTestBitmap.GetTestBitmap();
             var serializedBitmap = bitmap.Serialize(SerializationFormat.Portable);
-            
+
             // Act
             using var bitmapMemory = new Roaring32BitmapMemory((nuint)serializedBitmap.Length);
             serializedBitmap.CopyTo(bitmapMemory.AsSpan());
-            using var frozenBitmap = bitmapMemory.ToFrozen(SerializationFormat.Portable);
-            
+            using FrozenRoaring32Bitmap frozenBitmap = bitmapMemory.ToFrozen(SerializationFormat.Portable);
+
             // Assert
             Assert.Equal(bitmap.Values, frozenBitmap.Values);
             Assert.True(bitmap.IsValid());

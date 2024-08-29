@@ -27,12 +27,12 @@ internal sealed unsafe class Roaring32Enumerator : IEnumerator<uint>, IEnumerabl
 
     internal Roaring32Enumerator(IntPtr bitmap)
     {
-        var ptr = NativeMethods.roaring_iterator_create(bitmap);
+        IntPtr ptr = NativeMethods.roaring_iterator_create(bitmap);
         if (ptr == IntPtr.Zero)
         {
             throw new InvalidOperationException(ExceptionMessages.UnableToAllocateBitmapIterator);
         }
-        
+
         _iterator = (NativeMethods.Iterator*)ptr;
         _isFirst = true;
     }

@@ -6,23 +6,23 @@ namespace Roaring.Net.CRoaring;
 internal interface IReadOnlyRoaring32Bitmap : IDisposable
 {
     ulong Count { get; }
-    
+
     bool IsEmpty { get; }
-    
+
     uint? Min { get; }
-    
+
     uint? Max { get; }
 
     Roaring32Bitmap Not();
 
     Roaring32Bitmap NotRange(uint start, uint end);
-    
+
     Roaring32Bitmap And(Roaring32BitmapBase bitmap);
-    
+
     ulong AndCount(Roaring32BitmapBase bitmap);
-    
+
     Roaring32Bitmap AndNot(Roaring32BitmapBase bitmap);
-    
+
     ulong AndNotCount(Roaring32BitmapBase bitmap);
 
     Roaring32Bitmap Or(Roaring32BitmapBase bitmap);
@@ -52,11 +52,11 @@ internal interface IReadOnlyRoaring32Bitmap : IDisposable
     bool Contains(uint value);
 
     bool ContainsBulk(BulkContext context, uint value);
-    
+
     bool ContainsRange(uint start, uint end);
-    
+
     bool ValueEquals(Roaring32BitmapBase? bitmap);
-    
+
     bool IsSubsetOf(Roaring32BitmapBase? bitmap);
 
     bool IsProperSubsetOf(Roaring32BitmapBase? bitmap);
@@ -64,7 +64,7 @@ internal interface IReadOnlyRoaring32Bitmap : IDisposable
     bool IsSupersetOf(Roaring32BitmapBase? bitmap);
 
     bool IsProperSupersetOf(Roaring32BitmapBase? bitmap);
-    
+
     bool TryGetValue(uint index, out uint value);
 
     long GetIndex(uint value);
@@ -76,7 +76,7 @@ internal interface IReadOnlyRoaring32Bitmap : IDisposable
     ulong CountRange(uint start, uint end);
 
     void CopyTo(uint[] buffer);
-    
+
     IEnumerable<uint> Values { get; }
 
     uint[] ToArray();
@@ -86,9 +86,9 @@ internal interface IReadOnlyRoaring32Bitmap : IDisposable
     nuint GetSerializationBytes(SerializationFormat format = SerializationFormat.Normal);
 
     byte[] Serialize(SerializationFormat format = SerializationFormat.Normal);
-    
+
     Statistics GetStatistics();
-    
+
     bool IsValid();
 
     bool IsValid(out string? reason);
