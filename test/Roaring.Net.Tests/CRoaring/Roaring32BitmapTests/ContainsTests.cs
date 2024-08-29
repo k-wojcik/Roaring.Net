@@ -97,18 +97,19 @@ public class ContainsTests
     
     public class ContainsBulk
     {
-        [Fact]
-        public void ContainsBulk_DifferentBitmaps_ThrowsArgumentException()
+        [Theory]
+        [InlineMatrixTestObject]
+        public void ContainsBulk_DifferentBitmaps_ThrowsArgumentException(TestObjectMatrix<IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory> matrix)
         {
             // Arrange
-            using var testObject1 = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
-            using var testObject2 = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+            using var testObject1 = matrix.X.GetEmpty();
+            using var testObject2 = matrix.Y.GetEmpty();
             using var context = BulkContext.For(testObject1.Bitmap);
             
             // Act && Assert
             Assert.Throws<ArgumentException>(() =>
             {
-                testObject2.Bitmap.ContainsBulk(context, 10);
+                testObject2.ReadOnlyBitmap.ContainsBulk(context, 10);
             });
         }
         

@@ -25,7 +25,7 @@ internal sealed unsafe class Roaring32Enumerator : IEnumerator<uint>, IEnumerabl
 
     object IEnumerator.Current => Current;
 
-    public Roaring32Enumerator(IntPtr bitmap)
+    internal Roaring32Enumerator(IntPtr bitmap)
     {
         var ptr = NativeMethods.roaring_iterator_create(bitmap);
         if (ptr == IntPtr.Zero)
