@@ -11,6 +11,7 @@ public class IndexTests
         [InlineTestObject(new uint[] { 0, 1, 2, 3, 4 }, 4, 4)]
         [InlineTestObject(new uint[] { 4, 3, 2, 1, 0 }, 4, 4)]
         [InlineTestObject(new uint[] { 0, 2, 4, 6, 8 }, 2, 4)]
+        [InlineTestObject(new uint[] { 50, 100, 200, 300, 400 }, 2, 200)]
         public void TryGetValue_IndexLessThanBitmapSize_ReturnsTrueAndExpectedValue(uint[] values, uint index, uint expected, IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
