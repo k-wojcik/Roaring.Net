@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 
 namespace Roaring.Net.Tests.CRoaring.Roaring32BitmapTests;
 
@@ -44,17 +45,32 @@ public class CollectionTests
 
         [Theory]
         [InlineTestObject]
-        public void CopyTo_OutputCollectionIsEmpty_ReturnsEmptyCollection(IRoaring32BitmapTestObjectFactory factory)
+        public void CopyTo_OutputCollectionIsEmptyWhenBitmapHasValues_ThrowsArgumentOutOfRangeException(IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
-            using IRoaring32BitmapTestObject testObject = factory.GetFromValues([0, 1, 2, 3, 4]);
+            using IRoaring32BitmapTestObject testObject = factory.GetDefault();
             uint[] actual = [];
 
-            // Act
-            testObject.ReadOnlyBitmap.CopyTo(actual);
+            // Act && Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+            {
+                testObject.ReadOnlyBitmap.CopyTo(actual);
+            });
+        }
 
-            // Assert
-            Assert.Empty(actual);
+        [Theory]
+        [InlineTestObject]
+        public void CopyTo_OutputCollectionSizeLowerThanNumberOfValues_ThrowsArgumentOutOfRangeException(IRoaring32BitmapTestObjectFactory factory)
+        {
+            // Arrange
+            var input = new uint[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            using IRoaring32BitmapTestObject testObject = factory.GetFromValues(input);
+
+            // Act && Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+            {
+                testObject.ReadOnlyBitmap.CopyTo(new uint[input.Length - 5]);
+            });
         }
 
         [Theory]

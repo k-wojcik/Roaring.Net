@@ -172,7 +172,7 @@ public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoarin
     public ulong[] CountManyLessOrEqualTo(uint[] values) => _bitmap.CountManyLessOrEqualTo(values);
 
     /// <summary>
-    /// Counts the number of values in the given range of values.
+    /// Counts number of values in the given range of values.
     /// </summary>
     /// <param name="start">Start of range (inclusive).</param>
     /// <param name="end">End of range (inclusive).</param>
@@ -196,42 +196,155 @@ public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoarin
     /// <remarks>Values outside the range are left unchanged.</remarks>
     public Roaring32Bitmap NotRange(uint start, uint end) => _bitmap.NotRange(start, end);
 
+    /// <summary>
+    /// Creates a intersection between the current bitmap and the <paramref name="bitmap"/> given in the parameter.
+    /// </summary>
+    /// <param name="bitmap">Bitmap with which the intersection will be performed.</param>
+    /// <returns><see cref="Roaring32Bitmap"/> with the result of intersection of two bitmaps.</returns>
+    /// <remarks>
+    /// Performance hints:
+    /// <list type="bullet">
+    /// <item>if you are computing the intersection between several bitmaps, two-by-two, it is best to start with the smallest bitmap,</item>
+    /// </list>
+    /// </remarks>
     public Roaring32Bitmap And(Roaring32BitmapBase bitmap) => _bitmap.And(bitmap);
 
+    /// <summary>
+    /// Intersects the current bitmap with the <paramref name="bitmap"/> given in the parameter and returns the number of values contained in the resulting bitmap.
+    /// </summary>
+    /// <param name="bitmap">Bitmap with which the intersection will be performed.</param>
     public ulong AndCount(Roaring32BitmapBase bitmap) => _bitmap.AndCount(bitmap);
 
+    /// <summary>
+    /// Creates a difference between the current bitmap and the <paramref name="bitmap"/> given in the parameter.
+    /// </summary>
+    /// <param name="bitmap">Bitmap with which the difference will be performed.</param>
+    /// <returns><see cref="Roaring32Bitmap"/> with the result of difference of two bitmaps.</returns>
     public Roaring32Bitmap AndNot(Roaring32BitmapBase bitmap) => _bitmap.AndNot(bitmap);
 
+    /// <summary>
+    /// Creates a difference between the current bitmap and the <paramref name="bitmap"/> given in the parameter and returns the number of values contained in the resulting bitmap.
+    /// </summary>
+    /// <param name="bitmap">Bitmap with which the difference will be performed.</param>
+    /// <returns>Number of values contained in the resulting bitmap after difference.</returns>
     public ulong AndNotCount(Roaring32BitmapBase bitmap) => _bitmap.AndNotCount(bitmap);
 
+    /// <summary>
+    /// Creates a union between the current bitmap and the <paramref name="bitmap"/> given in the parameter.
+    /// </summary>
+    /// <param name="bitmap">Bitmap with which the union will be performed.</param>
+    /// <returns><see cref="Roaring32Bitmap"/> with the result of union two bitmaps.</returns>
     public Roaring32Bitmap Or(Roaring32BitmapBase bitmap) => _bitmap.Or(bitmap);
 
+    /// <summary>
+    /// Creates a union between the current bitmap and the <paramref name="bitmap"/> given in the parameter and returns the number of values contained in the resulting bitmap.
+    /// </summary>
+    /// <param name="bitmap">Bitmap with which the union will be performed.</param>
+    /// <returns>Number of values contained in the resulting bitmap after union.</returns>
     public ulong OrCount(Roaring32BitmapBase bitmap) => _bitmap.OrCount(bitmap);
 
+    /// <summary>
+    /// Creates a union between the current bitmap and the <paramref name="bitmaps"/> given in the parameter.
+    /// </summary>
+    /// <param name="bitmaps">Bitmaps with which the union will be performed.</param>
+    /// <returns><see cref="Roaring32Bitmap"/> with the result of union of many bitmaps.</returns>
+    /// <remarks>This method may be slower than <see cref="OrManyHeap"/> in some cases.</remarks>
     public Roaring32Bitmap OrMany(Roaring32BitmapBase[] bitmaps) => _bitmap.OrMany(bitmaps);
 
+    /// <summary>
+    /// Creates a union between the current bitmap and the <paramref name="bitmaps"/> given in the parameter using a heap.
+    /// </summary>
+    /// <param name="bitmaps">Bitmaps with which the union will be performed.</param>
+    /// <returns><see cref="Roaring32Bitmap"/> with the result of union of many bitmaps.</returns>
+    /// <remarks>This method may be faster than <see cref="OrMany"/> in some cases.</remarks>
     public Roaring32Bitmap OrManyHeap(Roaring32BitmapBase[] bitmaps) => _bitmap.OrManyHeap(bitmaps);
 
+    /// <summary>
+    /// Creates a union between the current bitmap and the <paramref name="bitmap"/> given in the parameter using lazy algorithm.
+    /// </summary>
+    /// <param name="bitmap">Bitmap with which the union will be performed.</param>
+    /// <param name="bitsetConversion">Flag which determines whether container-container operations force a bitset conversion.</param>
+    /// <returns><see cref="Roaring32Bitmap"/> with the result of union two bitmaps.</returns>
+    /// <remarks>
+    /// You must call <see cref="Roaring32Bitmap.RepairAfterLazy"/> on the resulting bitmap after executing "lazy" computations. <br/>
+    /// Lazy operations can be called multiple times in sequence.
+    /// </remarks>
     public Roaring32Bitmap LazyOr(Roaring32BitmapBase bitmap, bool bitsetConversion) => _bitmap.LazyOr(bitmap, bitsetConversion);
 
+    /// <summary>
+    /// Creates a symmetric difference between the current bitmap and the <paramref name="bitmap"/> given in the parameter.
+    /// </summary>
+    /// <param name="bitmap">Bitmap with which the symmetric difference will be performed.</param>
+    /// <returns><see cref="Roaring32Bitmap"/> with the result of the symmetric difference of two bitmaps.</returns>
     public Roaring32Bitmap Xor(Roaring32BitmapBase bitmap) => _bitmap.Xor(bitmap);
 
+    /// <summary>
+    /// Creates a symmetric difference between the current bitmap and the <paramref name="bitmap"/> given in the parameter and returns the number of values contained in the resulting bitmap. 
+    /// </summary>
+    /// <param name="bitmap">Bitmap with which the symmetric difference will be performed.</param>
+    /// <returns>Number of values contained in the resulting bitmap after symmetric difference.</returns>
     public ulong XorCount(Roaring32BitmapBase bitmap) => _bitmap.XorCount(bitmap);
 
+    /// <summary>
+    /// Creates a symmetric difference between the current bitmap and the <paramref name="bitmaps"/> given in the parameter.
+    /// </summary>
+    /// <param name="bitmaps">Bitmaps with which the symmetric difference will be performed.</param>
+    /// <returns><see cref="Roaring32Bitmap"/> with the result of the symmetric difference of many bitmaps.</returns>
     public Roaring32Bitmap XorMany(params Roaring32BitmapBase[] bitmaps) => _bitmap.XorMany(bitmaps);
 
+    /// <summary>
+    /// Creates a symmetric difference between the current bitmap and the <paramref name="bitmap"/> given in the parameter using lazy algorithm.
+    /// </summary>
+    /// <param name="bitmap">Bitmap with which the symmetric difference will be performed.</param>
+    /// <returns><see cref="Roaring32Bitmap"/> with the result of the symmetric difference of two bitmaps.</returns>
+    /// <remarks>
+    /// You must call <see cref="Roaring32Bitmap.RepairAfterLazy"/> on the resulting bitmap after executing "lazy" computations. <br/>
+    /// Lazy operations can be called multiple times in sequence.
+    /// </remarks>
     public Roaring32Bitmap LazyXor(Roaring32BitmapBase bitmap) => _bitmap.LazyXor(bitmap);
 
+    /// <summary>
+    /// Checks whether the current bitmaps overlaps (at least one element exists in both bitmaps) the <paramref name="bitmap"/> given in the parameter.
+    /// </summary>
+    /// <param name="bitmap">Bitmap with which the calculation will be performed.</param>
+    /// <returns><c>true</c> if current bitmap overlaps the given bitmap and the bitmaps are not empty; otherwise, <c>false</c>.</returns>
     public bool Overlaps(Roaring32BitmapBase bitmap) => _bitmap.Overlaps(bitmap);
 
+    /// <summary>
+    /// Checks whether the current bitmaps overlaps (at least one element exists in range) the range given in the parameters.
+    /// </summary>
+    /// <param name="start">Start of range (inclusive).</param>
+    /// <param name="end">End of range (inclusive).</param>
+    /// <returns><c>true</c> if current bitmap overlaps the given range; otherwise, <c>false</c>.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
     public bool OverlapsRange(uint start, uint end) => _bitmap.OverlapsRange(start, end);
 
+    /// <summary>
+    /// Computes the Jaccard index (Tanimoto distance, Jaccard similarity coefficient)
+    /// between current bitmap and the <paramref name="bitmap"/> given in the parameter. 
+    /// </summary>
+    /// <param name="bitmap">Bitmap with which the Jaccard index computation will be performed.</param>
+    /// <returns>Value of the Jaccard index.</returns>
+    /// <remarks>The Jaccard index is undefined if both bitmaps are empty.</remarks>
     public double GetJaccardIndex(Roaring32BitmapBase bitmap) => _bitmap.GetJaccardIndex(bitmap);
 
+    /// <summary>
+    /// Writes current bitmap to the <paramref name="buffer"/> given in the parameter.
+    /// </summary>
+    /// <param name="buffer">The array in which the bitmap will be written.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the <paramref name="buffer"/> size is too small to write the bitmap.</exception>
     public void CopyTo(uint[] buffer) => _bitmap.CopyTo(buffer);
 
+    /// <summary>
+    /// Gets enumerator that returns the values contained in the bitmap.
+    /// </summary>
+    /// <remarks>The values are ordered from smallest to largest.</remarks>
     public IEnumerable<uint> Values => _bitmap.Values;
 
+    /// <summary>
+    /// Writes current bitmap to the array.
+    /// </summary>
+    /// <returns>The array containing the values of the bitmap.</returns>
     public uint[] ToArray() => _bitmap.ToArray();
 
     /// <summary>
@@ -248,10 +361,6 @@ public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoarin
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     public Roaring32Bitmap ToBitmapWithOffset(long offset) => _bitmap.CloneWithOffset(offset);
 
-    public nuint GetSerializationBytes(SerializationFormat format = SerializationFormat.Normal) => _bitmap.GetSerializationBytes(format);
-
-    public byte[] Serialize(SerializationFormat format = SerializationFormat.Normal) => _bitmap.Serialize(format);
-
     public uint[] Take(ulong count) => _bitmap.Take(count);
 
     public Statistics GetStatistics() => _bitmap.GetStatistics();
@@ -259,4 +368,8 @@ public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoarin
     public bool IsValid() => _bitmap.IsValid();
 
     public bool IsValid(out string? reason) => _bitmap.IsValid(out reason);
+
+    public nuint GetSerializationBytes(SerializationFormat format = SerializationFormat.Normal) => _bitmap.GetSerializationBytes(format);
+
+    public byte[] Serialize(SerializationFormat format = SerializationFormat.Normal) => _bitmap.Serialize(format);
 }

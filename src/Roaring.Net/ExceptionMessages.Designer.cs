@@ -78,6 +78,15 @@ namespace Roaring.Net {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Buffer size is too small to save the bitmap..
+        /// </summary>
+        internal static string BufferSizeIsTooSmall {
+            get {
+                return ResourceManager.GetString("BufferSizeIsTooSmall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The passed context is belongs to another bitmap..
         /// </summary>
         internal static string BulkContextBelongsToOtherBitmap {

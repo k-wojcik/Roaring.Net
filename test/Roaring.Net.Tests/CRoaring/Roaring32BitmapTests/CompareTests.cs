@@ -433,12 +433,17 @@ public class CompareTests
     public class Overlaps
     {
         [Theory]
-        [InlineMatrixTestObject]
-        public void Overlaps_IntersectsWithAtLeastOneValue_ReturnsTrue(TestObjectMatrix<IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory> matrix)
+        [InlineMatrixTestObject(new uint[] { 0, 10, uint.MaxValue, 1 }, new uint[] { 5, 10, 11 })]
+        [InlineMatrixTestObject(new uint[] { 0 }, new uint[] { 0 })]
+        [InlineMatrixTestObject(new uint[] { 0, uint.MaxValue }, new uint[] { 0, uint.MaxValue })]
+        public void Overlaps_IntersectsWithAtLeastOneValue_ReturnsTrue(
+            uint[] values1,
+            uint[] values2,
+            TestObjectMatrix<IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory> matrix)
         {
             // Arrange
-            using IRoaring32BitmapTestObject testObject1 = matrix.X.GetFromValues([0, 10, uint.MaxValue, 1]);
-            using IRoaring32BitmapTestObject testObject2 = matrix.Y.GetFromValues([5, 10, 11]);
+            using IRoaring32BitmapTestObject testObject1 = matrix.X.GetFromValues(values1);
+            using IRoaring32BitmapTestObject testObject2 = matrix.Y.GetFromValues(values2);
 
             // Act
             var actual = testObject1.ReadOnlyBitmap.Overlaps(testObject2.Bitmap);
@@ -448,12 +453,18 @@ public class CompareTests
         }
 
         [Theory]
-        [InlineMatrixTestObject]
-        public void Overlaps_NoValuesIntersects_ReturnsFalse(TestObjectMatrix<IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory> matrix)
+        [InlineMatrixTestObject(new uint[] { }, new uint[] { })]
+        [InlineMatrixTestObject(new uint[] { 0, 10, uint.MaxValue, 1 }, new uint[] { 5, 12, 11 })]
+        [InlineMatrixTestObject(new uint[] { }, new uint[] { 5, 12, 11 })]
+        [InlineMatrixTestObject(new uint[] { 0, 10, uint.MaxValue, 1 }, new uint[] { })]
+        public void Overlaps_NoValuesIntersects_ReturnsFalse(
+            uint[] values1,
+            uint[] values2,
+            TestObjectMatrix<IRoaring32BitmapTestObjectFactory, IRoaring32BitmapTestObjectFactory> matrix)
         {
             // Arrange
-            using IRoaring32BitmapTestObject testObject1 = matrix.X.GetFromValues([0, 10, uint.MaxValue, 1]);
-            using IRoaring32BitmapTestObject testObject2 = matrix.Y.GetFromValues([5, 12, 11]);
+            using IRoaring32BitmapTestObject testObject1 = matrix.X.GetFromValues(values1);
+            using IRoaring32BitmapTestObject testObject2 = matrix.Y.GetFromValues(values2);
 
             // Act
             var actual = testObject1.ReadOnlyBitmap.Overlaps(testObject2.Bitmap);
@@ -502,6 +513,7 @@ public class CompareTests
         [InlineTestObject(new uint[] { 5, 10, uint.MaxValue }, 0, 4)]
         [InlineTestObject(new uint[] { 0, 10, uint.MaxValue }, 11, uint.MaxValue - 1)]
         [InlineTestObject(new uint[] { 0, 10, uint.MaxValue - 1 }, uint.MaxValue, uint.MaxValue)]
+        [InlineTestObject(new uint[] { }, uint.MaxValue, uint.MaxValue)]
         public void OverlapsRange_NoValuesIntersects_ReturnsFalse(uint[] values, uint start, uint end, IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange

@@ -54,4 +54,7 @@
     <data name="BulkContextBelongsToOtherBitmap" xml:space="preserve">
         <value>The passed context is belongs to another bitmap.</value>
     </data>
+    <data name="BufferSizeIsTooSmall" xml:space="preserve">
+        <value>Buffer size is too small to save the bitmap.</value>
+    </data>
 </root>
