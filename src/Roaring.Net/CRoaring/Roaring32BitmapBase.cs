@@ -18,6 +18,9 @@ public abstract class Roaring32BitmapBase : IDisposable
     /// <param name="disposing">A flag indicating whether to dispose managed state. Set to <c>true</c> to dispose managed state, otherwise <c>false</c>.</param>
     protected abstract void Dispose(bool disposing);
 
+    /// <summary>
+    /// Finalizer.
+    /// </summary>
     ~Roaring32BitmapBase() => Dispose(false);
 
     /// <inheritdoc />

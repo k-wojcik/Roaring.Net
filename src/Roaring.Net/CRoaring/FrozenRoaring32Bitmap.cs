@@ -69,6 +69,7 @@ public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoarin
         _isDisposed = true;
     }
 
+    /// <inheritdoc />
     ~FrozenRoaring32Bitmap() => Dispose(false);
 
     /// <summary>
@@ -361,15 +362,58 @@ public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoarin
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     public Roaring32Bitmap ToBitmapWithOffset(long offset) => _bitmap.CloneWithOffset(offset);
 
+    /// <summary>
+    /// Takes the given number of values from the current bitmap and puts them into an array.
+    /// </summary>
+    /// <param name="count">Number of values to take from the bitmap.</param>
+    /// <returns>An array containing the given number of values from the bitmap.</returns>
+    /// <remarks>If the bitmap contains fewer values than the given number then the array will be adjusted to the number of values.</remarks>
     public uint[] Take(ulong count) => _bitmap.Take(count);
 
+    /// <summary>
+    /// Gets statistics about the bitmap.
+    /// </summary>
+    /// <returns>Structure containing statistics about the bitmap.</returns>
     public Statistics GetStatistics() => _bitmap.GetStatistics();
 
+    /// <summary>
+    /// Performs internal consistency checks.
+    /// </summary>
+    /// <returns><c>true</c> if the bitmap is consistent; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    /// It may be useful to call this after deserializing bitmaps from
+    /// untrusted sources. If <see cref="IsValid()"/> returns <c>true</c>, then the
+    /// bitmap should be consistent and can be trusted not to cause crashes or memory
+    /// corruption.
+    /// </remarks>
     public bool IsValid() => _bitmap.IsValid();
 
+    /// <summary>
+    /// Performs internal consistency checks and returns the cause of inconsistencies.
+    /// </summary>
+    /// <param name="reason">Reason of inconsistency.</param>
+    /// <returns><c>true</c> if the bitmap is consistent; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    /// It may be useful to call this after deserializing bitmaps from
+    /// untrusted sources. If <see cref="IsValid()"/> returns <c>true</c>, then the
+    /// bitmap should be consistent and can be trusted not to cause crashes or memory
+    /// corruption.
+    /// </remarks>
     public bool IsValid(out string? reason) => _bitmap.IsValid(out reason);
 
+    /// <summary>
+    /// Gets the number of bytes required for a given serialization format.
+    /// </summary>
+    /// <param name="format">Serialization type for which we get the number of bytes.</param>
+    /// <returns>Number of bytes required for the given serialization format.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
     public nuint GetSerializationBytes(SerializationFormat format = SerializationFormat.Normal) => _bitmap.GetSerializationBytes(format);
 
+    /// <summary>
+    /// Serializes the current bitmap to the given serialization format.
+    /// </summary>
+    /// <param name="format">The serialization format to which we serialize the bitmap.</param>
+    /// <returns>An array that contains a bitmap in a serialized form.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
     public byte[] Serialize(SerializationFormat format = SerializationFormat.Normal) => _bitmap.Serialize(format);
 }

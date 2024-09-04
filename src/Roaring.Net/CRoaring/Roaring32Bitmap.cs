@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace Roaring.Net.CRoaring;
@@ -145,6 +144,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
         _isDisposed = true;
     }
 
+    /// <inheritdoc />
     ~Roaring32Bitmap() => Dispose(false);
 
     /// <summary>
@@ -878,6 +878,12 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
         return new Roaring32Bitmap(ptr);
     }
 
+    /// <summary>
+    /// Takes the given number of values from the current bitmap and puts them into an array.
+    /// </summary>
+    /// <param name="count">Number of values to take from the bitmap.</param>
+    /// <returns>An array containing the given number of values from the bitmap.</returns>
+    /// <remarks>If the bitmap contains fewer values than the given number then the array will be adjusted to the number of values.</remarks>
     public uint[] Take(ulong count)
     {
         ulong cardinality = NativeMethods.roaring_bitmap_get_cardinality(Pointer);
@@ -891,14 +897,38 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
         return values;
     }
 
+    /// <summary>
+    /// Gets statistics about the bitmap.
+    /// </summary>
+    /// <returns>Structure containing statistics about the bitmap.</returns>
     public Statistics GetStatistics()
     {
         NativeMethods.roaring_bitmap_statistics(Pointer, out Statistics stats);
         return stats;
     }
 
+    /// <summary>
+    /// Performs internal consistency checks.
+    /// </summary>
+    /// <returns><c>true</c> if the bitmap is consistent; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    /// It may be useful to call this after deserializing bitmaps from
+    /// untrusted sources. If <see cref="IsValid()"/> returns <c>true</c>, then the
+    /// bitmap should be consistent and can be trusted not to cause crashes or memory
+    /// corruption.
+    /// </remarks>
     public bool IsValid() => IsValid(out _);
 
+    /// <summary>
+    /// Performs internal consistency checks and returns the cause of inconsistencies.
+    /// </summary>
+    /// <param name="reason">Reason of inconsistency.</param>
+    /// <returns><c>true</c> if the bitmap is consistent; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    /// It may be useful to call this after deserializing bitmaps from
+    /// untrusted sources. If <see cref="IsValid()"/> returns <c>true</c>, then the
+    /// bitmap should be consistent and can be trusted not to cause crashes or memory corruption.
+    /// </remarks>
     public bool IsValid(out string? reason)
     {
         var result = NativeMethods.roaring_bitmap_internal_validate(Pointer, out IntPtr reasonPtr);
@@ -906,8 +936,23 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
         return result;
     }
 
+    /// <summary>
+    /// Allows you to enable copy-on-write (COW) mode. <br/>
+    /// This mode saves memory and avoids copying, but requires more care in a threaded context.
+    /// </summary>
+    /// <param name="enabled"><c>true</c> if the copy-on-write should be enabled; otherwise, <c>false</c></param>
+    /// <remarks>
+    /// If you enable this mode, make sure you do it for all your bitmaps,
+    /// because interactions between bitmaps with and without COW is unsafe.
+    /// </remarks>
     public void SetCopyOnWrite(bool enabled) => NativeMethods.roaring_bitmap_set_copy_on_write(Pointer, enabled);
 
+    /// <summary>
+    /// Gets the number of bytes required for a given serialization format.
+    /// </summary>
+    /// <param name="format">Serialization format for which we get the number of bytes.</param>
+    /// <returns>Number of bytes required for the given serialization format.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
     public nuint GetSerializationBytes(SerializationFormat format = SerializationFormat.Normal)
         => format switch
         {
@@ -917,6 +962,12 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat)
         };
 
+    /// <summary>
+    /// Serializes the current bitmap to the given serialization format.
+    /// </summary>
+    /// <param name="format">The serialization format to which we serialize the bitmap.</param>
+    /// <returns>An array that contains a bitmap in a serialized form.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
     public byte[] Serialize(SerializationFormat format = SerializationFormat.Normal)
     {
         byte[] buffer;
@@ -944,6 +995,14 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
         return buffer;
     }
 
+    /// <summary>
+    /// Deserializes the bitmap from the given serialization format.
+    /// </summary>
+    /// <param name="buffer">An array that contains a bitmap in a serialized form.</param>
+    /// <param name="format">The serialization format from which we deserialize the bitmap.</param>
+    /// <returns><see cref="Roaring32Bitmap"/> deserialized from the provided array.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     public static Roaring32Bitmap Deserialize(byte[] buffer, SerializationFormat format = SerializationFormat.Normal)
     {
         IntPtr ptr = format switch
@@ -961,6 +1020,17 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
         return new Roaring32Bitmap(ptr);
     }
 
+    /// <summary>
+    /// Deserializes the bitmap from the given serialization format in unsafe mode.
+    /// </summary>
+    /// <param name="buffer">An array that contains a bitmap in a serialized form.</param>
+    /// <param name="format">The serialization format from which we deserialize the bitmap.</param>
+    /// <returns><see cref="Roaring32Bitmap"/> deserialized from the provided array.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    /// <remarks>
+    /// This method does not check that the input buffer is a valid bitmap and may cause crashes or memory corruption.
+    /// </remarks>
     public static Roaring32Bitmap DeserializeUnsafe(byte[] buffer, SerializationFormat format = SerializationFormat.Normal)
     {
         IntPtr ptr = format switch
@@ -978,6 +1048,14 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
         return new Roaring32Bitmap(ptr);
     }
 
+    /// <summary>
+    /// Checks how many bytes will be read from the array to deserialize the bitmap.
+    /// </summary>
+    /// <param name="buffer">An array that contains a bitmap in a serialized form.</param>
+    /// <param name="expectedSize">The expected number of bytes after which the check will be aborted.</param>
+    /// <param name="format">The serialization format for which we check the number of bytes.</param>
+    /// <returns><c>0</c> if the bitmap is invalid; otherwise, the number of bytes required to deserialize the bitmap.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
     public static nuint GetSerializedSize(byte[] buffer, nuint expectedSize, SerializationFormat format = SerializationFormat.Portable)
     {
         nuint size = format switch

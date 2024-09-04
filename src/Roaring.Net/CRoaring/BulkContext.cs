@@ -58,6 +58,9 @@ public sealed unsafe class BulkContext : IDisposable
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// Finalizer.
+    /// </summary>
     ~BulkContext()
     {
         Dispose(false);

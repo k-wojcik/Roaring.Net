@@ -207,5 +207,8 @@ public sealed unsafe class Roaring32BitmapMemory : IDisposable
         _isDisposed = true;
     }
 
+    /// <summary>
+    /// Finalizer.
+    /// </summary>
     ~Roaring32BitmapMemory() => Dispose(false);
 }

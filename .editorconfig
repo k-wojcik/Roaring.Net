@@ -39,4 +39,4 @@ csharp_style_namespace_declarations = file_scoped:warning
 dotnet_diagnostic.SYSLIB1054.severity = warning
 
 # Missing XML comment for publicly visible type or member 'Type_or_Member'
-dotnet_diagnostic.CS1591.severity = suggestion
+dotnet_diagnostic.CS1591.severity = warning
