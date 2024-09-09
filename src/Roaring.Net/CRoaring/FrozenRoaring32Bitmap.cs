@@ -41,7 +41,7 @@ public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoarin
     internal FrozenRoaring32Bitmap(Roaring32Bitmap bitmap)
     {
         nuint size = bitmap.GetSerializationBytes(SerializationFormat.Frozen);
-        Memory = new Roaring32BitmapMemory(size);
+        Memory = new Roaring32BitmapMemory(size, shared: false);
         _bitmap = bitmap.GetFrozenView(size, Memory.MemoryPtr);
 
         Pointer = _bitmap.Pointer;

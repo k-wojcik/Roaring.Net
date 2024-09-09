@@ -39,6 +39,12 @@ public sealed unsafe class Roaring32BitmapMemory : IDisposable
         MemoryPtr = AllocateMemory(size);
     }
 
+    internal Roaring32BitmapMemory(nuint size, bool shared)
+        : this(size)
+    {
+        _isDisposable = !shared;
+    }
+
     private static byte* AllocateMemory(nuint size)
     {
         GC.AddMemoryPressure((long)size);
