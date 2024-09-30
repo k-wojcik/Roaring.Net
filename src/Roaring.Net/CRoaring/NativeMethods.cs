@@ -537,10 +537,10 @@ internal static unsafe partial class NativeMethods
 
 #if NET7_0_OR_GREATER
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_to_uint32_array")]
-    public static partial void roaring_bitmap_to_uint32_array(IntPtr bitmap, Span<uint> values);
+    public static partial void roaring_bitmap_to_uint32_array(IntPtr bitmap, uint* values);
 #else
     [DllImport("roaring")]
-    public static extern void roaring_bitmap_to_uint32_array(IntPtr bitmap, Span<uint> values);
+    public static extern void roaring_bitmap_to_uint32_array(IntPtr bitmap, uint* values);
 #endif
 
 #if NET7_0_OR_GREATER

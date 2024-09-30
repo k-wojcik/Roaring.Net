@@ -865,7 +865,10 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
             throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, ExceptionMessages.BufferSizeIsTooSmall);
         }
 
-        NativeMethods.roaring_bitmap_to_uint32_array(Pointer, buffer);
+        fixed (uint* ptr = &MemoryMarshal.GetReference(buffer))
+        {
+            NativeMethods.roaring_bitmap_to_uint32_array(Pointer, ptr);
+        }
     }
 
     /// <summary>
