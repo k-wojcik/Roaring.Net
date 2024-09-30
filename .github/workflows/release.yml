@@ -263,7 +263,7 @@ jobs:
       run: dotnet test --no-build --configuration Release
 
     - name: Pack
-      run: dotnet pack --configuration Release --no-build --output nupkgs -p:Version="${{ env.VERSION }}"
+      run: dotnet pack .\src\Roaring.Net\Roaring.Net.csproj --configuration Release --no-build --output nupkgs -p:Version="${{ env.VERSION }}"
     
     - name: Upload nuget package
       uses: actions/upload-artifact@v4
