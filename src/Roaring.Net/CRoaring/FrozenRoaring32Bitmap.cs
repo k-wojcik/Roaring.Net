@@ -337,6 +337,20 @@ public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoarin
     public void CopyTo(uint[] buffer) => _bitmap.CopyTo(buffer);
 
     /// <summary>
+    /// Writes current bitmap to the <paramref name="buffer"/> given in the parameter.
+    /// </summary>
+    /// <param name="buffer">The <see cref="Memory{T}"/> in which the bitmap will be written.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the <paramref name="buffer"/> size is too small to write the bitmap.</exception>
+    public void CopyTo(Memory<uint> buffer) => _bitmap.CopyTo(buffer);
+
+    /// <summary>
+    /// Writes current bitmap to the <paramref name="buffer"/> given in the parameter.
+    /// </summary>
+    /// <param name="buffer">The <see cref="Span{T}"/> in which the bitmap will be written.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the <paramref name="buffer"/> size is too small to write the bitmap.</exception>
+    public void CopyTo(Span<uint> buffer) => _bitmap.CopyTo(buffer);
+
+    /// <summary>
     /// Gets enumerator that returns the values contained in the bitmap.
     /// </summary>
     /// <remarks>The values are ordered from smallest to largest.</remarks>

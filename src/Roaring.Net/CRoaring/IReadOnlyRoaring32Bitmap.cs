@@ -77,6 +77,10 @@ internal interface IReadOnlyRoaring32Bitmap : IDisposable
 
     void CopyTo(uint[] buffer);
 
+    void CopyTo(Memory<uint> buffer);
+
+    void CopyTo(Span<uint> buffer);
+
     IEnumerable<uint> Values { get; }
 
     uint[] ToArray();
