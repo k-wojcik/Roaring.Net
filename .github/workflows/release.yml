@@ -1,8 +1,8 @@
 name: Build NuGet Package
 
 on:
- release:
-   types: [published, edited]
+  release:
+    types: [published, edited]
 
 permissions:
   contents: write
@@ -11,268 +11,282 @@ jobs:
   build-osx-x64:
     runs-on: macos-latest
     env:
-        VCPKG_DISABLE_METRICS: 1
-        VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed    
+      VCPKG_DISABLE_METRICS: 1
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
     steps:
-    - uses: actions/checkout@v4
-    - name: install deps
-      run: brew install ninja
-    - name: vcpkg x64-osx
-      uses: lukka/run-vcpkg@v11
-      env:
-        VCPKG_DEFAULT_TRIPLET: x64-osx-dynamic
-      with:
-        doNotCache: false
-        runVcpkgInstall: true
-    - name: copy lib
-      run: mkdir -p libs/x64-osx/ && cp vcpkg_installed/x64-osx-dynamic/lib/libroaring.dylib libs/x64-osx/
-    - name: Upload lib to artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: libs-osx-x64
-        path: |
-          libs/**/*.dylib
+      - uses: actions/checkout@v4
+      - name: install deps
+        run: brew install ninja
+      - name: vcpkg x64-osx
+        uses: lukka/run-vcpkg@v11
+        env:
+          VCPKG_DEFAULT_TRIPLET: x64-osx-dynamic
+        with:
+          doNotCache: false
+          runVcpkgInstall: true
+      - name: copy lib
+        run: mkdir -p libs/x64-osx/ && cp vcpkg_installed/x64-osx-dynamic/lib/libroaring.dylib libs/x64-osx/
+      - name: Upload lib to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: libs-osx-x64
+          path: |
+            libs/**/*.dylib
 
   build-osx-arm64:
     runs-on: macos-latest
     env:
-        VCPKG_DISABLE_METRICS: 1
-        VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed    
+      VCPKG_DISABLE_METRICS: 1
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
     steps:
-    - uses: actions/checkout@v4
-    - name: install deps
-      run: brew install ninja
-    - name: vcpkg arm64-osx
-      uses: lukka/run-vcpkg@v11
-      env:
-        VCPKG_DEFAULT_TRIPLET: arm64-osx-dynamic
-      with:
-        doNotCache: false
-        runVcpkgInstall: true
-    - run: ls -la vcpkg_installed/arm64-osx-dynamic        
-    - name: copy lib
-      run: mkdir -p libs/arm64-osx/ && cp vcpkg_installed/arm64-osx-dynamic/lib/libroaring.dylib libs/arm64-osx/
-    - name: Upload lib to artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: libs-osx-arm64
-        path: |
-          libs/**/*.dylib
+      - uses: actions/checkout@v4
+      - name: install deps
+        run: brew install ninja
+      - name: vcpkg arm64-osx
+        uses: lukka/run-vcpkg@v11
+        env:
+          VCPKG_DEFAULT_TRIPLET: arm64-osx-dynamic
+        with:
+          doNotCache: false
+          runVcpkgInstall: true
+      - run: ls -la vcpkg_installed/arm64-osx-dynamic
+      - name: copy lib
+        run: mkdir -p libs/arm64-osx/ && cp vcpkg_installed/arm64-osx-dynamic/lib/libroaring.dylib libs/arm64-osx/
+      - name: Upload lib to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: libs-osx-arm64
+          path: |
+            libs/**/*.dylib
 
   build-linux-x64:
     runs-on: ubuntu-latest
     env:
-        VCPKG_DISABLE_METRICS: 1
-        VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
+      VCPKG_DISABLE_METRICS: 1
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
     steps:
-    - uses: actions/checkout@v4
-    - name: vcpkg x64-linux
-      uses: lukka/run-vcpkg@v11
-      env:
-        VCPKG_DEFAULT_TRIPLET: x64-linux-dynamic
-      with:
-        doNotCache: false
-        runVcpkgInstall: true
-    - name: copy lib
-      run: mkdir -p libs/x64-linux/ && cp vcpkg_installed/x64-linux-dynamic/lib/libroaring.so libs/x64-linux/
-    - name: Upload lib to artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: libs-linux-x64
-        path: |
-          libs/**/*.so
+      - uses: actions/checkout@v4
+      - name: vcpkg x64-linux
+        uses: lukka/run-vcpkg@v11
+        env:
+          VCPKG_DEFAULT_TRIPLET: x64-linux-dynamic
+        with:
+          doNotCache: false
+          runVcpkgInstall: true
+      - name: copy lib
+        run: mkdir -p libs/x64-linux/ && cp vcpkg_installed/x64-linux-dynamic/lib/libroaring.so libs/x64-linux/
+      - name: Upload lib to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: libs-linux-x64
+          path: |
+            libs/**/*.so
 
   build-linux-arm64:
     runs-on: ubuntu-latest
     env:
-        VCPKG_DISABLE_METRICS: 1
-        VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
+      VCPKG_DISABLE_METRICS: 1
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
     steps:
-    - uses: actions/checkout@v4
-    - name: install deps
-      run: sudo apt-get install -qy gcc-aarch64-linux-gnu g++-aarch64-linux-gnu 
-    - name: vcpkg arm64-linux
-      uses: lukka/run-vcpkg@v11
-      env:
-        VCPKG_DEFAULT_TRIPLET: arm64-linux-dynamic
-      with:
-        doNotCache: false
-        runVcpkgInstall: true
-    - name: copy lib
-      run: mkdir -p libs/arm64-linux/ && cp vcpkg_installed/arm64-linux-dynamic/lib/libroaring.so libs/arm64-linux/        
-    - name: Upload lib to artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: libs-linux-arm64
-        path: |
-          libs/**/*.so
+      - uses: actions/checkout@v4
+      - name: install deps
+        run: sudo apt-get install -qy gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+      - name: vcpkg arm64-linux
+        uses: lukka/run-vcpkg@v11
+        env:
+          VCPKG_DEFAULT_TRIPLET: arm64-linux-dynamic
+        with:
+          doNotCache: false
+          runVcpkgInstall: true
+      - name: copy lib
+        run: mkdir -p libs/arm64-linux/ && cp vcpkg_installed/arm64-linux-dynamic/lib/libroaring.so libs/arm64-linux/
+      - name: Upload lib to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: libs-linux-arm64
+          path: |
+            libs/**/*.so
 
   build-linux-arm:
     runs-on: ubuntu-latest
     env:
-        VCPKG_DISABLE_METRICS: 1
-        VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
+      VCPKG_DISABLE_METRICS: 1
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
     steps:
-    - uses: actions/checkout@v4
-    - name: install deps
-      run: sudo apt-get install -qy gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf        
-    - name: arm-linux
-      uses: lukka/run-vcpkg@v11
-      env:
-        VCPKG_DEFAULT_TRIPLET: arm-linux-dynamic
-      with:
-        doNotCache: false
-        runVcpkgInstall: true
-    - name: copy lib
-      run: mkdir -p libs/arm-linux/ && cp vcpkg_installed/arm-linux-dynamic/lib/libroaring.so libs/arm-linux/
-    - name: Upload lib to artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: libs-linux-arm
-        path: |
-          libs/**/*.so
+      - uses: actions/checkout@v4
+      - name: install deps
+        run: sudo apt-get install -qy gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+      - name: arm-linux
+        uses: lukka/run-vcpkg@v11
+        env:
+          VCPKG_DEFAULT_TRIPLET: arm-linux-dynamic
+        with:
+          doNotCache: false
+          runVcpkgInstall: true
+      - name: copy lib
+        run: mkdir -p libs/arm-linux/ && cp vcpkg_installed/arm-linux-dynamic/lib/libroaring.so libs/arm-linux/
+      - name: Upload lib to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: libs-linux-arm
+          path: |
+            libs/**/*.so
 
   windows-x64:
     runs-on: windows-latest
     env:
-        VCPKG_DISABLE_METRICS: 1
-        VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed    
+      VCPKG_DISABLE_METRICS: 1
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
     steps:
-    - uses: actions/checkout@v4
-    - name: vcpkg x64-windows
-      uses: lukka/run-vcpkg@v11
-      env:
-        VCPKG_DEFAULT_TRIPLET: x64-windows
-      with:
-        doNotCache: false
-        runVcpkgInstall: true   
-    - name: copy lib
-      run: mkdir -p libs/x64-windows/ && cp vcpkg_installed/x64-windows/bin/roaring.dll libs/x64-windows/
-    - name: Upload lib to artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: libs-windows-x64
-        path: |
-          libs/**/*.dll
+      - uses: actions/checkout@v4
+      - name: vcpkg x64-windows
+        uses: lukka/run-vcpkg@v11
+        env:
+          VCPKG_DEFAULT_TRIPLET: x64-windows
+        with:
+          doNotCache: false
+          runVcpkgInstall: true
+      - name: copy lib
+        run: mkdir -p libs/x64-windows/ && cp vcpkg_installed/x64-windows/bin/roaring.dll libs/x64-windows/
+      - name: Upload lib to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: libs-windows-x64
+          path: |
+            libs/**/*.dll
 
   windows-x86:
     runs-on: windows-latest
     env:
-        VCPKG_DISABLE_METRICS: 1
-        VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed    
+      VCPKG_DISABLE_METRICS: 1
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
     steps:
-    - uses: actions/checkout@v4
-    - name: vcpkg x86-windows
-      uses: lukka/run-vcpkg@v11
-      env:
-        VCPKG_DEFAULT_TRIPLET: x86-windows
-      with:
-        doNotCache: false
-        runVcpkgInstall: true 
-    - name: copy lib
-      run: mkdir -p libs/x86-windows/ && cp vcpkg_installed/x86-windows/bin/roaring.dll libs/x86-windows/
-    - name: Upload lib to artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: libs-windows-x86
-        path: |
-          libs/**/*.dll
+      - uses: actions/checkout@v4
+      - name: vcpkg x86-windows
+        uses: lukka/run-vcpkg@v11
+        env:
+          VCPKG_DEFAULT_TRIPLET: x86-windows
+        with:
+          doNotCache: false
+          runVcpkgInstall: true
+      - name: copy lib
+        run: mkdir -p libs/x86-windows/ && cp vcpkg_installed/x86-windows/bin/roaring.dll libs/x86-windows/
+      - name: Upload lib to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: libs-windows-x86
+          path: |
+            libs/**/*.dll
 
   windows-arm:
     runs-on: windows-latest
     env:
-        VCPKG_DISABLE_METRICS: 1
-        VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
+      VCPKG_DISABLE_METRICS: 1
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
     steps:
-    - uses: actions/checkout@v4
-    - name: vcpkg arm32-windows
-      uses: lukka/run-vcpkg@v11
-      env:
-        VCPKG_DEFAULT_TRIPLET: arm-windows
-      with:
-        doNotCache: false
-        runVcpkgInstall: true 
-    - name: copy lib
-      run: mkdir -p libs/arm32-windows/ && cp vcpkg_installed/arm-windows/bin/roaring.dll libs/arm32-windows/
-    - name: Upload lib to artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: libs-windows-arm32
-        path: |
-          libs/**/*.dll
+      - uses: actions/checkout@v4
+      - name: Windows SDK downgrade   # https://github.com/actions/runner-images/issues/10981
+        run: .\build\downgrade-win-sdk.bat
+
+      - name: vcpkg arm32-windows
+        uses: lukka/run-vcpkg@v11
+        env:
+          VCPKG_DEFAULT_TRIPLET: arm-windows
+        with:
+          doNotCache: false
+          runVcpkgInstall: true
+      - name: copy lib
+        run: mkdir -p libs/arm32-windows/ && cp vcpkg_installed/arm-windows/bin/roaring.dll libs/arm32-windows/
+      - name: Upload lib to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: libs-windows-arm32
+          path: |
+            libs/**/*.dll
 
   windows-arm64:
     runs-on: windows-latest
     env:
-        VCPKG_DISABLE_METRICS: 1
-        VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed    
+      VCPKG_DISABLE_METRICS: 1
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
     steps:
-    - uses: actions/checkout@v4
-    - name: vcpkg arm64-windows
-      uses: lukka/run-vcpkg@v11
-      env:
-        VCPKG_DEFAULT_TRIPLET: arm64-windows
-      with:
-        doNotCache: false
-        runVcpkgInstall: true 
-    - name: copy lib
-      run: mkdir -p libs/arm64-windows/ && cp vcpkg_installed/arm64-windows/bin/roaring.dll libs/arm64-windows/
-    - name: Upload lib to artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: libs-windows-arm64
-        path: |
-          libs/**/*.dll
+      - uses: actions/checkout@v4
+      - name: vcpkg arm64-windows
+        uses: lukka/run-vcpkg@v11
+        env:
+          VCPKG_DEFAULT_TRIPLET: arm64-windows
+        with:
+          doNotCache: false
+          runVcpkgInstall: true
+      - name: copy lib
+        run: mkdir -p libs/arm64-windows/ && cp vcpkg_installed/arm64-windows/bin/roaring.dll libs/arm64-windows/
+      - name: Upload lib to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: libs-windows-arm64
+          path: |
+            libs/**/*.dll
 
   build-dotnet:
     runs-on: ubuntu-latest
-    needs: [build-linux-x64, build-linux-arm64, build-linux-arm, build-osx-x64, build-osx-arm64, windows-x64, windows-x86, windows-arm, windows-arm64]
+    needs:
+      [
+        build-linux-x64,
+        build-linux-arm64,
+        build-linux-arm,
+        build-osx-x64,
+        build-osx-arm64,
+        windows-x64,
+        windows-x86,
+        windows-arm,
+        windows-arm64,
+      ]
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Merge Artifacts
-      uses: actions/upload-artifact/merge@v4
-      with:
-        name: libs
-        pattern: libs-*
-        delete-merged: true
+      - name: Merge Artifacts
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: libs
+          pattern: libs-*
+          delete-merged: true
 
-    - name: Download libs atrifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: libs
-        path: libs
+      - name: Download libs atrifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: libs
+          path: libs
 
-    - name: Set the version env
-      run: echo VERSION=${GITHUB_REF#refs/tags/v}  >> $GITHUB_ENV
+      - name: Set the version env
+        run: echo VERSION=${GITHUB_REF#refs/tags/v}  >> $GITHUB_ENV
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
 
-    - name: Restore dependencies
-      run: dotnet restore
+      - name: Restore dependencies
+        run: dotnet restore
 
-    - name: Build
-      run: dotnet build --no-restore --configuration Release -p:Version="${{ env.VERSION }}" /p:TreatWarningsAsErrors=true
+      - name: Build
+        run: dotnet build --no-restore --configuration Release -p:Version="${{ env.VERSION }}" /p:TreatWarningsAsErrors=true
 
-    - name: Test
-      run: dotnet test --no-build --configuration Release
+      - name: Test
+        run: dotnet test --no-build --configuration Release
 
-    - name: Pack
-      run: dotnet pack .\src\Roaring.Net\Roaring.Net.csproj --configuration Release --no-build --output nupkgs -p:Version="${{ env.VERSION }}"
-    
-    - name: Upload nuget package
-      uses: actions/upload-artifact@v4
-      with:
-        name: nuget-packages
-        path: nupkgs/*.nupkg
+      - name: Pack
+        run: dotnet pack ./src/Roaring.Net/Roaring.Net.csproj --configuration Release --no-build --output nupkgs -p:Version="${{ env.VERSION }}"
 
-    - name: Upload release assets
-      uses: softprops/action-gh-release@v2
-      with:
-        files: | 
-          nupkgs/*.nupkg
+      - name: Upload nuget package
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: nupkgs/*.nupkg
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            nupkgs/*.nupkg
