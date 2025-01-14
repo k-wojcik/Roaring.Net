@@ -93,13 +93,16 @@ public class InitializationTests
         [InlineData(33, 333, 33)]
         [InlineData(uint.MaxValue - 1, uint.MaxValue, 1)]
         [InlineData(uint.MaxValue, uint.MaxValue, 1)]
+        [InlineData(uint.MaxValue - 3, uint.MaxValue, 3)]
+        [InlineData(uint.MaxValue - 15 * 9, uint.MaxValue, 15)]
+        [InlineData(1, uint.MaxValue, uint.MaxValue / 2)]
         public void FromRange_CorrectRange_BitmapContainsExpectedValues(uint start, uint end, uint step)
         {
             // Act
             using var uut = Roaring32Bitmap.FromRange(start, end, step);
 
             // Assert
-            var expected = Enumerable.Range(0, (int)Math.Ceiling((end - start + 1) / (double)step))
+            var expected = Enumerable.Range(0, (int)Math.Floor((end - start) / (double)step) + 1)
                 .Select(x => start + (uint)x * step)
                 .ToList();
             var actual = uut.Values.ToList();

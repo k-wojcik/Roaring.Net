@@ -1,7 +1,7 @@
 ﻿using System;
 using Roaring.Net.CRoaring;
 
-namespace Roaring.Net.Tests.CRoaring.Roaring32BitmapTests;
+namespace Roaring.Net.Tests.CRoaring;
 
 internal abstract class Roaring32BitmapTestObjectFactoryBase<TBitmap, TTestObject> : IRoaring32BitmapTestObjectFactory<TTestObject>, IRoaring32BitmapTestObjectFactory
     where TBitmap : IReadOnlyRoaring32Bitmap

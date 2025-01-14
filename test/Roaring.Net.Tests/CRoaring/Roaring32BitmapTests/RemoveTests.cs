@@ -9,9 +9,6 @@ public class RemoveTests
 {
     public class Remove
     {
-
-
-
         [Fact]
         public void Remove_BitmapIsEmpty_DoesNotRemoveValue()
         {

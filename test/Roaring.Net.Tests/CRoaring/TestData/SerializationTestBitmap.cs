@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Roaring.Net.CRoaring;
 
 namespace Roaring.Net.Tests.CRoaring.TestData;
@@ -26,10 +27,25 @@ internal static class SerializationTestBitmap
         return values;
     }
 
+    public static List<ulong> GetTestBitmap64Values() => GetTestBitmapValues().Select(x => (ulong)x).ToList();
+
     public static Roaring32Bitmap GetTestBitmap()
     {
         List<uint> values = GetTestBitmapValues();
         var bitmap = new Roaring32Bitmap();
+
+        foreach (var value in values)
+        {
+            bitmap.Add(value);
+        }
+
+        return bitmap;
+    }
+
+    public static Roaring64Bitmap GetTestBitmap64()
+    {
+        List<ulong> values = GetTestBitmap64Values();
+        var bitmap = new Roaring64Bitmap();
 
         foreach (var value in values)
         {

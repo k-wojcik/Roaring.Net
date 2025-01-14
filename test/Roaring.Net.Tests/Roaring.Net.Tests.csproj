@@ -30,5 +30,11 @@
     <None Update="CRoaring\TestData\bitmapwithoutruns.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="CRoaring\TestData\bitmap64withoutruns.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="CRoaring\TestData\bitmap64withruns.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

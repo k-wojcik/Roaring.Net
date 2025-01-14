@@ -5,65 +5,51 @@ using System.Runtime.InteropServices;
 namespace Roaring.Net.CRoaring;
 
 /// <summary>
-/// Represents a 32-bit CRoaring bitmap.
+/// Represents a 64-bit CRoaring bitmap.
 /// </summary>
-public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bitmap
+public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bitmap
 {
     private bool _isDisposed;
 
     /// <summary>
-    /// Gets the number of elements (cardinality) contained in the <see cref="Roaring32Bitmap"/>.
+    /// Gets the number of elements (cardinality) contained in the <see cref="Roaring64Bitmap"/>.
     /// </summary>
-    /// <returns>The number of elements contained in the <see cref="Roaring32Bitmap"/>.</returns>
-    public ulong Count => NativeMethods.roaring_bitmap_get_cardinality(Pointer);
+    /// <returns>The number of elements contained in the <see cref="Roaring64Bitmap"/>.</returns>
+    public ulong Count => NativeMethods.roaring64_bitmap_get_cardinality(Pointer);
 
     /// <summary>
-    /// Gets a value indicating that <see cref="Roaring32Bitmap"/> is empty (cardinality is zero).
+    /// Gets a value indicating that <see cref="Roaring64Bitmap"/> is empty (cardinality is zero).
     /// </summary>
-    /// <returns><c>true</c> if <see cref="Roaring32Bitmap"/> is empty (cardinality is zero); otherwise, <c>false</c>.</returns>
-    public bool IsEmpty => NativeMethods.roaring_bitmap_is_empty(Pointer);
+    /// <returns><c>true</c> if <see cref="Roaring64Bitmap"/> is empty (cardinality is zero); otherwise, <c>false</c>.</returns>
+    public bool IsEmpty => NativeMethods.roaring64_bitmap_is_empty(Pointer);
 
     /// <summary>
-    /// Gets a value indicating that <see cref="Roaring32Bitmap"/> is has copy-on-write (COW) mode enabled.
+    /// Gets the minimum value in the <see cref="Roaring64Bitmap"/>.
     /// </summary>
-    /// <returns><c>true</c> if <see cref="Roaring32Bitmap"/> has copy-on-write enabled; otherwise, <c>false</c>.</returns>
-    public bool IsCopyOnWrite => NativeMethods.roaring_bitmap_get_copy_on_write(Pointer);
+    /// <returns>The minimum value in the <see cref="Roaring64Bitmap"/> or <c>null</c> when the bitmap is empty.</returns>
+    public ulong? Min => IsEmpty ? null : NativeMethods.roaring64_bitmap_minimum(Pointer);
 
     /// <summary>
-    /// Gets the minimum value in the <see cref="Roaring32Bitmap"/>.
+    /// Gets the maximum value in the <see cref="Roaring64Bitmap"/>.
     /// </summary>
-    /// <returns>The minimum value in the <see cref="Roaring32Bitmap"/> or <c>null</c> when the bitmap is empty.</returns>
-    public uint? Min => IsEmpty ? null : NativeMethods.roaring_bitmap_minimum(Pointer);
+    /// <returns>The maximum value in the <see cref="Roaring64Bitmap"/> or <see langword="null"/> when the bitmap is empty.</returns>
+    public ulong? Max => IsEmpty ? null : NativeMethods.roaring64_bitmap_maximum(Pointer);
 
     /// <summary>
-    /// Gets the maximum value in the <see cref="Roaring32Bitmap"/>.
+    /// Initializes a new instance of the <see cref="Roaring64Bitmap"/> class.
     /// </summary>
-    /// <returns>The maximum value in the <see cref="Roaring32Bitmap"/> or <see langword="null"/> when the bitmap is empty.</returns>
-    public uint? Max => IsEmpty ? null : NativeMethods.roaring_bitmap_maximum(Pointer);
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Roaring32Bitmap"/> class.
-    /// </summary>
-    /// <remarks>Initializes an empty bitmap (with a capacity of 0).</remarks>
+    /// <remarks>Initializes an empty bitmap.</remarks>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
-    public Roaring32Bitmap() => Pointer = CheckBitmapPointer(NativeMethods.roaring_bitmap_create_with_capacity(0));
+    public Roaring64Bitmap() => Pointer = CheckBitmapPointer(NativeMethods.roaring64_bitmap_create());
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Roaring32Bitmap"/> class with the given capacity.
-    /// </summary>
-    /// <param name="capacity">Initial capacity of the bitmap.</param>
-    /// <remarks>Capacity is a performance hint indicating how much data should be allocated when creating a bitmap.</remarks>
-    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
-    public Roaring32Bitmap(uint capacity) => Pointer = CheckBitmapPointer(NativeMethods.roaring_bitmap_create_with_capacity(capacity));
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Roaring32Bitmap"/> class with the given values.
+    /// Initializes a new instance of the <see cref="Roaring64Bitmap"/> class with the given values.
     /// </summary>
     /// <param name="values">Values that will be added to the bitmap directly when it is created.</param>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
-    public Roaring32Bitmap(uint[] values) => Pointer = CheckBitmapPointer(CreatePtrFromValues(values, 0, (uint)values.Length));
+    public Roaring64Bitmap(ulong[] values) => Pointer = CheckBitmapPointer(CreatePtrFromValues(values, 0, (uint)values.Length));
 
-    internal Roaring32Bitmap(IntPtr pointer) => Pointer = CheckBitmapPointer(pointer);
+    internal Roaring64Bitmap(IntPtr pointer) => Pointer = CheckBitmapPointer(pointer);
 
     private static IntPtr CheckBitmapPointer(IntPtr pointer)
     {
@@ -76,15 +62,15 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Roaring32Bitmap"/> class for the given range.
+    /// Initializes a new instance of the <see cref="Roaring64Bitmap"/> class for the given range.
     /// </summary>
     /// <param name="start">Start of range (inclusive).</param>
     /// <param name="end">End of range (inclusive).</param>
     /// <param name="step">Step between values (i * stop from minimum value).</param>
-    /// <returns>Instance of the <see cref="Roaring32Bitmap"/> class for the given range.</returns>
+    /// <returns>Instance of the <see cref="Roaring64Bitmap"/> class for the given range.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
-    public static Roaring32Bitmap FromRange(uint start, uint end, uint step = 1)
+    public static Roaring64Bitmap FromRange(ulong start, ulong end, ulong step = 1)
     {
         if (start > end)
         {
@@ -96,62 +82,71 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
             throw new ArgumentOutOfRangeException(nameof(step), step, ExceptionMessages.StepEqualToZero);
         }
 
-        Roaring32Bitmap bitmap;
-        if (start != uint.MaxValue)
+        Roaring64Bitmap bitmap;
+        if (start != ulong.MaxValue)
         {
             ulong inclusiveEnd = end;
-
-            if (end != uint.MaxValue) // CRoaring behaves unpredictably when uint.MaxValue is exceeded
+            if (end != ulong.MaxValue)
             {
                 inclusiveEnd += 1;
             }
-            bitmap = new Roaring32Bitmap(NativeMethods.roaring_bitmap_from_range(start, inclusiveEnd, step));
 
-            if (end == uint.MaxValue && (end - start) % step == 0)
+            bitmap = new Roaring64Bitmap(NativeMethods.roaring64_bitmap_from_range(start, inclusiveEnd, step));
+
+            if (end == ulong.MaxValue && (end - start) % step == 0)
             {
-                bitmap.Add(uint.MaxValue);
+                bitmap.Add(ulong.MaxValue);
             }
         }
         else
         {
-            bitmap = FromValues(new[] { uint.MaxValue });
+            bitmap = FromValues(new[] { ulong.MaxValue });
         }
 
         return bitmap;
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Roaring32Bitmap"/> class with the given values.
+    /// Initializes a new instance of the <see cref="Roaring64Bitmap"/> class with the given values.
     /// </summary>
     /// <param name="values">Values that will be added to the bitmap directly when it is created.</param>
-    /// <returns>Instance of the <see cref="Roaring32Bitmap"/> class with the given values.</returns>
+    /// <returns>Instance of the <see cref="Roaring64Bitmap"/> class with the given values.</returns>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
-    public static Roaring32Bitmap FromValues(uint[] values) => FromValues(values, 0U, (nuint)values.Length);
+    public static Roaring64Bitmap FromValues(ulong[] values) => FromValues(values, 0U, (nuint)values.Length);
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Roaring32Bitmap"/> class with the given values from subarray.
+    /// Initializes a new instance of the <see cref="Roaring64Bitmap"/> class with the given values from subarray.
     /// </summary>
     /// <param name="values">An array containing the values to add.</param>
     /// <param name="offset">The position in the array from which to start adding data.</param>
     /// <param name="count">The number of values to add from the offset position.</param>
-    /// <returns>Instance of the <see cref="Roaring32Bitmap"/> class with the given values from subarray.</returns>
+    /// <returns>Instance of the <see cref="Roaring64Bitmap"/> class with the given values from subarray.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
-    public static Roaring32Bitmap FromValues(uint[] values, nuint offset, nuint count)
+    public static Roaring64Bitmap FromValues(ulong[] values, nuint offset, nuint count)
         => new(CreatePtrFromValues(values, offset, count));
 
-    private static IntPtr CreatePtrFromValues(uint[] values, nuint offset, nuint count)
+    private static IntPtr CreatePtrFromValues(ulong[] values, nuint offset, nuint count)
     {
         if ((nuint)values.Length < offset + count)
         {
             throw new ArgumentOutOfRangeException(nameof(offset), offset, ExceptionMessages.OffsetWithCountGreaterThanNumberOfValues);
         }
 
-        fixed (uint* valuePtr = values)
+        fixed (ulong* valuePtr = values)
         {
-            return NativeMethods.roaring_bitmap_of_ptr(count, valuePtr + offset);
+            return NativeMethods.roaring64_bitmap_of_ptr(count, valuePtr + offset);
         }
     }
+
+    /// <summary>
+    ///  Initializes a new instance of the <see cref="Roaring64Bitmap"/> class with the values from CRoaring 32-bit bitmap.
+    /// </summary>
+    /// <param name="bitmap">CRoaring 32-bit bitmap.</param>
+    /// <returns>Instance of the <see cref="Roaring64Bitmap"/> class with the values from given <paramref name="bitmap"/>.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    public static Roaring64Bitmap FromBitmap(Roaring32BitmapBase bitmap)
+        => new(NativeMethods.roaring64_bitmap_move_from_roaring32(bitmap.Pointer));
 
     /// <inheritdoc />
     protected override void Dispose(bool disposing)
@@ -161,52 +156,31 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
             return;
         }
 
-        NativeMethods.roaring_bitmap_free(Pointer);
+        NativeMethods.roaring64_bitmap_free(Pointer);
         _isDisposed = true;
     }
 
     /// <inheritdoc />
-    ~Roaring32Bitmap() => Dispose(false);
+    ~Roaring64Bitmap() => Dispose(false);
 
     /// <summary>
     /// Copies the bitmap.
     /// </summary>
-    /// <returns>Instance of the <see cref="Roaring32Bitmap"/> class with the same values as the current bitmap.</returns>
+    /// <returns>Instance of the <see cref="Roaring64Bitmap"/> class with the same values as the current bitmap.</returns>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
-    public Roaring32Bitmap Clone() => new(NativeMethods.roaring_bitmap_copy(Pointer));
-
-    /// <summary>
-    /// Copies the bitmap from the given offset.
-    /// </summary>
-    /// <param name="offset">The position in the bitmap from which to start copying data.</param>
-    /// <returns>Instance of the <see cref="Roaring32Bitmap"/> class with the same values as the current bitmap from the given offset.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
-    public Roaring32Bitmap CloneWithOffset(long offset)
-        => new(NativeMethods.roaring_bitmap_add_offset(Pointer, offset));
-
-    /// <summary>
-    /// Overwrites the current bitmap with the bitmap given in the <paramref name="source"/> parameter. <br/>
-    /// The content of the current bitmap will be deleted.
-    /// </summary>
-    /// <param name="source">Bitmap that will be written in place of the current bitmap.</param>
-    /// <returns><c>true</c> if successful; otherwise, <c>false</c>.</returns>
-    /// <remarks>
-    /// The <see cref="OverwriteWith"/> method can save on memory allocations compared to the <see cref="Clone"/> method. <br/>
-    /// On failure, the current bitmap is left in a valid, empty state (all stored values are deleted).
-    /// </remarks>
-    public bool OverwriteWith(Roaring32BitmapBase source) => NativeMethods.roaring_bitmap_overwrite(Pointer, source.Pointer);
+    public Roaring64Bitmap Clone() => new(NativeMethods.roaring64_bitmap_copy(Pointer));
 
     /// <summary>
     /// Adds a value to the bitmap.
     /// </summary>
     /// <param name="value">A value that will be added to the bitmap.</param>
-    public void Add(uint value) => NativeMethods.roaring_bitmap_add(Pointer, value);
+    public void Add(ulong value) => NativeMethods.roaring64_bitmap_add(Pointer, value);
 
     /// <summary>
     /// Adds values from the given array to the bitmap.
     /// </summary>
     /// <param name="values">An array containing the values to add.</param>
-    public void AddMany(uint[] values) => AddMany(values, 0, (nuint)values.Length);
+    public void AddMany(ulong[] values) => AddMany(values, 0, (nuint)values.Length);
 
     /// <summary>
     /// Adds values from the given subarray to the bitmap.
@@ -215,16 +189,16 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <param name="offset">The position in the array from which to start adding data.</param>
     /// <param name="count">The number of values to add from the offset position.</param>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
-    public void AddMany(uint[] values, nuint offset, nuint count)
+    public void AddMany(ulong[] values, nuint offset, nuint count)
     {
         if ((nuint)values.Length < offset + count)
         {
             throw new ArgumentOutOfRangeException(nameof(offset), offset, ExceptionMessages.OffsetWithCountGreaterThanNumberOfValues);
         }
 
-        fixed (uint* valuePtr = values)
+        fixed (ulong* valuePtr = values)
         {
-            NativeMethods.roaring_bitmap_add_many(Pointer, count, valuePtr + offset);
+            NativeMethods.roaring64_bitmap_add_many(Pointer, count, valuePtr + offset);
         }
     }
 
@@ -233,7 +207,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// </summary>
     /// <param name="value">A value that will be added to the bitmap.</param>
     /// <returns><c>true</c> if a new value does not exist in the bitmap and has been added; otherwise, <c>false</c>.</returns>
-    public bool TryAdd(uint value) => NativeMethods.roaring_bitmap_add_checked(Pointer, value);
+    public bool TryAdd(ulong value) => NativeMethods.roaring64_bitmap_add_checked(Pointer, value);
 
     /// <summary>
     /// Adds values from the given range.
@@ -241,27 +215,14 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <param name="start">Start of range (inclusive).</param>
     /// <param name="end">End of range (inclusive).</param>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
-    public void AddRange(uint start, uint end)
+    public void AddRange(ulong start, ulong end)
     {
         if (start > end)
         {
             throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
         }
 
-        NativeMethods.roaring_bitmap_add_range_closed(Pointer, start, end);
-    }
-
-    /// <summary>
-    /// Adds an offset to all values stored in the bitmap.
-    /// </summary>
-    /// <param name="offset">The offset that will be added to all values.</param>
-    /// <remarks>This method allocates a new bitmap.</remarks>
-    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
-    public void AddOffset(long offset)
-    {
-        IntPtr previousPtr = Pointer;
-        Pointer = CheckBitmapPointer(NativeMethods.roaring_bitmap_add_offset(Pointer, offset));
-        NativeMethods.roaring_bitmap_free(previousPtr);
+        NativeMethods.roaring64_bitmap_add_range_closed(Pointer, start, end);
     }
 
     /// <summary>
@@ -270,31 +231,27 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <param name="context">A context that stores information between `*Bulk` method calls.</param>
     /// <param name="value">A value that will be added to the bitmap.</param>
     /// <exception cref="ArgumentException">Thrown when context belongs to another bitmap.</exception>
-    /// <remarks>
-    /// To take advantage of this optimization, the caller should call this method sequentially with values
-    /// with the same "key" (high 16 bits of the value).
-    /// </remarks>
-    public void AddBulk(BulkContext context, uint value)
+    public void AddBulk(BulkContext64 context, ulong value)
     {
         if (context.Bitmap != this)
         {
             throw new ArgumentException(ExceptionMessages.BulkContextBelongsToOtherBitmap, nameof(context));
         }
 
-        NativeMethods.roaring_bitmap_add_bulk(Pointer, context.Pointer, value);
+        NativeMethods.roaring64_bitmap_add_bulk(Pointer, context.Pointer, value);
     }
 
     /// <summary>
     /// Removes a value from the bitmap.
     /// </summary>
     /// <param name="value">A value that will be removed from the bitmap.</param>
-    public void Remove(uint value) => NativeMethods.roaring_bitmap_remove(Pointer, value);
+    public void Remove(ulong value) => NativeMethods.roaring64_bitmap_remove(Pointer, value);
 
     /// <summary>
     /// Removes the values contained in the given array from the bitmap.
     /// </summary>
     /// <param name="values">An array containing the values to remove.</param>
-    public void RemoveMany(uint[] values) => RemoveMany(values, 0, (nuint)values.Length);
+    public void RemoveMany(ulong[] values) => RemoveMany(values, 0, (nuint)values.Length);
 
     /// <summary>
     /// Removes the values contained in the given subarray from the bitmap.
@@ -303,16 +260,16 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <param name="offset">The position in the array from which to start removing data.</param>
     /// <param name="count">The number of values to remove from the offset position.</param>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
-    public void RemoveMany(uint[] values, nuint offset, nuint count)
+    public void RemoveMany(ulong[] values, nuint offset, nuint count)
     {
         if ((nuint)values.Length < offset + count)
         {
             throw new ArgumentOutOfRangeException(nameof(offset), offset, ExceptionMessages.OffsetWithCountGreaterThanNumberOfValues);
         }
 
-        fixed (uint* valuePtr = values)
+        fixed (ulong* valuePtr = values)
         {
-            NativeMethods.roaring_bitmap_remove_many(Pointer, count, valuePtr + offset);
+            NativeMethods.roaring64_bitmap_remove_many(Pointer, count, valuePtr + offset);
         }
     }
 
@@ -321,7 +278,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// </summary>
     /// <param name="value">A value that will be removed from the bitmap.</param>
     /// <returns><c>true</c> if a value exists in the bitmap and has been removed; otherwise, <c>false</c>.</returns>
-    public bool TryRemove(uint value) => NativeMethods.roaring_bitmap_remove_checked(Pointer, value);
+    public bool TryRemove(ulong value) => NativeMethods.roaring64_bitmap_remove_checked(Pointer, value);
 
     /// <summary>
     /// Removes values from the given range.
@@ -329,27 +286,44 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <param name="start">Start of range (inclusive).</param>
     /// <param name="end">End of range (inclusive).</param>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
-    public void RemoveRange(uint start, uint end)
+    public void RemoveRange(ulong start, ulong end)
     {
         if (start > end)
         {
             throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
         }
 
-        NativeMethods.roaring_bitmap_remove_range_closed(Pointer, start, end);
+        NativeMethods.roaring64_bitmap_remove_range_closed(Pointer, start, end);
     }
+
+    /// <summary>
+    /// Removes value from the bitmap using context from a previous bulk operation to optimize the addition process.
+    /// </summary>
+    /// <param name="context">A context that stores information between `*Bulk` method calls.</param>
+    /// <param name="value">A value that will be removed from the bitmap.</param>
+    /// <exception cref="ArgumentException">Thrown when context belongs to another bitmap.</exception>
+    public void RemoveBulk(BulkContext64 context, ulong value)
+    {
+        if (context.Bitmap != this)
+        {
+            throw new ArgumentException(ExceptionMessages.BulkContextBelongsToOtherBitmap, nameof(context));
+        }
+
+        NativeMethods.roaring64_bitmap_remove_bulk(Pointer, context.Pointer, value);
+    }
+
 
     /// <summary>
     /// Removes all values from the bitmap.
     /// </summary>
-    public void Clear() => NativeMethods.roaring_bitmap_clear(Pointer);
+    public void Clear() => NativeMethods.roaring64_bitmap_clear(Pointer);
 
     /// <summary>
     /// Checks if a value is present in the bitmap.
     /// </summary>
     /// <param name="value">A value for which the check will be performed.</param>
     /// <returns><c>true</c> if a value exists in the bitmap; otherwise, <c>false</c>.</returns>
-    public bool Contains(uint value) => NativeMethods.roaring_bitmap_contains(Pointer, value);
+    public bool Contains(ulong value) => NativeMethods.roaring64_bitmap_contains(Pointer, value);
 
     /// <summary>
     /// Checks if the values for the given range are present in the bitmap.
@@ -358,14 +332,15 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <param name="end">End of range (inclusive).</param>
     /// <returns><c>true</c> if all values from the given range exist in the bitmap; otherwise, <c>false</c>.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
-    public bool ContainsRange(uint start, uint end)
+    public bool ContainsRange(ulong start, ulong end)
     {
         if (start > end)
         {
             throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
         }
 
-        return NativeMethods.roaring_bitmap_contains_range(Pointer, start, (ulong)end + 1);
+        return NativeMethods.roaring64_bitmap_contains_range(Pointer, start, end)
+               && (end != ulong.MaxValue || NativeMethods.roaring64_bitmap_contains(Pointer, end));
     }
 
     /// <summary>
@@ -374,18 +349,14 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <param name="context">A context that stores information between `*Bulk` method calls.</param>
     /// <param name="value">A value for which the check will be performed.</param>
     /// <exception cref="ArgumentException">Thrown when context belongs to another bitmap.</exception>
-    /// <remarks>
-    /// To take advantage of this optimization, the caller should call this method sequentially with values
-    /// with the same "key" (high 16 bits of the value).
-    /// </remarks>
-    public bool ContainsBulk(BulkContext context, uint value)
+    public bool ContainsBulk(BulkContext64 context, ulong value)
     {
         if (context.Bitmap != this)
         {
             throw new ArgumentException(ExceptionMessages.BulkContextBelongsToOtherBitmap, nameof(context));
         }
 
-        return NativeMethods.roaring_bitmap_contains_bulk(Pointer, context.Pointer, value);
+        return NativeMethods.roaring64_bitmap_contains_bulk(Pointer, context.Pointer, value);
     }
 
     /// <summary>
@@ -393,14 +364,14 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// </summary>
     /// <param name="bitmap">Bitmap with which equality will be compared.</param>
     /// <returns><c>true</c> if both bitmaps have the same values; otherwise, <c>false</c>.</returns>
-    public bool ValueEquals(Roaring32BitmapBase? bitmap)
+    public bool ValueEquals(Roaring64BitmapBase? bitmap)
     {
         if (bitmap == null)
         {
             return false;
         }
 
-        return NativeMethods.roaring_bitmap_equals(Pointer, bitmap.Pointer);
+        return NativeMethods.roaring64_bitmap_equals(Pointer, bitmap.Pointer);
     }
 
     /// <summary>
@@ -408,14 +379,14 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// </summary>
     /// <param name="bitmap"></param>
     /// <returns><c>true</c> if current bitmaps is a subset of the <paramref name="bitmap"/>; otherwise, <c>false</c>.</returns>
-    public bool IsSubsetOf(Roaring32BitmapBase? bitmap)
+    public bool IsSubsetOf(Roaring64BitmapBase? bitmap)
     {
         if (bitmap == null)
         {
             return false;
         }
 
-        return NativeMethods.roaring_bitmap_is_subset(Pointer, bitmap.Pointer);
+        return NativeMethods.roaring64_bitmap_is_subset(Pointer, bitmap.Pointer);
     }
 
     /// <summary>
@@ -423,14 +394,14 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// </summary>
     /// <param name="bitmap"></param>
     /// <returns><c>true</c> if current bitmaps is a proper subset of the <paramref name="bitmap"/>; otherwise, <c>false</c>.</returns>
-    public bool IsProperSubsetOf(Roaring32BitmapBase? bitmap)
+    public bool IsProperSubsetOf(Roaring64BitmapBase? bitmap)
     {
         if (bitmap == null)
         {
             return false;
         }
 
-        return NativeMethods.roaring_bitmap_is_strict_subset(Pointer, bitmap.Pointer);
+        return NativeMethods.roaring64_bitmap_is_strict_subset(Pointer, bitmap.Pointer);
     }
 
     /// <summary>
@@ -438,20 +409,20 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// </summary>
     /// <param name="bitmap"></param>
     /// <returns><c>true</c> if current bitmaps is a superset of the <paramref name="bitmap"/>; otherwise, <c>false</c>.</returns>
-    public bool IsSupersetOf(Roaring32BitmapBase? bitmap)
+    public bool IsSupersetOf(Roaring64BitmapBase? bitmap)
     {
         if (bitmap == null)
         {
             return false;
         }
 
-        if (NativeMethods.roaring_bitmap_get_cardinality(bitmap.Pointer) >
-            NativeMethods.roaring_bitmap_get_cardinality(Pointer))
+        if (NativeMethods.roaring64_bitmap_get_cardinality(bitmap.Pointer) >
+            NativeMethods.roaring64_bitmap_get_cardinality(Pointer))
         {
             return false;
         }
 
-        return NativeMethods.roaring_bitmap_is_subset(bitmap.Pointer, Pointer);
+        return NativeMethods.roaring64_bitmap_is_subset(bitmap.Pointer, Pointer);
     }
 
     /// <summary>
@@ -459,20 +430,20 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// </summary>
     /// <param name="bitmap"></param>
     /// <returns><c>true</c> if current bitmaps is a proper superset of the <paramref name="bitmap"/>; otherwise, <c>false</c>.</returns>
-    public bool IsProperSupersetOf(Roaring32BitmapBase? bitmap)
+    public bool IsProperSupersetOf(Roaring64BitmapBase? bitmap)
     {
         if (bitmap == null)
         {
             return false;
         }
 
-        if (NativeMethods.roaring_bitmap_get_cardinality(bitmap.Pointer) >=
-            NativeMethods.roaring_bitmap_get_cardinality(Pointer))
+        if (NativeMethods.roaring64_bitmap_get_cardinality(bitmap.Pointer) >=
+            NativeMethods.roaring64_bitmap_get_cardinality(Pointer))
         {
             return false;
         }
 
-        return NativeMethods.roaring_bitmap_is_subset(bitmap.Pointer, Pointer);
+        return NativeMethods.roaring64_bitmap_is_subset(bitmap.Pointer, Pointer);
     }
 
     /// <summary>
@@ -481,36 +452,22 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <param name="index">The index for which the value will be retrieved. Index values start from 0.</param>
     /// <param name="value">Retrieved value. <c>0</c> if value does not exist in the bitmap.</param>
     /// <returns><c>true</c> if a value exists in the bitmap; otherwise, <c>false</c>.</returns>
-    public bool TryGetValue(uint index, out uint value) => NativeMethods.roaring_bitmap_select(Pointer, index, out value);
+    public bool TryGetValue(ulong index, out ulong value) => NativeMethods.roaring64_bitmap_select(Pointer, index, out value);
 
     /// <summary>
     /// Gets the index (rank) for the given value.
     /// </summary>
     /// <param name="value">The value for which the index will be retrieved.</param>
-    /// <returns><c>-1</c> if a <paramref name="value"/> does not exist in the bitmap; otherwise, index (rank) of the <paramref name="value"/>.</returns>
-    public long GetIndex(uint value) => NativeMethods.roaring_bitmap_get_index(Pointer, value);
+    /// <param name="index">Index (rank) of the <paramref name="value"/>. <c>0</c> if value does not exist in the bitmap.</param>
+    /// <returns><c>true</c> if index for <paramref name="value"/> exists in the bitmap; otherwise, <c>false</c>.</returns>
+    public bool TryGetIndex(ulong value, out ulong index) => NativeMethods.roaring64_bitmap_get_index(Pointer, value, out index);
 
     /// <summary>
     /// Counts number of values less than or equal to <paramref name="value"/>.
     /// </summary>
     /// <param name="value">The value for which data will be counted.</param>
     /// <returns>The number of values that are less than or equal to the <paramref name="value"/>.</returns>
-    public ulong CountLessOrEqualTo(uint value) => NativeMethods.roaring_bitmap_rank(Pointer, value);
-
-    /// <summary>
-    /// Counts number of values less than or equal to for each element of <paramref name="values"/>.
-    /// </summary>
-    /// <param name="values">An ascending sorted set of tested values.</param>
-    /// <returns>The number of values that are less than or equal to the value from <paramref name="values"/> placed under the same index.</returns>
-    public ulong[] CountManyLessOrEqualTo(uint[] values)
-    {
-        var items = new ulong[values.Length];
-        fixed (uint* valuesPtr = values)
-        {
-            NativeMethods.roaring_bitmap_rank_many(Pointer, valuesPtr, valuesPtr + values.Length, items);
-        }
-        return items;
-    }
+    public ulong CountLessOrEqualTo(ulong value) => NativeMethods.roaring64_bitmap_rank(Pointer, value);
 
     /// <summary>
     /// Counts number of values in the given range of values.
@@ -519,44 +476,48 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <param name="end">End of range (inclusive).</param>
     /// <returns>The number of values in the given range of values.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
-    public ulong CountRange(uint start, uint end)
+    public ulong CountRange(ulong start, ulong end)
     {
         if (start > end)
         {
             throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
         }
 
-        return NativeMethods.roaring_bitmap_range_cardinality_closed(Pointer, start, end);
+        return NativeMethods.roaring64_bitmap_range_closed_cardinality(Pointer, start, end);
     }
 
+    /* unavailable due to CRoaring performance issues
+    
     /// <summary>
     /// Creates a new negated bitmap based on the values in the current bitmap. 
     /// </summary>
-    /// <returns>Instance of the <see cref="Roaring32Bitmap"/> class with negated values of current bitmap.</returns>
-    public Roaring32Bitmap Not()
-        => new(NativeMethods.roaring_bitmap_flip_closed(Pointer, uint.MinValue, uint.MaxValue));
+    /// <returns>Instance of the <see cref="Roaring64Bitmap"/> class with negated values of current bitmap.</returns>
+    public Roaring64Bitmap Not()
+        => new(NativeMethods.roaring64_bitmap_flip_closed(Pointer, ulong.MinValue, ulong.MaxValue));
 
     /// <summary>
     /// Negates all values in the current bitmap. 
     /// </summary>
-    public void INot() => NativeMethods.roaring_bitmap_flip_inplace_closed(Pointer, uint.MinValue, uint.MaxValue);
+    public void INot() => NativeMethods.roaring64_bitmap_flip_closed_inplace(Pointer, ulong.MinValue, ulong.MaxValue);
+
+    */
 
     /// <summary>
     /// Creates a new negated bitmap based on the values in the current bitmap for the given range of values. 
     /// </summary>
     /// <param name="start">Start of range (inclusive).</param>
     /// <param name="end">End of range (inclusive).</param>
-    /// <returns>Instance of the <see cref="Roaring32Bitmap"/> class with negated values of current bitmap in the given range of values.</returns>
+    /// <returns>Instance of the <see cref="Roaring64Bitmap"/> class with negated values of current bitmap in the given range of values.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
     /// <remarks>Values outside the range are left unchanged.</remarks>
-    public Roaring32Bitmap NotRange(uint start, uint end)
+    public Roaring64Bitmap NotRange(ulong start, ulong end)
     {
         if (start > end)
         {
             throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
         }
 
-        return new(NativeMethods.roaring_bitmap_flip_closed(Pointer, start, end));
+        return new(NativeMethods.roaring64_bitmap_flip_closed(Pointer, start, end));
     }
 
     /// <summary>
@@ -566,21 +527,21 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <param name="end">End of range (inclusive).</param>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
     /// <remarks>Values outside the range are left unchanged.</remarks>
-    public void INotRange(uint start, uint end)
+    public void INotRange(ulong start, ulong end)
     {
         if (start > end)
         {
             throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
         }
 
-        NativeMethods.roaring_bitmap_flip_inplace_closed(Pointer, start, end);
+        NativeMethods.roaring64_bitmap_flip_closed_inplace(Pointer, start, end);
     }
 
     /// <summary>
     /// Creates a intersection between the current bitmap and the <paramref name="bitmap"/> given in the parameter.
     /// </summary>
     /// <param name="bitmap">Bitmap with which the intersection will be performed.</param>
-    /// <returns><see cref="Roaring32Bitmap"/> with the result of intersection of two bitmaps.</returns>
+    /// <returns><see cref="Roaring64BitmapBase"/> with the result of intersection of two bitmaps.</returns>
     /// <remarks>
     /// Performance hints:
     /// <list type="bullet">
@@ -588,8 +549,8 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <item>you may also rely on <see cref="IAnd"/> to avoid creating many temporary bitmaps.</item>
     /// </list>
     /// </remarks>
-    public Roaring32Bitmap And(Roaring32BitmapBase bitmap) =>
-        new(NativeMethods.roaring_bitmap_and(Pointer, bitmap.Pointer));
+    public Roaring64Bitmap And(Roaring64BitmapBase bitmap) =>
+        new(NativeMethods.roaring64_bitmap_and(Pointer, bitmap.Pointer));
 
     /// <summary>
     /// Intersects (in place) the current bitmap with the <paramref name="bitmap"/> given in the parameter.
@@ -601,197 +562,93 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <item>if you are computing the intersection between several bitmaps, two-by-two, it is best to start with the smallest bitmap,</item>
     /// </list>
     /// </remarks>
-    public void IAnd(Roaring32BitmapBase bitmap)
-        => NativeMethods.roaring_bitmap_and_inplace(Pointer, bitmap.Pointer);
+    public void IAnd(Roaring64BitmapBase bitmap)
+        => NativeMethods.roaring64_bitmap_and_inplace(Pointer, bitmap.Pointer);
 
     /// <summary>
     /// Intersects the current bitmap with the <paramref name="bitmap"/> given in the parameter and returns the number of values contained in the resulting bitmap.
     /// </summary>
     /// <param name="bitmap">Bitmap with which the intersection will be performed.</param>
     /// <returns>Number of values contained in the resulting bitmap after intersection.</returns>
-    public ulong AndCount(Roaring32BitmapBase bitmap)
-        => NativeMethods.roaring_bitmap_and_cardinality(Pointer, bitmap.Pointer);
+    public ulong AndCount(Roaring64BitmapBase bitmap)
+        => NativeMethods.roaring64_bitmap_and_cardinality(Pointer, bitmap.Pointer);
 
     /// <summary>
     /// Creates a difference between the current bitmap and the <paramref name="bitmap"/> given in the parameter.
     /// </summary>
     /// <param name="bitmap">Bitmap with which the difference will be performed.</param>
-    /// <returns><see cref="Roaring32Bitmap"/> with the result of the difference of two bitmaps.</returns>
-    public Roaring32Bitmap AndNot(Roaring32BitmapBase bitmap) =>
-        new(NativeMethods.roaring_bitmap_andnot(Pointer, bitmap.Pointer));
+    /// <returns><see cref="Roaring64BitmapBase"/> with the result of the difference of two bitmaps.</returns>
+    public Roaring64Bitmap AndNot(Roaring64BitmapBase bitmap) =>
+        new(NativeMethods.roaring64_bitmap_andnot(Pointer, bitmap.Pointer));
 
     /// <summary>
     /// Creates (in place) a difference between the current bitmap with the <paramref name="bitmap"/> given in the parameter.
     /// </summary>
     /// <param name="bitmap">Bitmap with which the difference will be performed.</param>
-    public void IAndNot(Roaring32BitmapBase bitmap)
-        => NativeMethods.roaring_bitmap_andnot_inplace(Pointer, bitmap.Pointer);
+    public void IAndNot(Roaring64BitmapBase bitmap)
+        => NativeMethods.roaring64_bitmap_andnot_inplace(Pointer, bitmap.Pointer);
 
     /// <summary>
     /// Creates a difference between the current bitmap and the <paramref name="bitmap"/> given in the parameter and returns the number of values contained in the resulting bitmap.
     /// </summary>
     /// <param name="bitmap">Bitmap with which the difference will be performed.</param>
     /// <returns>Number of values contained in the resulting bitmap after difference.</returns>
-    public ulong AndNotCount(Roaring32BitmapBase bitmap)
-        => NativeMethods.roaring_bitmap_andnot_cardinality(Pointer, bitmap.Pointer);
+    public ulong AndNotCount(Roaring64BitmapBase bitmap)
+        => NativeMethods.roaring64_bitmap_andnot_cardinality(Pointer, bitmap.Pointer);
 
     /// <summary>
     /// Creates a union between the current bitmap and the <paramref name="bitmap"/> given in the parameter.
     /// </summary>
     /// <param name="bitmap">Bitmap with which the union will be performed.</param>
-    /// <returns><see cref="Roaring32Bitmap"/> with the result of union two bitmaps.</returns>
-    public Roaring32Bitmap Or(Roaring32BitmapBase bitmap) =>
-        new(NativeMethods.roaring_bitmap_or(Pointer, bitmap.Pointer));
+    /// <returns><see cref="Roaring64Bitmap"/> with the result of union two bitmaps.</returns>
+    public Roaring64Bitmap Or(Roaring64BitmapBase bitmap) =>
+        new(NativeMethods.roaring64_bitmap_or(Pointer, bitmap.Pointer));
 
     /// <summary>
     /// Creates a union between the current bitmap and the <paramref name="bitmap"/> given in the parameter and returns the number of values contained in the resulting bitmap.
     /// </summary>
     /// <param name="bitmap">Bitmap with which the union will be performed.</param>
     /// <returns>Number of values contained in the resulting bitmap after union.</returns>
-    public ulong OrCount(Roaring32BitmapBase bitmap)
-        => NativeMethods.roaring_bitmap_or_cardinality(Pointer, bitmap.Pointer);
-
-    /// <summary>
-    /// Creates a union between the current bitmap and the <paramref name="bitmaps"/> given in the parameter.
-    /// </summary>
-    /// <param name="bitmaps">Bitmaps with which the union will be performed.</param>
-    /// <returns><see cref="Roaring32Bitmap"/> with the result of union of many bitmaps.</returns>
-    /// <remarks>This method may be slower than <see cref="OrManyHeap"/> in some cases.</remarks>
-    public Roaring32Bitmap OrMany(Roaring32BitmapBase[] bitmaps)
-    {
-        int length = bitmaps.Length + 1;
-        var pointers = new IntPtr[length];
-        for (int i = 0; i < bitmaps.Length; i++)
-        {
-            pointers[i] = bitmaps[i].Pointer;
-        }
-        pointers[length - 1] = Pointer;
-
-        return new Roaring32Bitmap(NativeMethods.roaring_bitmap_or_many((nuint)pointers.Length, pointers));
-    }
-
-    /// <summary>
-    /// Creates a union between the current bitmap and the <paramref name="bitmaps"/> given in the parameter using a heap.
-    /// </summary>
-    /// <param name="bitmaps">Bitmaps with which the union will be performed.</param>
-    /// <returns><see cref="Roaring32Bitmap"/> with the result of union of many bitmaps.</returns>
-    /// <remarks>This method may be faster than <see cref="OrMany"/> in some cases.</remarks>
-    public Roaring32Bitmap OrManyHeap(Roaring32BitmapBase[] bitmaps)
-    {
-        int length = bitmaps.Length + 1;
-        var pointers = new IntPtr[length];
-        for (int i = 0; i < bitmaps.Length; i++)
-        {
-            pointers[i] = bitmaps[i].Pointer;
-        }
-        pointers[length - 1] = Pointer;
-
-        return new Roaring32Bitmap(NativeMethods.roaring_bitmap_or_many_heap((uint)pointers.Length, pointers));
-    }
+    public ulong OrCount(Roaring64BitmapBase bitmap)
+        => NativeMethods.roaring64_bitmap_or_cardinality(Pointer, bitmap.Pointer);
 
     /// <summary>
     /// Creates (in place) a union between the current bitmap and the <paramref name="bitmap"/> given in the parameter.
     /// </summary>
     /// <param name="bitmap">Bitmap with which the union will be performed.</param>
-    public void IOr(Roaring32BitmapBase bitmap)
-        => NativeMethods.roaring_bitmap_or_inplace(Pointer, bitmap.Pointer);
-
-    /// <summary>
-    /// Creates a union between the current bitmap and the <paramref name="bitmap"/> given in the parameter using lazy algorithm.
-    /// </summary>
-    /// <param name="bitmap">Bitmap with which the union will be performed.</param>
-    /// <param name="bitsetConversion">Flag which determines whether container-container operations force a bitset conversion.</param>
-    /// <returns><see cref="Roaring32Bitmap"/> with the result of union two bitmaps.</returns>
-    /// <remarks>
-    /// You must call <see cref="RepairAfterLazy"/> on the resulting bitmap after executing "lazy" computations. <br/>
-    /// Lazy operations can be called multiple times in sequence.
-    /// </remarks>
-    public Roaring32Bitmap LazyOr(Roaring32BitmapBase bitmap, bool bitsetConversion) =>
-        new(NativeMethods.roaring_bitmap_lazy_or(Pointer, bitmap.Pointer, bitsetConversion));
-
-    /// <summary>
-    /// Creates (in place) a union between the current bitmap and the <paramref name="bitmap"/> given in the parameter using lazy algorithm.
-    /// </summary>
-    /// <param name="bitmap">Bitmap with which the union will be performed.</param>
-    /// <param name="bitsetConversion">Flag which determines whether container-container operations force a bitset conversion.</param>
-    /// <remarks>
-    /// You must call <see cref="RepairAfterLazy"/> on the resulting bitmap after executing "lazy" computations. <br/>
-    /// Lazy operations can be called multiple times in sequence.
-    /// </remarks>
-    public void ILazyOr(Roaring32BitmapBase bitmap, bool bitsetConversion)
-        => NativeMethods.roaring_bitmap_lazy_or_inplace(Pointer, bitmap.Pointer, bitsetConversion);
+    public void IOr(Roaring64BitmapBase bitmap)
+        => NativeMethods.roaring64_bitmap_or_inplace(Pointer, bitmap.Pointer);
 
     /// <summary>
     /// Creates a symmetric difference between the current bitmap and the <paramref name="bitmap"/> given in the parameter.
     /// </summary>
     /// <param name="bitmap">Bitmap with which the symmetric difference will be performed.</param>
-    /// <returns><see cref="Roaring32Bitmap"/> with the result of the symmetric difference of two bitmaps.</returns>
-    public Roaring32Bitmap Xor(Roaring32BitmapBase bitmap) =>
-        new(NativeMethods.roaring_bitmap_xor(Pointer, bitmap.Pointer));
+    /// <returns><see cref="Roaring64Bitmap"/> with the result of the symmetric difference of two bitmaps.</returns>
+    public Roaring64Bitmap Xor(Roaring64BitmapBase bitmap) =>
+        new(NativeMethods.roaring64_bitmap_xor(Pointer, bitmap.Pointer));
 
     /// <summary>
     /// Creates (in place) a symmetric difference between the current bitmap and the <paramref name="bitmap"/> given in the parameter.
     /// </summary>
     /// <param name="bitmap">Bitmap with which the symmetric difference will be performed.</param>
-    public void IXor(Roaring32BitmapBase bitmap)
-        => NativeMethods.roaring_bitmap_xor_inplace(Pointer, bitmap.Pointer);
+    public void IXor(Roaring64BitmapBase bitmap)
+        => NativeMethods.roaring64_bitmap_xor_inplace(Pointer, bitmap.Pointer);
 
     /// <summary>
     /// Creates a symmetric difference between the current bitmap and the <paramref name="bitmap"/> given in the parameter and returns the number of values contained in the resulting bitmap. 
     /// </summary>
     /// <param name="bitmap">Bitmap with which the symmetric difference will be performed.</param>
     /// <returns>Number of values contained in the resulting bitmap after symmetric difference.</returns>
-    public ulong XorCount(Roaring32BitmapBase bitmap)
-        => NativeMethods.roaring_bitmap_xor_cardinality(Pointer, bitmap.Pointer);
-
-    /// <summary>
-    /// Creates a symmetric difference between the current bitmap and the <paramref name="bitmaps"/> given in the parameter.
-    /// </summary>
-    /// <param name="bitmaps">Bitmaps with which the symmetric difference will be performed.</param>
-    /// <returns><see cref="Roaring32Bitmap"/> with the result of the symmetric difference of many bitmaps.</returns>
-    public Roaring32Bitmap XorMany(params Roaring32BitmapBase[] bitmaps)
-    {
-        int length = bitmaps.Length + 1;
-        var pointers = new IntPtr[length];
-        for (int i = 0; i < bitmaps.Length; i++)
-        {
-            pointers[i] = bitmaps[i].Pointer;
-        }
-        pointers[length - 1] = Pointer;
-
-        return new Roaring32Bitmap(NativeMethods.roaring_bitmap_xor_many((nuint)pointers.Length, pointers));
-    }
-
-    /// <summary>
-    /// Creates a symmetric difference between the current bitmap and the <paramref name="bitmap"/> given in the parameter using lazy algorithm.
-    /// </summary>
-    /// <param name="bitmap">Bitmap with which the symmetric difference will be performed.</param>
-    /// <returns><see cref="Roaring32Bitmap"/> with the result of the symmetric difference of two bitmaps.</returns>
-    /// <remarks>
-    /// You must call <see cref="RepairAfterLazy"/> on the resulting bitmap after executing "lazy" computations. <br/>
-    /// Lazy operations can be called multiple times in sequence.
-    /// </remarks>
-    public Roaring32Bitmap LazyXor(Roaring32BitmapBase bitmap)
-        => new(NativeMethods.roaring_bitmap_lazy_xor(Pointer, bitmap.Pointer));
-
-    /// <summary>
-    /// Creates (in place) a symmetric difference between the current bitmap and the <paramref name="bitmap"/> given in the parameter using lazy algorithm.
-    /// </summary>
-    /// <param name="bitmap">Bitmap with which the symmetric difference will be performed.</param>
-    /// <remarks>
-    /// You must call <see cref="RepairAfterLazy"/> on the resulting bitmap after executing "lazy" computations. <br/>
-    /// Lazy operations can be called multiple times in sequence.
-    /// </remarks>
-    public void ILazyXor(Roaring32BitmapBase bitmap)
-        => NativeMethods.roaring_bitmap_lazy_xor_inplace(Pointer, bitmap.Pointer);
+    public ulong XorCount(Roaring64BitmapBase bitmap)
+        => NativeMethods.roaring64_bitmap_xor_cardinality(Pointer, bitmap.Pointer);
 
     /// <summary>
     /// Checks whether the current bitmaps overlaps (at least one element exists in both bitmaps) the <paramref name="bitmap"/> given in the parameter.
     /// </summary>
     /// <param name="bitmap">Bitmap with which the calculation will be performed.</param>
     /// <returns><c>true</c> if current bitmap overlaps the given bitmap and the bitmaps are not empty; otherwise, <c>false</c>.</returns>
-    public bool Overlaps(Roaring32BitmapBase bitmap)
-        => NativeMethods.roaring_bitmap_intersect(Pointer, bitmap.Pointer);
+    public bool Overlaps(Roaring64BitmapBase bitmap)
+        => NativeMethods.roaring64_bitmap_intersect(Pointer, bitmap.Pointer);
 
     /// <summary>
     /// Checks whether the current bitmaps overlaps (at least one element exists in range) the range given in the parameters.
@@ -800,14 +657,31 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <param name="end">End of range (inclusive).</param>
     /// <returns><c>true</c> if current bitmap overlaps the given range; otherwise, <c>false</c>.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
-    public bool OverlapsRange(uint start, uint end)
+    public bool OverlapsRange(ulong start, ulong end)
     {
         if (start > end)
         {
             throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
         }
 
-        return NativeMethods.roaring_bitmap_intersect_with_range(Pointer, start, (ulong)end + 1);
+        bool overlaps;
+        if (start != ulong.MaxValue)
+        {
+            ulong endInclusive = end;
+            if (end != ulong.MaxValue)
+            {
+                endInclusive += 1;
+            }
+
+            overlaps = NativeMethods.roaring64_bitmap_intersect_with_range(Pointer, start, endInclusive)
+                       || (end == ulong.MaxValue && NativeMethods.roaring64_bitmap_contains(Pointer, end));
+        }
+        else
+        {
+            overlaps = NativeMethods.roaring64_bitmap_contains(Pointer, start);
+        }
+
+        return overlaps;
     }
 
     /// <summary>
@@ -817,54 +691,29 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <param name="bitmap">Bitmap with which the Jaccard index computation will be performed.</param>
     /// <returns>Value of the Jaccard index.</returns>
     /// <remarks>The Jaccard index is undefined if both bitmaps are empty.</remarks>
-    public double GetJaccardIndex(Roaring32BitmapBase bitmap)
-        => NativeMethods.roaring_bitmap_jaccard_index(Pointer, bitmap.Pointer);
-
-    /// <summary>
-    /// Executes maintenance on the current bitmap after using "*Lazy" methods.
-    /// </summary>
-    public void RepairAfterLazy()
-        => NativeMethods.roaring_bitmap_repair_after_lazy(Pointer);
+    public double GetJaccardIndex(Roaring64BitmapBase bitmap)
+        => NativeMethods.roaring64_bitmap_jaccard_index(Pointer, bitmap.Pointer);
 
     /// <summary>
     /// Performs optimizations on the current bitmap.
     /// </summary>
     /// <returns><c>true</c> if the result has at least one run container; otherwise, <c>false</c>.</returns>
-    /// <remarks>
-    /// Converts array and bitmap containers to run containers when it is more
-    /// efficient, also converts from run containers when more space efficient. <br/>
-    /// Additional savings might be possible by calling <see cref="ShrinkToFit"/>.
-    /// </remarks>
     public bool Optimize()
-        => NativeMethods.roaring_bitmap_run_optimize(Pointer);
-
-    /// <summary>
-    /// Removes run-length encoding even when it is more space efficient.
-    /// </summary>
-    /// <returns><c>true</c> if remove operation has been performed; otherwise, <c>false</c>.</returns>
-    public bool RemoveRunCompression()
-        => NativeMethods.roaring_bitmap_remove_run_compression(Pointer);
-
-    /// <summary>
-    /// Tries to reallocate memory to reduce the memory usage.
-    /// </summary>
-    /// <returns>The number of bytes saved after performing the shrink operation.</returns>
-    public nuint ShrinkToFit()
-        => NativeMethods.roaring_bitmap_shrink_to_fit(Pointer);
+        => NativeMethods.roaring64_bitmap_run_optimize(Pointer);
 
     /// <summary>
     /// Writes current bitmap to the <paramref name="buffer"/> given in the parameter.
     /// </summary>
     /// <param name="buffer">The array in which the bitmap will be written.</param>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the <paramref name="buffer"/> size is too small to write the bitmap.</exception>
-    public void CopyTo(uint[] buffer)
+    public void CopyTo(ulong[] buffer)
     {
-        if ((ulong)buffer.Length < Count)
+        if ((ulong)buffer.LongLength < Count)
         {
             throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, ExceptionMessages.BufferSizeIsTooSmall);
         }
 
-        NativeMethods.roaring_bitmap_to_uint32_array(Pointer, buffer);
+        NativeMethods.roaring64_bitmap_to_uint64_array(Pointer, buffer);
     }
 
     /// <summary>
@@ -872,23 +721,23 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// </summary>
     /// <param name="buffer">The <see cref="Memory{T}"/> in which the bitmap will be written.</param>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the <paramref name="buffer"/> size is too small to write the bitmap.</exception>
-    public void CopyTo(Memory<uint> buffer) => CopyTo(buffer.Span);
+    public void CopyTo(Memory<ulong> buffer) => CopyTo(buffer.Span);
 
     /// <summary>
     /// Writes current bitmap to the <paramref name="buffer"/> given in the parameter.
     /// </summary>
     /// <param name="buffer">The <see cref="Span{T}"/> in which the bitmap will be written.</param>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the <paramref name="buffer"/> size is too small to write the bitmap.</exception>
-    public void CopyTo(Span<uint> buffer)
+    public void CopyTo(Span<ulong> buffer)
     {
         if ((ulong)buffer.Length < Count)
         {
             throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, ExceptionMessages.BufferSizeIsTooSmall);
         }
 
-        fixed (uint* ptr = &MemoryMarshal.GetReference(buffer))
+        fixed (ulong* ptr = &MemoryMarshal.GetReference(buffer))
         {
-            NativeMethods.roaring_bitmap_to_uint32_array(Pointer, ptr);
+            NativeMethods.roaring64_bitmap_to_uint64_array(Pointer, ptr);
         }
     }
 
@@ -896,32 +745,18 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// Gets enumerator that returns the values contained in the bitmap.
     /// </summary>
     /// <remarks>The values are ordered from smallest to largest.</remarks>
-    public IEnumerable<uint> Values => new Roaring32Enumerator(Pointer);
+    public IEnumerable<ulong> Values => new Roaring64Enumerator(Pointer);
 
     /// <summary>
     /// Writes current bitmap to the array.
     /// </summary>
     /// <returns>The array containing the values of the bitmap.</returns>
-    public uint[] ToArray()
+    public ulong[] ToArray()
     {
-        ulong count = NativeMethods.roaring_bitmap_get_cardinality(Pointer);
-        uint[] values = new uint[count];
-        NativeMethods.roaring_bitmap_to_uint32_array(Pointer, values);
+        ulong count = NativeMethods.roaring64_bitmap_get_cardinality(Pointer);
+        ulong[] values = new ulong[count];
+        NativeMethods.roaring64_bitmap_to_uint64_array(Pointer, values);
         return values;
-    }
-
-    /// <summary>
-    /// Converts current bitmap to the <see cref="FrozenRoaring32Bitmap"/>.
-    /// </summary>
-    /// <returns>Instance of the <see cref="FrozenRoaring32Bitmap"/> class with the same values as the current bitmap.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
-    public FrozenRoaring32Bitmap ToFrozen() => new(this);
-
-    internal Roaring32Bitmap GetFrozenView(nuint size, byte* memoryPtr)
-    {
-        NativeMethods.roaring_bitmap_frozen_serialize(Pointer, memoryPtr);
-        IntPtr ptr = NativeMethods.roaring_bitmap_frozen_view(memoryPtr, size);
-        return new Roaring32Bitmap(ptr);
     }
 
     /// <summary>
@@ -930,16 +765,16 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <param name="count">Number of values to take from the bitmap.</param>
     /// <returns>An array containing the given number of values from the bitmap.</returns>
     /// <remarks>If the bitmap contains fewer values than the given number then the array will be adjusted to the number of values.</remarks>
-    public uint[] Take(ulong count)
+    public ulong[] Take(ulong count)
     {
-        ulong cardinality = NativeMethods.roaring_bitmap_get_cardinality(Pointer);
+        ulong cardinality = NativeMethods.roaring64_bitmap_get_cardinality(Pointer);
         if (cardinality < count)
         {
             count = cardinality;
         }
 
-        uint[] values = new uint[count];
-        NativeMethods.roaring_bitmap_to_uint32_array(Pointer, values);
+        ulong[] values = new ulong[count];
+        NativeMethods.roaring64_bitmap_to_uint64_array(Pointer, values);
         return values;
     }
 
@@ -947,9 +782,9 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// Gets statistics about the bitmap.
     /// </summary>
     /// <returns>Structure containing statistics about the bitmap.</returns>
-    public Statistics GetStatistics()
+    public Statistics64 GetStatistics()
     {
-        NativeMethods.roaring_bitmap_statistics(Pointer, out Statistics stats);
+        NativeMethods.roaring64_bitmap_statistics(Pointer, out Statistics64 stats);
         return stats;
     }
 
@@ -977,21 +812,10 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// </remarks>
     public bool IsValid(out string? reason)
     {
-        var result = NativeMethods.roaring_bitmap_internal_validate(Pointer, out IntPtr reasonPtr);
+        var result = NativeMethods.roaring64_bitmap_internal_validate(Pointer, out IntPtr reasonPtr);
         reason = Marshal.PtrToStringAnsi(reasonPtr);
         return result;
     }
-
-    /// <summary>
-    /// Allows you to enable copy-on-write (COW) mode. <br/>
-    /// This mode saves memory and avoids copying, but requires more care in a threaded context.
-    /// </summary>
-    /// <param name="enabled"><c>true</c> if the copy-on-write should be enabled; otherwise, <c>false</c></param>
-    /// <remarks>
-    /// If you enable this mode, make sure you do it for all your bitmaps,
-    /// because interactions between bitmaps with and without COW is unsafe.
-    /// </remarks>
-    public void SetCopyOnWrite(bool enabled) => NativeMethods.roaring_bitmap_set_copy_on_write(Pointer, enabled);
 
     /// <summary>
     /// Gets the number of bytes required for a given serialization format.
@@ -999,12 +823,10 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <param name="format">Serialization format for which we get the number of bytes.</param>
     /// <returns>Number of bytes required for the given serialization format.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
-    public nuint GetSerializationBytes(SerializationFormat format = SerializationFormat.Normal)
+    public nuint GetSerializationBytes(SerializationFormat format = SerializationFormat.Portable)
         => format switch
         {
-            SerializationFormat.Normal => NativeMethods.roaring_bitmap_size_in_bytes(Pointer),
-            SerializationFormat.Portable => NativeMethods.roaring_bitmap_portable_size_in_bytes(Pointer),
-            SerializationFormat.Frozen => NativeMethods.roaring_bitmap_frozen_size_in_bytes(Pointer),
+            SerializationFormat.Portable => NativeMethods.roaring64_bitmap_portable_size_in_bytes(Pointer),
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat)
         };
 
@@ -1014,25 +836,14 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <param name="format">The serialization format to which we serialize the bitmap.</param>
     /// <returns>An array that contains a bitmap in a serialized form.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
-    public byte[] Serialize(SerializationFormat format = SerializationFormat.Normal)
+    public byte[] Serialize(SerializationFormat format = SerializationFormat.Portable)
     {
         byte[] buffer;
         switch (format)
         {
-            case SerializationFormat.Normal:
-                buffer = new byte[NativeMethods.roaring_bitmap_size_in_bytes(Pointer)];
-                NativeMethods.roaring_bitmap_serialize(Pointer, buffer);
-                break;
             case SerializationFormat.Portable:
-                buffer = new byte[NativeMethods.roaring_bitmap_portable_size_in_bytes(Pointer)];
-                NativeMethods.roaring_bitmap_portable_serialize(Pointer, buffer);
-                break;
-            case SerializationFormat.Frozen:
-                buffer = new byte[NativeMethods.roaring_bitmap_frozen_size_in_bytes(Pointer)];
-                fixed (byte* bufferPtr = buffer)
-                {
-                    NativeMethods.roaring_bitmap_frozen_serialize(Pointer, bufferPtr);
-                }
+                buffer = new byte[NativeMethods.roaring64_bitmap_portable_size_in_bytes(Pointer)];
+                NativeMethods.roaring64_bitmap_portable_serialize(Pointer, buffer);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat);
@@ -1046,15 +857,14 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// </summary>
     /// <param name="buffer">An array that contains a bitmap in a serialized form.</param>
     /// <param name="format">The serialization format from which we deserialize the bitmap.</param>
-    /// <returns><see cref="Roaring32Bitmap"/> deserialized from the provided array.</returns>
+    /// <returns><see cref="Roaring64Bitmap"/> deserialized from the provided array.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
-    public static Roaring32Bitmap Deserialize(byte[] buffer, SerializationFormat format = SerializationFormat.Normal)
+    public static Roaring64Bitmap Deserialize(byte[] buffer, SerializationFormat format = SerializationFormat.Portable)
     {
         IntPtr ptr = format switch
         {
-            SerializationFormat.Normal => NativeMethods.roaring_bitmap_deserialize_safe(buffer, (nuint)buffer.Length),
-            SerializationFormat.Portable => NativeMethods.roaring_bitmap_portable_deserialize_safe(buffer, (nuint)buffer.Length),
+            SerializationFormat.Portable => NativeMethods.roaring64_bitmap_portable_deserialize_safe(buffer, (nuint)buffer.Length),
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat)
         };
 
@@ -1063,35 +873,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
             throw new InvalidOperationException(ExceptionMessages.DeserializationFailedUnknownReason);
         }
 
-        return new Roaring32Bitmap(ptr);
-    }
-
-    /// <summary>
-    /// Deserializes the bitmap from the given serialization format in unsafe mode.
-    /// </summary>
-    /// <param name="buffer">An array that contains a bitmap in a serialized form.</param>
-    /// <param name="format">The serialization format from which we deserialize the bitmap.</param>
-    /// <returns><see cref="Roaring32Bitmap"/> deserialized from the provided array.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
-    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
-    /// <remarks>
-    /// This method does not check that the input buffer is a valid bitmap and may cause crashes or memory corruption.
-    /// </remarks>
-    public static Roaring32Bitmap DeserializeUnsafe(byte[] buffer, SerializationFormat format = SerializationFormat.Normal)
-    {
-        IntPtr ptr = format switch
-        {
-            SerializationFormat.Normal => NativeMethods.roaring_bitmap_deserialize(buffer),
-            SerializationFormat.Portable => NativeMethods.roaring_bitmap_portable_deserialize(buffer),
-            _ => throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat)
-        };
-
-        if (ptr == IntPtr.Zero)
-        {
-            throw new InvalidOperationException(ExceptionMessages.DeserializationFailedUnknownReason);
-        }
-
-        return new Roaring32Bitmap(ptr);
+        return new Roaring64Bitmap(ptr);
     }
 
     /// <summary>
@@ -1106,7 +888,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     {
         nuint size = format switch
         {
-            SerializationFormat.Portable => NativeMethods.roaring_bitmap_portable_deserialize_size(buffer, expectedSize),
+            SerializationFormat.Portable => NativeMethods.roaring64_bitmap_portable_deserialize_size(buffer, expectedSize),
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat)
         };
 

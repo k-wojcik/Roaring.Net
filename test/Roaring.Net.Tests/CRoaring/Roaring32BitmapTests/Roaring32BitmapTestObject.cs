@@ -1,6 +1,6 @@
 ﻿using Roaring.Net.CRoaring;
 
-namespace Roaring.Net.Tests.CRoaring;
+namespace Roaring.Net.Tests.CRoaring.Roaring32BitmapTests;
 
 internal sealed class Roaring32BitmapTestObject : IRoaring32BitmapTestObject
 {
