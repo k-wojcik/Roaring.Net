@@ -6,7 +6,7 @@ namespace Roaring.Net.CRoaring;
 /// <summary>
 /// Stores statistics about the bitmap.
 /// </summary>
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
+[StructLayout(LayoutKind.Sequential)]
 public readonly struct Statistics
 {
     /// <summary>

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Roaring.Net.CRoaring;
 
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
+[StructLayout(LayoutKind.Sequential)]
 internal struct BulkContextInternal
 {
     public readonly IntPtr container;
