@@ -3,10 +3,11 @@ using System.Runtime.InteropServices;
 
 namespace Roaring.Net.CRoaring;
 
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
+[StructLayout(LayoutKind.Sequential)]
 internal unsafe struct BulkContext64Internal
 {
-    public fixed byte high_bytes[6];
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
+    public byte[] high_bytes;
 
-    public readonly IntPtr leaf;
+    public IntPtr leaf;
 }
