@@ -1,12 +1,12 @@
 {
-  "builtin-baseline": "80d54ff62d528339c626a6fbc3489a7f25956ade",
+  "builtin-baseline": "a7d06b3a72d5ec48353bacb84152bd027ee9999b",
   "dependencies": [
     "roaring"
   ],
   "overrides": [
     {
       "name": "roaring",
-      "version": "4.2.1"
+      "version": "4.3.1"
     }
   ]
 }
