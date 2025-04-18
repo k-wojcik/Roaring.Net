@@ -97,5 +97,20 @@ public class MaintenanceTests
             // Assert
             Assert.True(actual);
         }
+
+        [Theory]
+        [InlineTestObject]
+        public void IsValid_WithReason_BitmapIsValid_ReturnsTrueAndNullReason(IRoaring64BitmapTestObjectFactory factory)
+        {
+            // Arrange
+            using IRoaring64BitmapTestObject testObject = factory.GetDefault();
+
+            // Act
+            var actual = testObject.ReadOnlyBitmap.IsValid(out var reason);
+
+            // Assert
+            Assert.True(actual);
+            Assert.Null(reason);
+        }
     }
 }

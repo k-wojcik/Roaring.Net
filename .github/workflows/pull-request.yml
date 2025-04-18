@@ -62,3 +62,8 @@ jobs:
     - uses: geekyeggo/delete-artifact@v5
       with:
           name: libs-*
+          
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5.4.2
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
