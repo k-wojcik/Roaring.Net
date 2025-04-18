@@ -538,10 +538,10 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     }
 
     /// <summary>
-    /// Creates a intersection between the current bitmap and the <paramref name="bitmap"/> given in the parameter.
+    /// Creates an intersection between the current bitmap and the <paramref name="bitmap"/> given in the parameter.
     /// </summary>
     /// <param name="bitmap">Bitmap with which the intersection will be performed.</param>
-    /// <returns><see cref="Roaring64BitmapBase"/> with the result of intersection of two bitmaps.</returns>
+    /// <returns><see cref="Roaring64Bitmap"/> with the result of intersection of two bitmaps.</returns>
     /// <remarks>
     /// Performance hints:
     /// <list type="bullet">
@@ -577,7 +577,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// Creates a difference between the current bitmap and the <paramref name="bitmap"/> given in the parameter.
     /// </summary>
     /// <param name="bitmap">Bitmap with which the difference will be performed.</param>
-    /// <returns><see cref="Roaring64BitmapBase"/> with the result of the difference of two bitmaps.</returns>
+    /// <returns><see cref="Roaring64Bitmap"/> with the result of the difference of two bitmaps.</returns>
     public Roaring64Bitmap AndNot(Roaring64BitmapBase bitmap) =>
         new(NativeMethods.roaring64_bitmap_andnot(Pointer, bitmap.Pointer));
 
@@ -702,6 +702,13 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
         => NativeMethods.roaring64_bitmap_run_optimize(Pointer);
 
     /// <summary>
+    /// Tries to reallocate memory to reduce the memory usage.
+    /// </summary>
+    /// <returns>The number of bytes saved after performing the shrink operation.</returns>
+    public nuint ShrinkToFit()
+        => NativeMethods.roaring64_bitmap_shrink_to_fit(Pointer);
+
+    /// <summary>
     /// Writes current bitmap to the <paramref name="buffer"/> given in the parameter.
     /// </summary>
     /// <param name="buffer">The array in which the bitmap will be written.</param>
@@ -824,11 +831,19 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <returns>Number of bytes required for the given serialization format.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
     public nuint GetSerializationBytes(SerializationFormat format = SerializationFormat.Portable)
-        => format switch
+    {
+        switch (format)
         {
-            SerializationFormat.Portable => NativeMethods.roaring64_bitmap_portable_size_in_bytes(Pointer),
-            _ => throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat)
-        };
+            case SerializationFormat.Portable:
+                return NativeMethods.roaring64_bitmap_portable_size_in_bytes(Pointer);
+            case SerializationFormat.Frozen:
+                ShrinkToFit(); // CRoaring requires shrink_to_fit before frozen operations
+                return NativeMethods.roaring64_bitmap_frozen_size_in_bytes(Pointer);
+            default:
+                throw new ArgumentOutOfRangeException(nameof(format), format,
+                    ExceptionMessages.UnsupportedSerializationFormat);
+        }
+    }
 
     /// <summary>
     /// Serializes the current bitmap to the given serialization format.
@@ -839,14 +854,27 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     public byte[] Serialize(SerializationFormat format = SerializationFormat.Portable)
     {
         byte[] buffer;
+
         switch (format)
         {
             case SerializationFormat.Portable:
                 buffer = new byte[NativeMethods.roaring64_bitmap_portable_size_in_bytes(Pointer)];
-                NativeMethods.roaring64_bitmap_portable_serialize(Pointer, buffer);
+                fixed (byte* bufferPtr = buffer)
+                {
+                    NativeMethods.roaring64_bitmap_portable_serialize(Pointer, bufferPtr);
+                }
+                break;
+            case SerializationFormat.Frozen:
+                ShrinkToFit(); // CRoaring requires shrink_to_fit before frozen operations
+                buffer = new byte[NativeMethods.roaring64_bitmap_frozen_size_in_bytes(Pointer)];
+                fixed (byte* bufferPtr = buffer)
+                {
+                    NativeMethods.roaring64_bitmap_frozen_serialize(Pointer, bufferPtr);
+                }
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat);
+                throw new ArgumentOutOfRangeException(nameof(format), format,
+                    ExceptionMessages.UnsupportedSerializationFormat);
         }
 
         return buffer;
@@ -893,5 +921,20 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
         };
 
         return size;
+    }
+
+    /// <summary>
+    /// Converts current bitmap to the <see cref="FrozenRoaring32Bitmap"/>.
+    /// </summary>
+    /// <returns>Instance of the <see cref="FrozenRoaring32Bitmap"/> class with the same values as the current bitmap.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    public FrozenRoaring64Bitmap ToFrozen() => new(this);
+
+    internal Roaring64Bitmap GetFrozenView(nuint size, byte* memoryPtr)
+    {
+        ShrinkToFit(); // CRoaring requires shrink_to_fit before frozen operations
+        NativeMethods.roaring64_bitmap_frozen_serialize(Pointer, memoryPtr);
+        IntPtr ptr = NativeMethods.roaring64_bitmap_frozen_view(memoryPtr, size);
+        return new Roaring64Bitmap(ptr);
     }
 }

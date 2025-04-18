@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Roaring.Net.Tests.CRoaring.FrozenRoaring32BitmapTests;
+using Roaring.Net.Tests.CRoaring.FrozenRoaring64BitmapTests;
 using Roaring.Net.Tests.CRoaring.Roaring32BitmapTests;
 using Roaring.Net.Tests.CRoaring.Roaring64BitmapTests;
 
@@ -16,5 +17,6 @@ internal static class TestObjectFactories
     public static readonly List<IRoaring64BitmapTestObjectFactory> InstancesFor64Bit = new()
     {
         new Roaring64BitmapTestObjectFactory(),
+        new FrozenRoaring64BitmapTestObjectFactory(),
     };
 }

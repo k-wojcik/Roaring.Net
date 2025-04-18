@@ -887,6 +887,14 @@ internal static unsafe partial class NativeMethods
 #endif
 
 #if NET7_0_OR_GREATER
+    [LibraryImport("roaring", EntryPoint = "roaring64_bitmap_shrink_to_fit")]
+    public static partial nuint roaring64_bitmap_shrink_to_fit(IntPtr bitmap);
+#else
+    [DllImport("roaring")]
+    public static extern nuint roaring64_bitmap_shrink_to_fit(IntPtr bitmap);
+#endif
+
+#if NET7_0_OR_GREATER
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_size_in_bytes")]
     public static partial nuint roaring_bitmap_size_in_bytes(IntPtr bitmap);
 #else
@@ -916,6 +924,14 @@ internal static unsafe partial class NativeMethods
 #else
     [DllImport("roaring")]
     public static extern nuint roaring_bitmap_frozen_size_in_bytes(IntPtr bitmap);
+#endif
+
+#if NET7_0_OR_GREATER
+    [LibraryImport("roaring", EntryPoint = "roaring64_bitmap_frozen_size_in_bytes")]
+    public static partial nuint roaring64_bitmap_frozen_size_in_bytes(IntPtr bitmap);
+#else
+    [DllImport("roaring")]
+    public static extern nuint roaring64_bitmap_frozen_size_in_bytes(IntPtr bitmap);
 #endif
 
 #if NET7_0_OR_GREATER
@@ -984,10 +1000,10 @@ internal static unsafe partial class NativeMethods
 
 #if NET7_0_OR_GREATER
     [LibraryImport("roaring", EntryPoint = "roaring64_bitmap_portable_serialize")]
-    public static partial nuint roaring64_bitmap_portable_serialize(IntPtr bitmap, [Out] byte[] buffer);
+    public static partial nuint roaring64_bitmap_portable_serialize(IntPtr bitmap, byte* buffer);
 #else
     [DllImport("roaring")]
-    public static extern nuint roaring64_bitmap_portable_serialize(IntPtr bitmap, [Out] byte[] buffer);
+    public static extern nuint roaring64_bitmap_portable_serialize(IntPtr bitmap, byte* buffer);
 #endif
 
 #if NET7_0_OR_GREATER
@@ -1039,6 +1055,14 @@ internal static unsafe partial class NativeMethods
 #endif
 
 #if NET7_0_OR_GREATER
+    [LibraryImport("roaring", EntryPoint = "roaring64_bitmap_frozen_serialize")]
+    public static partial void roaring64_bitmap_frozen_serialize(IntPtr bitmap, byte* buffer);
+#else
+    [DllImport("roaring")]
+    public static extern void roaring64_bitmap_frozen_serialize(IntPtr bitmap, byte* buffer);
+#endif
+
+#if NET7_0_OR_GREATER
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_portable_deserialize_frozen")]
     public static partial IntPtr roaring_bitmap_portable_deserialize_frozen(byte* buffer);
 #else
@@ -1052,6 +1076,14 @@ internal static unsafe partial class NativeMethods
 #else
     [DllImport("roaring")]
     public static extern IntPtr roaring_bitmap_frozen_view(byte* buffer, nuint length);
+#endif
+
+#if NET7_0_OR_GREATER
+    [LibraryImport("roaring", EntryPoint = "roaring64_bitmap_frozen_view")]
+    public static partial IntPtr roaring64_bitmap_frozen_view(byte* buffer, nuint length);
+#else
+    [DllImport("roaring")]
+    public static extern IntPtr roaring64_bitmap_frozen_view(byte* buffer, nuint length);
 #endif
 
     [StructLayout(LayoutKind.Sequential)]

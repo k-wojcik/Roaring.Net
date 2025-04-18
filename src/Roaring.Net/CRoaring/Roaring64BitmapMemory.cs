@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace Roaring.Net.CRoaring;
 
 /// <summary>
-/// Represents the memory region used by CRoaring 32-bit bitmaps. <br/>
+/// Represents the memory region used by CRoaring 64-bit bitmaps. <br/>
 /// </summary>
-public sealed unsafe class Roaring32BitmapMemory : IDisposable
+public sealed unsafe class Roaring64BitmapMemory : IDisposable
 {
     /// <summary>
     /// The size of memory region in bytes allocated for bitmap storage.
@@ -21,14 +21,14 @@ public sealed unsafe class Roaring32BitmapMemory : IDisposable
     private bool _isDisposed;
     private bool _isDisposable;
 
-    private readonly HashSet<Roaring32BitmapBase> _bitmapReferences = new();
+    private readonly HashSet<Roaring64BitmapBase> _bitmapReferences = new();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Roaring32BitmapMemory"/> class.
+    /// Initializes a new instance of the <see cref="Roaring64BitmapMemory"/> class.
     /// </summary>
     /// <param name="size">The size of memory region in bytes that will be allocated for bitmap storage.</param>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the <paramref name="size"/> is out of the allowed range.</exception>
-    public Roaring32BitmapMemory(nuint size)
+    public Roaring64BitmapMemory(nuint size)
     {
         if (size <= 0)
         {
@@ -39,7 +39,7 @@ public sealed unsafe class Roaring32BitmapMemory : IDisposable
         MemoryPtr = AllocateMemory(size);
     }
 
-    internal Roaring32BitmapMemory(nuint size, bool shared)
+    internal Roaring64BitmapMemory(nuint size, bool shared)
         : this(size)
     {
         _isDisposable = !shared;
@@ -48,7 +48,7 @@ public sealed unsafe class Roaring32BitmapMemory : IDisposable
     private static byte* AllocateMemory(nuint size)
     {
         GC.AddMemoryPressure((long)size);
-        return (byte*)NativeMemory.AlignedAlloc(size, 32);
+        return (byte*)NativeMemory.AlignedAlloc(size, 64);
     }
 
     /// <summary>
@@ -131,20 +131,18 @@ public sealed unsafe class Roaring32BitmapMemory : IDisposable
 
     /// <summary>
     /// Converts a memory area containing serialized data of the specified type to a frozen bitmap. <br/>
-    /// <a href="https://github.com/RoaringBitmap/CRoaring/blob/60d0e97fa021b04f8a6ad50e3877ca16d988c80e/include/roaring/roaring.h#L694-L711"> "Frozen" serialization format.</a>
     /// </summary>
     /// <param name="format">Serialization format used in the filled memory region.</param>
     /// <returns>Managed CRoaring frozen bitmap.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the serialization <paramref name="format"/> is not supported.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the memory region contains invalid data and the bitmap cannot be deserialized.</exception>
-    public FrozenRoaring32Bitmap ToFrozen(SerializationFormat format = SerializationFormat.Frozen)
+    public FrozenRoaring64Bitmap ToFrozen(SerializationFormat format = SerializationFormat.Frozen)
     {
         CheckDisposed();
 
         IntPtr ptr = format switch
         {
-            SerializationFormat.Frozen => NativeMethods.roaring_bitmap_frozen_view(MemoryPtr, Size),
-            SerializationFormat.Portable => NativeMethods.roaring_bitmap_portable_deserialize_frozen(MemoryPtr),
+            SerializationFormat.Frozen => NativeMethods.roaring64_bitmap_frozen_view(MemoryPtr, Size),
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat)
         };
 
@@ -153,7 +151,7 @@ public sealed unsafe class Roaring32BitmapMemory : IDisposable
             throw new InvalidOperationException(ExceptionMessages.DeserializationFailedUnknownReason);
         }
 
-        var bitmap = new FrozenRoaring32Bitmap(ptr, this);
+        var bitmap = new FrozenRoaring64Bitmap(ptr, this);
         _bitmapReferences.Add(bitmap);
         return bitmap;
     }
@@ -168,7 +166,7 @@ public sealed unsafe class Roaring32BitmapMemory : IDisposable
         throw new ObjectDisposedException(ExceptionMessages.BitmapMemoryDisposed);
     }
 
-    internal void Release(Roaring32BitmapBase bitmap)
+    internal void Release(Roaring64BitmapBase bitmap)
     {
         _bitmapReferences.Remove(bitmap);
 
@@ -216,5 +214,5 @@ public sealed unsafe class Roaring32BitmapMemory : IDisposable
     /// <summary>
     /// Finalizer.
     /// </summary>
-    ~Roaring32BitmapMemory() => Dispose(false);
+    ~Roaring64BitmapMemory() => Dispose(false);
 }

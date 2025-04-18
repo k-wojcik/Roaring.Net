@@ -153,6 +153,9 @@ public class MaintenanceTests
 
             // Assert
             Assert.Equal(0x16U, actual);
+
+            actual = bitmap.ShrinkToFit();
+            Assert.Equal(0x0U, actual);
         }
     }
 
