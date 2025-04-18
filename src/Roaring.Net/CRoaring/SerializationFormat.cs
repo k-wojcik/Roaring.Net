@@ -22,7 +22,7 @@ public enum SerializationFormat
     /// Deserialized bitmap is a constant view of the underlying buffer. <br/>
     /// This significantly reduces amount of allocations and copying required during deserialization. <br/>
     /// It can be used with memory mapped files. <br/>
-    /// Bitmaps serialized in frozen format are supported by the <see cref="FrozenRoaring32Bitmap"/> class.
+    /// Bitmaps serialized in frozen format are supported by the <see cref="FrozenRoaring32Bitmap"/> and <see cref="FrozenRoaring64Bitmap"/> class.
     /// </summary>
     Frozen,
 }

@@ -61,6 +61,27 @@ public class MaintenanceTests
         }
     }
 
+    public class ShrinkToFit
+    {
+        [Fact]
+        public void ShrinkToFit_BitmapCanBeShrink_ReturnsSavedBytes()
+        {
+            // Arrange
+            using var bitmap = new Roaring64Bitmap();
+            bitmap.AddRange(0, 1_000);
+            bitmap.RemoveRange(0, 1_0000);
+
+            // Act
+            var actual = bitmap.ShrinkToFit();
+
+            // Assert
+            Assert.Equal(0x30U, actual);
+
+            actual = bitmap.ShrinkToFit();
+            Assert.Equal(0x0U, actual);
+        }
+    }
+
     public class IsValid
     {
         [Theory]
