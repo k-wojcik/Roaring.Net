@@ -15,8 +15,6 @@ jobs:
       VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
     steps:
       - uses: actions/checkout@v4
-      - name: install deps
-        run: brew install ninja
       - name: vcpkg x64-osx
         uses: lukka/run-vcpkg@v11
         env:
@@ -40,8 +38,6 @@ jobs:
       VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
     steps:
       - uses: actions/checkout@v4
-      - name: install deps
-        run: brew install ninja
       - name: vcpkg arm64-osx
         uses: lukka/run-vcpkg@v11
         env:
@@ -179,7 +175,7 @@ jobs:
             libs/**/*.dll
 
   windows-arm:
-    runs-on: windows-latest
+    runs-on: windows-2022
     env:
       VCPKG_DISABLE_METRICS: 1
       VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
