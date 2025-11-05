@@ -86,7 +86,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: install deps
-        run: sudo apt-get install -qy gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+        run: sudo apt update && sudo apt-get install -qy gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
       - name: vcpkg arm64-linux
         uses: lukka/run-vcpkg@v11
         env:
@@ -111,7 +111,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: install deps
-        run: sudo apt-get install -qy gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+        run: sudo apt update && sudo apt-get install -qy gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
       - name: arm-linux
         uses: lukka/run-vcpkg@v11
         env:
