@@ -7,6 +7,6 @@ namespace Roaring.Net.Tests.CRoaring;
 public interface IRoaring64BitmapTestObject : IDisposable
 {
     internal IReadOnlyRoaring64Bitmap ReadOnlyBitmap { get; }
-    public Roaring64BitmapBase Bitmap { get; }
-    public ulong[] Values { get; }
+    Roaring64BitmapBase Bitmap { get; }
+    ulong[] Values { get; }
 }
