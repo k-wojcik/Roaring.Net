@@ -163,6 +163,13 @@ public unsafe class FrozenRoaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoarin
     public ulong CountLessOrEqualTo(ulong value) => _bitmap.CountLessOrEqualTo(value);
 
     /// <summary>
+    /// Counts number of values less than or equal to for each element of <paramref name="values"/>.
+    /// </summary>
+    /// <param name="values">An ascending sorted set of tested values.</param>
+    /// <returns>The number of values that are less than or equal to the value from <paramref name="values"/> placed under the same index.</returns>
+    public ulong[] CountManyLessOrEqualTo(ulong[] values) => _bitmap.CountManyLessOrEqualTo(values);
+
+    /// <summary>
     /// Counts number of values in the given range of values.
     /// </summary>
     /// <param name="start">Start of range (inclusive).</param>
@@ -223,6 +230,13 @@ public unsafe class FrozenRoaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoarin
     public Roaring64Bitmap Or(Roaring64BitmapBase bitmap) => _bitmap.Or(bitmap);
 
     /// <summary>
+    /// Creates a union between the current bitmap and the <paramref name="bitmaps"/> given in the parameter.
+    /// </summary>
+    /// <param name="bitmaps">Bitmaps with which the union will be performed.</param>
+    /// <returns><see cref="Roaring64Bitmap"/> with the result of union of many bitmaps.</returns>
+    public Roaring64Bitmap OrMany(Roaring64BitmapBase[] bitmaps) => _bitmap.OrMany(bitmaps);
+
+    /// <summary>
     /// Creates a union between the current bitmap and the <paramref name="bitmap"/> given in the parameter and returns the number of values contained in the resulting bitmap.
     /// </summary>
     /// <param name="bitmap">Bitmap with which the union will be performed.</param>
@@ -235,6 +249,13 @@ public unsafe class FrozenRoaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoarin
     /// <param name="bitmap">Bitmap with which the symmetric difference will be performed.</param>
     /// <returns><see cref="Roaring64Bitmap"/> with the result of the symmetric difference of two bitmaps.</returns>
     public Roaring64Bitmap Xor(Roaring64BitmapBase bitmap) => _bitmap.Xor(bitmap);
+
+    /// <summary>
+    /// Creates a symmetric difference between the current bitmap and the <paramref name="bitmaps"/> given in the parameter.
+    /// </summary>
+    /// <param name="bitmaps">Bitmaps with which the symmetric difference will be performed.</param>
+    /// <returns><see cref="Roaring64Bitmap"/> with the result of the symmetric difference of many bitmaps.</returns>
+    public Roaring64Bitmap XorMany(params Roaring64BitmapBase[] bitmaps) => _bitmap.XorMany(bitmaps);
 
     /// <summary>
     /// Creates a symmetric difference between the current bitmap and the <paramref name="bitmap"/> given in the parameter and returns the number of values contained in the resulting bitmap. 

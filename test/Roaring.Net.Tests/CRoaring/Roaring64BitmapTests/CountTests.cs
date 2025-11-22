@@ -62,6 +62,30 @@ public class CountTests
         }
     }
 
+    public class CountManyLessOrEqualTo
+    {
+        [Theory]
+        [InlineTestObject(new ulong[] { }, new ulong[] { }, new ulong[] { })]
+        [InlineTestObject(new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { }, new ulong[] { })]
+        [InlineTestObject(new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { 1, 2, 3, 4, 5 })]
+        [InlineTestObject(new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { 1, 2, 3, 4, 5 }, new ulong[] { 2, 3, 4, 5, 5 })]
+        [InlineTestObject(new ulong[] { 0, 2, 4, 6, 8 }, new ulong[] { 5, 6, 7, 8, 9 }, new ulong[] { 3, 4, 4, 5, 5 })]
+        [InlineTestObject(new ulong[] { 10, 11, 12 }, new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { 0, 0, 0, 0, 0 })]
+        [InlineTestObject(new ulong[] { 0, 1, 2, 3, 4, ulong.MaxValue }, new ulong[] { 0, 1, 2, 3, 4, ulong.MaxValue }, new ulong[] { 1, 2, 3, 4, 5, 6 })]
+        [InlineTestObject(new ulong[] { ulong.MaxValue - 1, ulong.MaxValue }, new ulong[] { ulong.MaxValue - 1, ulong.MaxValue }, new ulong[] { 1, 2 })]
+        public void CountManyLessOrEqualTo_ForValues_ReturnsExpectedNumberOfValues(ulong[] values, ulong[] testedValues, ulong[] expected, IRoaring64BitmapTestObjectFactory factory)
+        {
+            // Arrange
+            using IRoaring64BitmapTestObject testObject = factory.GetFromValues(values);
+
+            // Act
+            var actual = testObject.ReadOnlyBitmap.CountManyLessOrEqualTo(testedValues);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+    }
+
     public class CountRange
     {
         [Theory]

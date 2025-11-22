@@ -470,6 +470,21 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     public ulong CountLessOrEqualTo(ulong value) => NativeMethods.roaring64_bitmap_rank(Pointer, value);
 
     /// <summary>
+    /// Counts number of values less than or equal to for each element of <paramref name="values"/>.
+    /// </summary>
+    /// <param name="values">An ascending sorted set of tested values.</param>
+    /// <returns>The number of values that are less than or equal to the value from <paramref name="values"/> placed under the same index.</returns>
+    public ulong[] CountManyLessOrEqualTo(ulong[] values)
+    {
+        var items = new ulong[values.Length];
+        for (var i = 0; i < items.Length; i++)
+        {
+            items[i] = NativeMethods.roaring64_bitmap_rank(Pointer, values[i]);
+        }
+        return items;
+    }
+
+    /// <summary>
     /// Counts number of values in the given range of values.
     /// </summary>
     /// <param name="start">Start of range (inclusive).</param>
@@ -613,6 +628,22 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
         => NativeMethods.roaring64_bitmap_or_cardinality(Pointer, bitmap.Pointer);
 
     /// <summary>
+    /// Creates a union between the current bitmap and the <paramref name="bitmaps"/> given in the parameter.
+    /// </summary>
+    /// <param name="bitmaps">Bitmaps with which the union will be performed.</param>
+    /// <returns><see cref="Roaring64Bitmap"/> with the result of union of many bitmaps.</returns>
+    public Roaring64Bitmap OrMany(Roaring64BitmapBase[] bitmaps)
+    {
+        var result = new Roaring64Bitmap(NativeMethods.roaring64_bitmap_copy(Pointer));
+        for (var i = 0; i < bitmaps.Length; i++)
+        {
+            result.IOr(bitmaps[i]);
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Creates (in place) a union between the current bitmap and the <paramref name="bitmap"/> given in the parameter.
     /// </summary>
     /// <param name="bitmap">Bitmap with which the union will be performed.</param>
@@ -626,6 +657,22 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <returns><see cref="Roaring64Bitmap"/> with the result of the symmetric difference of two bitmaps.</returns>
     public Roaring64Bitmap Xor(Roaring64BitmapBase bitmap) =>
         new(NativeMethods.roaring64_bitmap_xor(Pointer, bitmap.Pointer));
+
+    /// <summary>
+    /// Creates a symmetric difference between the current bitmap and the <paramref name="bitmaps"/> given in the parameter.
+    /// </summary>
+    /// <param name="bitmaps">Bitmaps with which the symmetric difference will be performed.</param>
+    /// <returns><see cref="Roaring64Bitmap"/> with the result of the symmetric difference of many bitmaps.</returns>
+    public Roaring64Bitmap XorMany(params Roaring64BitmapBase[] bitmaps)
+    {
+        var result = new Roaring64Bitmap(NativeMethods.roaring64_bitmap_copy(Pointer));
+        for (var i = 0; i < bitmaps.Length; i++)
+        {
+            result.IXor(bitmaps[i]);
+        }
+
+        return result;
+    }
 
     /// <summary>
     /// Creates (in place) a symmetric difference between the current bitmap and the <paramref name="bitmap"/> given in the parameter.
