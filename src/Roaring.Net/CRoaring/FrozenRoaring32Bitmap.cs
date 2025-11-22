@@ -159,6 +159,14 @@ public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoarin
     public long GetIndex(uint value) => _bitmap.GetIndex(value);
 
     /// <summary>
+    /// Gets the index (rank) for the given value.
+    /// </summary>
+    /// <param name="value">The value for which the index will be retrieved.</param>
+    /// <param name="index">Index (rank) of the <paramref name="value"/>. <c>0</c> if value does not exist in the bitmap.</param>
+    /// <returns><c>true</c> if index for <paramref name="value"/> exists in the bitmap; otherwise, <c>false</c>.</returns>
+    public bool TryGetIndex(uint value, out ulong index) => _bitmap.TryGetIndex(value, out index);
+
+    /// <summary>
     /// Counts number of values less than or equal to <paramref name="value"/>.
     /// </summary>
     /// <param name="value">The value for which data will be counted.</param>

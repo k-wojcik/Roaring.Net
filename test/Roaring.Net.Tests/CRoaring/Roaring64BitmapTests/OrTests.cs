@@ -54,6 +54,32 @@ public class OrTests
         }
     }
 
+    public class OrMany
+    {
+        [Theory]
+        [InlineMatrixTestObject(new ulong[] { }, new ulong[] { }, new ulong[] { })]
+        [InlineMatrixTestObject(new ulong[] { 1 }, new ulong[] { 1 }, new ulong[] { 1 })]
+        [InlineMatrixTestObject(new ulong[] { 1 }, new ulong[] { }, new ulong[] { })]
+        [InlineMatrixTestObject(new ulong[] { }, new ulong[] { 1 }, new ulong[] { })]
+        [InlineMatrixTestObject(new ulong[] { }, new ulong[] { }, new ulong[] { 1 })]
+        [InlineMatrixTestObject(new ulong[] { 0, 1, 2 }, new ulong[] { 1, ulong.MaxValue }, new ulong[] { 3, 5 })]
+        [InlineMatrixTestObject(new ulong[] { 0, 1, 2, ulong.MaxValue }, new ulong[] { 0, 2, ulong.MaxValue }, new ulong[] { 5, ulong.MaxValue })]
+        public void OrMany_BitmapsWithDifferentValues_ReturnsUnionOfBitmaps(ulong[] values1, ulong[] values2, ulong[] values3,
+            TestObjectMatrix<IRoaring64BitmapTestObjectFactory, IRoaring64BitmapTestObjectFactory, IRoaring64BitmapTestObjectFactory> matrix)
+        {
+            // Arrange
+            using IRoaring64BitmapTestObject testObject1 = matrix.X.GetFromValues(values1);
+            using IRoaring64BitmapTestObject testObject2 = matrix.Y.GetFromValues(values2);
+            using IRoaring64BitmapTestObject testObject3 = matrix.Z.GetFromValues(values3);
+
+            // Act
+            Roaring64Bitmap actual = testObject1.ReadOnlyBitmap.OrMany([testObject2.Bitmap, testObject3.Bitmap]);
+
+            // Assert
+            Assert.Equal(values1.Union(values2).Union(values3).Order(), actual.Values);
+        }
+    }
+
     public class IOr
     {
         [Theory]

@@ -27,9 +27,13 @@ internal interface IReadOnlyRoaring64Bitmap : IDisposable
 
     ulong OrCount(Roaring64BitmapBase bitmap);
 
+    Roaring64Bitmap OrMany(Roaring64BitmapBase[] bitmaps);
+
     Roaring64Bitmap Xor(Roaring64BitmapBase bitmap);
 
     ulong XorCount(Roaring64BitmapBase bitmap);
+
+    Roaring64Bitmap XorMany(params Roaring64BitmapBase[] bitmaps);
 
     bool Overlaps(Roaring64BitmapBase bitmap);
 
@@ -58,6 +62,8 @@ internal interface IReadOnlyRoaring64Bitmap : IDisposable
     bool TryGetIndex(ulong value, out ulong index);
 
     ulong CountLessOrEqualTo(ulong value);
+
+    ulong[] CountManyLessOrEqualTo(ulong[] values);
 
     ulong CountRange(ulong start, ulong end);
 
