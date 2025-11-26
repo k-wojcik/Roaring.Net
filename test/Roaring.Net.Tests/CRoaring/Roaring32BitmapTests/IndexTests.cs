@@ -65,4 +65,29 @@ public class IndexTests
             Assert.Equal(expected, actual);
         }
     }
+
+    public class TryGetIndex
+    {
+        [Theory]
+        [InlineTestObject(new uint[] { 0, 1, 2, 3, 4 }, 0, 0, true)]
+        [InlineTestObject(new uint[] { 0, 1, 2, 3, 4 }, 4, 4, true)]
+        [InlineTestObject(new uint[] { 4, 3, 2, 1, 0 }, 4, 4, true)]
+        [InlineTestObject(new uint[] { 4, 3, 2, 1, 0 }, 5, 0, false)]
+        [InlineTestObject(new uint[] { 0, 2, 4, 6, 8 }, 2, 1, true)]
+        [InlineTestObject(new uint[] { 5, 6, 7, 8, 9 }, 2, 0, false)]
+        [InlineTestObject(new uint[] { 5, 6, 7, 8, 9 }, 7, 2, true)]
+        [InlineTestObject(new uint[] { 5, uint.MaxValue }, uint.MaxValue, 1, true)]
+        public void GetIndex_ForValues_ReturnsIndexOfValue(uint[] values, uint testedValue, uint expected, bool expectedReturn, IRoaring32BitmapTestObjectFactory factory)
+        {
+            // Arrange
+            using IRoaring32BitmapTestObject testObject = factory.GetFromValues(values);
+
+            // Act
+            var actualReturn = testObject.ReadOnlyBitmap.TryGetIndex(testedValue, out var actual);
+
+            // Assert
+            Assert.Equal(expected, actual);
+            Assert.Equal(expectedReturn, actualReturn);
+        }
+    }
 }

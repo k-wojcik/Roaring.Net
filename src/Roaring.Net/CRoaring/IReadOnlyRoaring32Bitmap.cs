@@ -69,6 +69,8 @@ internal interface IReadOnlyRoaring32Bitmap : IDisposable
 
     long GetIndex(uint value);
 
+    bool TryGetIndex(uint value, out ulong index);
+
     ulong CountLessOrEqualTo(uint value);
 
     ulong[] CountManyLessOrEqualTo(uint[] values);
