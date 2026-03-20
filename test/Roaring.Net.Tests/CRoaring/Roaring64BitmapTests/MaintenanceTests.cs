@@ -61,6 +61,58 @@ public class MaintenanceTests
         }
     }
 
+    public class RemoveRunCompression
+    {
+        [Fact]
+        public void RemoveRunCompression_BitmapContainsRunCompression_RemovesRunCompressionFromBitmapAndReturnsTrue()
+        {
+            // Arrange
+            using var bitmap = new Roaring64Bitmap();
+            bitmap.AddMany([.. Enumerable.Range(10, 1_000).Select(x => (ulong)x)]);
+
+            // Act
+            bitmap.Optimize();
+            Statistics64 statisticsBeforeRemoveRunCompression = bitmap.GetStatistics();
+            var result = bitmap.RemoveRunCompression();
+            Statistics64 statisticsBeforeAfterRunCompression = bitmap.GetStatistics();
+
+            // Assert
+            Assert.True(result);
+            Assert.Equal(1U, statisticsBeforeRemoveRunCompression.ContainerCount);
+            Assert.Equal(0U, statisticsBeforeRemoveRunCompression.ArrayContainerCount);
+            Assert.Equal(1U, statisticsBeforeRemoveRunCompression.RunContainerCount);
+            Assert.Equal(0U, statisticsBeforeRemoveRunCompression.BitsetContainerCount);
+
+            Assert.Equal(1U, statisticsBeforeAfterRunCompression.ContainerCount);
+            Assert.Equal(1U, statisticsBeforeAfterRunCompression.ArrayContainerCount);
+            Assert.Equal(0U, statisticsBeforeAfterRunCompression.RunContainerCount);
+            Assert.Equal(0U, statisticsBeforeAfterRunCompression.BitsetContainerCount);
+        }
+
+        [Fact]
+        public void RemoveRunCompression_BitmapNotContainRunCompression_ReturnsFalse()
+        {
+            // Arrange
+            using var bitmap = new Roaring64Bitmap();
+            bitmap.AddMany([.. Enumerable.Range(1, 2).Select(x => (ulong)x)]);
+
+            // Act
+            bitmap.Optimize();
+            Statistics64 statisticsBeforeRemoveRunCompression = bitmap.GetStatistics();
+            var result = bitmap.RemoveRunCompression();
+            Statistics64 statisticsBeforeAfterRunCompression = bitmap.GetStatistics();
+
+            // Assert
+            Assert.False(result);
+            Assert.Equal(0U, statisticsBeforeAfterRunCompression.RunContainerCount);
+
+            Assert.Equal(statisticsBeforeAfterRunCompression.ContainerCount, statisticsBeforeRemoveRunCompression.ContainerCount);
+            Assert.Equal(statisticsBeforeAfterRunCompression.ArrayContainerCount, statisticsBeforeRemoveRunCompression.ArrayContainerCount);
+            Assert.Equal(statisticsBeforeAfterRunCompression.RunContainerCount, statisticsBeforeRemoveRunCompression.RunContainerCount);
+            Assert.Equal(statisticsBeforeAfterRunCompression.BitsetContainerCount, statisticsBeforeRemoveRunCompression.BitsetContainerCount);
+        }
+    }
+
     public class ShrinkToFit
     {
         [Fact]

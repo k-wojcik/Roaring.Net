@@ -80,6 +80,14 @@ internal static unsafe partial class NativeMethods
 #endif
 
 #if NET7_0_OR_GREATER
+    [LibraryImport("roaring", EntryPoint = "roaring64_bitmap_overwrite")]
+    public static partial void roaring64_bitmap_overwrite(IntPtr destination, IntPtr source);
+#else
+    [DllImport("roaring")]
+    public static extern void roaring64_bitmap_overwrite(IntPtr destination, IntPtr source);
+#endif
+
+#if NET7_0_OR_GREATER
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_free")]
     public static partial void roaring_bitmap_free(IntPtr bitmap);
 #else
@@ -246,6 +254,14 @@ internal static unsafe partial class NativeMethods
 #else
     [DllImport("roaring")]
     public static extern IntPtr roaring_bitmap_add_offset(IntPtr bitmap, long offset);
+#endif
+
+#if NET7_0_OR_GREATER
+    [LibraryImport("roaring", EntryPoint = "roaring64_bitmap_add_offset_signed")]
+    public static partial IntPtr roaring64_bitmap_add_offset_signed(IntPtr bitmap, [MarshalAs(UnmanagedType.I1)] bool positive, ulong offset);
+#else
+    [DllImport("roaring")]
+    public static extern IntPtr roaring64_bitmap_add_offset_signed(IntPtr bitmap, bool positive, ulong offset);
 #endif
 
 #if NET7_0_OR_GREATER
@@ -876,6 +892,15 @@ internal static unsafe partial class NativeMethods
 #else
     [DllImport("roaring")]
     public static extern bool roaring_bitmap_remove_run_compression(IntPtr bitmap);
+#endif
+
+    [return: MarshalAs(UnmanagedType.I1)]
+#if NET7_0_OR_GREATER
+    [LibraryImport("roaring", EntryPoint = "roaring64_bitmap_remove_run_compression")]
+    public static partial bool roaring64_bitmap_remove_run_compression(IntPtr bitmap);
+#else
+    [DllImport("roaring")]
+    public static extern bool roaring64_bitmap_remove_run_compression(IntPtr bitmap);
 #endif
 
 #if NET7_0_OR_GREATER
