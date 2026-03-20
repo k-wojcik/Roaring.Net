@@ -379,10 +379,12 @@ public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoarin
     public Roaring32Bitmap ToBitmap() => _bitmap.Clone();
 
     /// <summary>
-    /// Converts <see cref="FrozenRoaring32Bitmap"/> to the <see cref="Roaring32Bitmap"/> from the given offset.
+    /// Converts <see cref="FrozenRoaring32Bitmap"/> to the <see cref="Roaring32Bitmap"/> and adds an offset.
     /// </summary>
+    /// <param name="offset">The offset to be added to the bitmap when converting.</param>
     /// <returns>Instance of the <see cref="Roaring32Bitmap"/> class with the same values as the current bitmap from the given offset.</returns>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    /// <remarks>Values that overflow or underflow are dropped.</remarks>
     public Roaring32Bitmap ToBitmapWithOffset(long offset) => _bitmap.CloneWithOffset(offset);
 
     /// <summary>
@@ -390,7 +392,7 @@ public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoarin
     /// </summary>
     /// <param name="count">Number of values to take from the bitmap.</param>
     /// <returns>An array containing the given number of values from the bitmap.</returns>
-    /// <remarks>If the bitmap contains fewer values than the given number then the array will be adjusted to the number of values.</remarks>
+    /// <remarks>If the bitmap contains fewer values than the given number, then the array will be adjusted to the number of values.</remarks>
     public uint[] Take(ulong count) => _bitmap.Take(count);
 
     /// <summary>

@@ -237,4 +237,75 @@ public class InitializationTests
             Assert.Equal(testObject.Bitmap.Values, actual.Values);
         }
     }
+
+    public class CloneWithOffset
+    {
+        [Theory]
+        [InlineData(new ulong[] { }, new ulong[] { }, 10)]
+        [InlineData(new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { 5, 6, 7, 8, 9 }, 5)]
+        [InlineData(new ulong[] { 0, 2, 4, 6, 8 }, new ulong[] { 10, 12, 14, 16, 18 }, 10)]
+        [InlineData(new ulong[] { 0, 1, 2, 3, 4, ulong.MaxValue }, new ulong[] { 1, 2, 3, 4, 5 }, 1)]
+        [InlineData(new ulong[] { ulong.MaxValue - 1, ulong.MaxValue }, new ulong[] { ulong.MaxValue }, 1)]
+        [InlineData(new ulong[] { 0 }, new ulong[] { ulong.MaxValue }, ulong.MaxValue)]
+        public void CloneWithOffset_AddsValueToBitmapValues_ReturnsNewBitmapWithExpectedValues(ulong[] values, ulong[] expected, ulong offset)
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetFromValues(values);
+
+            // Act
+            using Roaring64Bitmap actualBitmap = testObject.Bitmap.CloneWithOffset(offset);
+
+            // Assert
+            var actual = actualBitmap.Values.ToList();
+            Assert.Equal(expected, actual);
+            Assert.Equal(testObject.Bitmap.Values, values);
+        }
+    }
+
+    public class CloneWithNegativeOffset
+    {
+        [Theory]
+        [InlineData(new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { 0, 1, 2 }, 2)]
+        [InlineData(new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { }, 5)]
+        [InlineData(new ulong[] { ulong.MaxValue }, new ulong[] { 0 }, ulong.MaxValue)]
+        [InlineData(new ulong[] { ulong.MaxValue }, new ulong[] { ulong.MaxValue - 1 }, 1)]
+        public void CloneWithNegativeOffset_SubtractsValueFromBitmapValues_ReturnsNewBitmapWithExpectedValues(ulong[] values, ulong[] expected, ulong offset)
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetFromValues(values);
+
+            // Act
+            using Roaring64Bitmap actualBitmap = testObject.Bitmap.CloneWithNegativeOffset(offset);
+
+            // Assert
+            var actual = actualBitmap.Values.ToList();
+            Assert.Equal(expected, actual);
+            Assert.Equal(testObject.Bitmap.Values, values);
+        }
+    }
+
+    public class OverwriteWith
+    {
+        [Theory]
+        [InlineData(new ulong[] { })]
+        [InlineData(new ulong[] { 0 })]
+        [InlineData(new ulong[] { 0, 1, 2, 3, 4 })]
+        [InlineData(new ulong[] { 0, 2, 4, 6, 8 })]
+        [InlineData(new ulong[] { 0, 1, 2, 3, 4, ulong.MaxValue })]
+        [InlineData(new ulong[] { ulong.MaxValue - 1, ulong.MaxValue })]
+        [InlineData(new ulong[] { ulong.MaxValue })]
+        public void OverwriteWith_SourceBitmap_ReplacesDestinationBitmap(ulong[] source)
+        {
+            // Arrange
+            using Roaring64BitmapTestObject sourceObject = Roaring64BitmapTestObjectFactory.Default.GetFromValues(source);
+            using Roaring64BitmapTestObject destinationObject = Roaring64BitmapTestObjectFactory.Default.GetFromValues([0, 1, 2, 3, 4, ulong.MaxValue - 1, ulong.MaxValue]);
+
+            // Act
+            destinationObject.Bitmap.OverwriteWith(sourceObject.Bitmap);
+
+            // Assert
+            Assert.Equal(source, sourceObject.Bitmap.Values);
+            Assert.Equal(source, destinationObject.Bitmap.Values);
+        }
+    }
 }

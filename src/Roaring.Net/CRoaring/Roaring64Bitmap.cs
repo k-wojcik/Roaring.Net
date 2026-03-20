@@ -171,6 +171,37 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     public Roaring64Bitmap Clone() => new(NativeMethods.roaring64_bitmap_copy(Pointer));
 
     /// <summary>
+    /// Copies the bitmap and adds an offset.
+    /// </summary>
+    /// <param name="offset">The offset to be added to the bitmap when copying data.</param>
+    /// <returns>An instance of the <see cref="Roaring64Bitmap"/> class with values shifted relative to the current bitmap by the specified offset.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    /// <remarks>Values that overflow are dropped.</remarks>
+    public Roaring64Bitmap CloneWithOffset(ulong offset)
+        => new(NativeMethods.roaring64_bitmap_add_offset_signed(Pointer, true, offset));
+
+    /// <summary>
+    /// Copies the bitmap and subtracts an offset.
+    /// </summary>
+    /// <param name="offset">The offset to be subtracted from the bitmap when copying data.</param>
+    /// <returns>An instance of the <see cref="Roaring64Bitmap"/> class with values shifted relative to the current bitmap by the specified offset.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    /// <remarks>Values that underflow are dropped.</remarks>
+    public Roaring64Bitmap CloneWithNegativeOffset(ulong offset)
+        => new(NativeMethods.roaring64_bitmap_add_offset_signed(Pointer, false, offset));
+
+    /// <summary>
+    /// Overwrites the current bitmap with the bitmap given in the <paramref name="source"/> parameter. <br/>
+    /// The content of the current bitmap will be deleted.
+    /// </summary>
+    /// <param name="source">Bitmap that will be written in place of the current bitmap.</param>
+    /// <remarks>
+    /// The <see cref="OverwriteWith"/> method can save on memory allocations compared to the <see cref="Clone"/> method. <br/>
+    /// On failure, the current bitmap is left in a valid, empty state (all stored values are deleted).
+    /// </remarks>
+    public void OverwriteWith(Roaring64BitmapBase source) => NativeMethods.roaring64_bitmap_overwrite(Pointer, source.Pointer);
+
+    /// <summary>
     /// Adds a value to the bitmap.
     /// </summary>
     /// <param name="value">A value that will be added to the bitmap.</param>
@@ -223,6 +254,34 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
         }
 
         NativeMethods.roaring64_bitmap_add_range_closed(Pointer, start, end);
+    }
+
+    /// <summary>
+    /// Adds an offset to all values stored in the bitmap.
+    /// </summary>
+    /// <param name="offset">The offset that will be added to all values.</param>
+    /// <remarks>This method allocates a new bitmap.</remarks>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    /// <remarks>Values that overflow are dropped.</remarks>
+    public void AddOffset(ulong offset)
+    {
+        IntPtr previousPtr = Pointer;
+        Pointer = CheckBitmapPointer(NativeMethods.roaring64_bitmap_add_offset_signed(Pointer, true, offset));
+        NativeMethods.roaring64_bitmap_free(previousPtr);
+    }
+
+    /// <summary>
+    /// Subtract an offset from all values stored in the bitmap.
+    /// </summary>
+    /// <param name="offset">The offset that will be subtracted from all values.</param>
+    /// <remarks>This method allocates a new bitmap.</remarks>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    /// <remarks>Values that underflow are dropped.</remarks>
+    public void SubtractOffset(ulong offset)
+    {
+        IntPtr previousPtr = Pointer;
+        Pointer = CheckBitmapPointer(NativeMethods.roaring64_bitmap_add_offset_signed(Pointer, false, offset));
+        NativeMethods.roaring64_bitmap_free(previousPtr);
     }
 
     /// <summary>
@@ -747,6 +806,13 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <returns><c>true</c> if the result has at least one run container; otherwise, <c>false</c>.</returns>
     public bool Optimize()
         => NativeMethods.roaring64_bitmap_run_optimize(Pointer);
+
+    /// <summary>
+    /// Removes run-length encoding even when it is more space efficient.
+    /// </summary>
+    /// <returns><c>true</c> if remove operation has been performed; otherwise, <c>false</c>.</returns>
+    public bool RemoveRunCompression()
+        => NativeMethods.roaring64_bitmap_remove_run_compression(Pointer);
 
     /// <summary>
     /// Tries to reallocate memory to reduce the memory usage.

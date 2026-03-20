@@ -236,6 +236,50 @@ public class AddTests
         }
     }
 
+    public class AddOffset
+    {
+        [Theory]
+        [InlineData(new ulong[] { }, new ulong[] { }, 10)]
+        [InlineData(new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { 5, 6, 7, 8, 9 }, 5)]
+        [InlineData(new ulong[] { 0, 2, 4, 6, 8 }, new ulong[] { 10, 12, 14, 16, 18 }, 10)]
+        [InlineData(new ulong[] { 0, 1, 2, 3, 4, ulong.MaxValue }, new ulong[] { 1, 2, 3, 4, 5 }, 1)]
+        [InlineData(new ulong[] { ulong.MaxValue - 1, ulong.MaxValue }, new ulong[] { ulong.MaxValue }, 1)]
+        [InlineData(new ulong[] { 0 }, new ulong[] { ulong.MaxValue }, ulong.MaxValue)]
+        public void AddOffset_AddsValueToBitmapValues_BitmapContainsExpectedValues(ulong[] values, ulong[] expected, ulong offset)
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetFromValues(values);
+
+            // Act
+            testObject.Bitmap.AddOffset(offset);
+
+            // Assert
+            var actual = testObject.Bitmap.Values.ToList();
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    public class SubtractOffset
+    {
+        [Theory]
+        [InlineData(new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { 0, 1, 2 }, 2)]
+        [InlineData(new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { }, 5)]
+        [InlineData(new ulong[] { ulong.MaxValue }, new ulong[] { 0 }, ulong.MaxValue)]
+        [InlineData(new ulong[] { ulong.MaxValue }, new ulong[] { ulong.MaxValue - 1 }, 1)]
+        public void SubtractOffset_SubtractValueFromBitmapValues_BitmapContainsExpectedValues(ulong[] values, ulong[] expected, ulong offset)
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetFromValues(values);
+
+            // Act
+            testObject.Bitmap.SubtractOffset(offset);
+
+            // Assert
+            var actual = testObject.Bitmap.Values.ToList();
+            Assert.Equal(expected, actual);
+        }
+    }
+
     public class AddBulk
     {
         [Fact]

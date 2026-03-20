@@ -176,11 +176,12 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     public Roaring32Bitmap Clone() => new(NativeMethods.roaring_bitmap_copy(Pointer));
 
     /// <summary>
-    /// Copies the bitmap from the given offset.
+    /// Copies the bitmap and adds an offset.
     /// </summary>
-    /// <param name="offset">The position in the bitmap from which to start copying data.</param>
-    /// <returns>Instance of the <see cref="Roaring32Bitmap"/> class with the same values as the current bitmap from the given offset.</returns>
+    /// <param name="offset">The offset to be added to the bitmap when copying data.</param>
+    /// <returns>An instance of the <see cref="Roaring32Bitmap"/> class with values shifted relative to the current bitmap by the specified offset.</returns>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    /// <remarks>Values that overflow or underflow are dropped.</remarks>
     public Roaring32Bitmap CloneWithOffset(long offset)
         => new(NativeMethods.roaring_bitmap_add_offset(Pointer, offset));
 
@@ -257,6 +258,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <param name="offset">The offset that will be added to all values.</param>
     /// <remarks>This method allocates a new bitmap.</remarks>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    /// <remarks>Values that overflow or underflow are dropped.</remarks>
     public void AddOffset(long offset)
     {
         IntPtr previousPtr = Pointer;

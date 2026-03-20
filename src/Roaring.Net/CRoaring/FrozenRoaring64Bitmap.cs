@@ -330,6 +330,24 @@ public unsafe class FrozenRoaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoarin
     public Roaring64Bitmap ToBitmap() => _bitmap.Clone();
 
     /// <summary>
+    /// Converts <see cref="FrozenRoaring64Bitmap"/> to the <see cref="Roaring64Bitmap"/> and adds an offset.
+    /// </summary>
+    /// <param name="offset">The offset to be added to the bitmap when converting.</param>
+    /// <returns>An instance of the <see cref="Roaring64Bitmap"/> class with values shifted relative to the current bitmap by the specified offset.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    /// <remarks>Values that overflow are dropped.</remarks>
+    public Roaring64Bitmap ToBitmapWithOffset(ulong offset) => _bitmap.CloneWithOffset(offset);
+
+    /// <summary>
+    /// Converts <see cref="FrozenRoaring64Bitmap"/> to the <see cref="Roaring64Bitmap"/> and subtracts an offset.
+    /// </summary>
+    /// <param name="offset">The offset to be subtracted from the bitmap when converting.</param>
+    /// <returns>An instance of the <see cref="Roaring64Bitmap"/> class with values shifted relative to the current bitmap by the specified offset.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    /// <remarks>Values that underflow are dropped.</remarks>
+    public Roaring64Bitmap ToBitmapWithNegativeOffset(ulong offset) => _bitmap.CloneWithNegativeOffset(offset);
+
+    /// <summary>
     /// Takes the given number of values from the current bitmap and puts them into an array.
     /// </summary>
     /// <param name="count">Number of values to take from the bitmap.</param>
