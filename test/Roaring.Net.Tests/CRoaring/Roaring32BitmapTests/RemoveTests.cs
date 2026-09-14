@@ -145,9 +145,6 @@ public class RemoveTests
 
     public class RemoveRange
     {
-
-
-
         [Theory]
         [InlineData(1, 0)]
         [InlineData(10, 5)]
