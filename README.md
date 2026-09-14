@@ -17,8 +17,9 @@ A .NET wrapper for [CRoaring](https://github.com/RoaringBitmap/CRoaring) - a C i
 |        **osx**        |                    | :white_check_mark: |                    | :white_check_mark: |
 
 ### Supported frameworks
-* .NET 8+
-* .NET 6
+* .NET 10
+* .NET 9
+* .NET 8
 
 ## Usage
 ```cs

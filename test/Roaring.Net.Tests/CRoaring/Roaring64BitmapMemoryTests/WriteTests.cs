@@ -89,7 +89,7 @@ public class WriteTests
             // Act && Assert
             await Assert.ThrowsAsync<ObjectDisposedException>(async () =>
             {
-                await bitmapMemory.WriteAsync(Array.Empty<byte>().AsSpan());
+                await bitmapMemory.WriteAsync(Array.Empty<byte>().AsSpan(), TestContext.Current.CancellationToken);
             });
         }
 
@@ -120,7 +120,7 @@ public class WriteTests
 
             // Act
             using var bitmapMemory = new Roaring64BitmapMemory((nuint)serializedBitmap.Length);
-            await bitmapMemory.WriteAsync(serializedBitmap.AsSpan());
+            await bitmapMemory.WriteAsync(serializedBitmap.AsSpan(), TestContext.Current.CancellationToken);
             using FrozenRoaring64Bitmap frozenBitmap = bitmapMemory.ToFrozen();
 
             // Assert
@@ -175,7 +175,7 @@ public class WriteTests
             // Act && Assert
             await Assert.ThrowsAsync<ObjectDisposedException>(async () =>
             {
-                await bitmapMemory.WriteAsync([], 0, 0);
+                await bitmapMemory.WriteAsync([], 0, 0, TestContext.Current.CancellationToken);
             });
         }
 
@@ -206,7 +206,7 @@ public class WriteTests
 
             // Act
             using var bitmapMemory = new Roaring64BitmapMemory((nuint)serializedBitmap.Length);
-            await bitmapMemory.WriteAsync(serializedBitmap, 0, serializedBitmap.Length);
+            await bitmapMemory.WriteAsync(serializedBitmap, 0, serializedBitmap.Length, TestContext.Current.CancellationToken);
             using FrozenRoaring64Bitmap frozenBitmap = bitmapMemory.ToFrozen();
 
             // Assert

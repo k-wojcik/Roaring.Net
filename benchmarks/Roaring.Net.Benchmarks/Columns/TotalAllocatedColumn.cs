@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using Perfolizer.Metrology;
+using Pragmastat.Metrology;
 
 namespace Roaring.Net.Benchmarks.Columns;
 
@@ -25,9 +26,7 @@ internal class TotalAllocatedColumn : IColumn
             .ToList();
 
         double value = metrics.Sum(x => x.Value.Value);
-
-        UnitPresentation unitPresentation = new UnitPresentation(style.PrintUnitsInContent, minUnitWidth: 0, gap: true);
-        return SizeValue.FromBytes((long)value).ToString(style.SizeUnit, "0.##", summary.GetCultureInfo(), unitPresentation);
+        return SizeValue.FromBytes((long)value).ToString();
     }
 
     public bool IsAvailable(Summary summary)

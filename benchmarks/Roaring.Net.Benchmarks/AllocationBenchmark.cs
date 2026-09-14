@@ -15,7 +15,7 @@ using BenchmarkDotNet.Diagnostics.Windows.Configs;
 namespace Roaring.Net.Benchmarks;
 
 [ShortRunJob(RuntimeMoniker.Net80)]
-[ShortRunJob(RuntimeMoniker.Net60)]
+[ShortRunJob(RuntimeMoniker.Net10_0)]
 [MemoryDiagnoser]
 [MarkdownExporterAttribute.GitHub]
 #if RELEASE
