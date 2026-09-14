@@ -34,7 +34,7 @@ public class CollectionTests
         {
             // Arrange
             using IRoaring32BitmapTestObject testObject = factory.GetFromValues(expected);
-            uint[] actual = new uint[expected.Length];
+            var actual = new uint[expected.Length];
 
             // Act
             testObject.ReadOnlyBitmap.CopyTo(actual);
@@ -81,7 +81,7 @@ public class CollectionTests
             var expected = new uint[] { 0, 1, 2, 3, 4, 0, 0, 0, 0, 0 };
             var input = expected[..5];
             using IRoaring32BitmapTestObject testObject = factory.GetFromValues(input);
-            uint[] actual = new uint[input.Length + 5];
+            var actual = new uint[input.Length + 5];
 
             // Act
             testObject.ReadOnlyBitmap.CopyTo(actual);
@@ -101,7 +101,7 @@ public class CollectionTests
         {
             // Arrange
             using IRoaring32BitmapTestObject testObject = factory.GetFromValues(expected);
-            uint[] actual = new uint[expected.Length];
+            var actual = new uint[expected.Length];
 
             // Act
             testObject.ReadOnlyBitmap.CopyTo(actual.AsMemory());
@@ -148,7 +148,7 @@ public class CollectionTests
             var expected = new uint[] { 0, 1, 2, 3, 4, 0, 0, 0, 0, 0 };
             var input = expected[..5];
             using IRoaring32BitmapTestObject testObject = factory.GetFromValues(input);
-            uint[] actual = new uint[input.Length + 5];
+            var actual = new uint[input.Length + 5];
 
             // Act
             testObject.ReadOnlyBitmap.CopyTo(actual.AsMemory());
@@ -168,7 +168,7 @@ public class CollectionTests
         {
             // Arrange
             using IRoaring32BitmapTestObject testObject = factory.GetFromValues(expected);
-            uint[] actual = new uint[expected.Length];
+            var actual = new uint[expected.Length];
 
             // Act
             testObject.ReadOnlyBitmap.CopyTo(actual.AsSpan());
@@ -215,7 +215,7 @@ public class CollectionTests
             var expected = new uint[] { 0, 1, 2, 3, 4, 0, 0, 0, 0, 0 };
             var input = expected[..5];
             using IRoaring32BitmapTestObject testObject = factory.GetFromValues(input);
-            uint[] actual = new uint[input.Length + 5];
+            var actual = new uint[input.Length + 5];
 
             // Act
             testObject.ReadOnlyBitmap.CopyTo(actual.AsSpan());

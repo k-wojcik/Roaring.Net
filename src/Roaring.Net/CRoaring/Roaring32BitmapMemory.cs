@@ -141,7 +141,7 @@ public sealed unsafe class Roaring32BitmapMemory : IDisposable
     {
         CheckDisposed();
 
-        IntPtr ptr = format switch
+        var ptr = format switch
         {
             SerializationFormat.Frozen => NativeMethods.roaring_bitmap_frozen_view(MemoryPtr, Size),
             SerializationFormat.Portable => NativeMethods.roaring_bitmap_portable_deserialize_frozen(MemoryPtr),

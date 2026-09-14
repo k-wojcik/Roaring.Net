@@ -40,7 +40,7 @@ public unsafe class FrozenRoaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoarin
     internal FrozenRoaring64Bitmap(Roaring64Bitmap bitmap)
     {
         bitmap.ShrinkToFit(); // CRoaring requires shrink_to_fit before frozen operations
-        nuint size = bitmap.GetSerializationBytes(SerializationFormat.Frozen);
+        var size = bitmap.GetSerializationBytes(SerializationFormat.Frozen);
         Memory = new Roaring64BitmapMemory(size, shared: false);
         _bitmap = bitmap.GetFrozenView(size, Memory.MemoryPtr);
 

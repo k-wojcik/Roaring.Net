@@ -85,7 +85,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
         Roaring64Bitmap bitmap;
         if (start != ulong.MaxValue)
         {
-            ulong inclusiveEnd = end;
+            var inclusiveEnd = end;
             if (end != ulong.MaxValue)
             {
                 inclusiveEnd += 1;
@@ -265,7 +265,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <remarks>Values that overflow are dropped.</remarks>
     public void AddOffset(ulong offset)
     {
-        IntPtr previousPtr = Pointer;
+        var previousPtr = Pointer;
         Pointer = CheckBitmapPointer(NativeMethods.roaring64_bitmap_add_offset_signed(Pointer, true, offset));
         NativeMethods.roaring64_bitmap_free(previousPtr);
     }
@@ -279,7 +279,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <remarks>Values that underflow are dropped.</remarks>
     public void SubtractOffset(ulong offset)
     {
-        IntPtr previousPtr = Pointer;
+        var previousPtr = Pointer;
         Pointer = CheckBitmapPointer(NativeMethods.roaring64_bitmap_add_offset_signed(Pointer, false, offset));
         NativeMethods.roaring64_bitmap_free(previousPtr);
     }
@@ -773,7 +773,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
         bool overlaps;
         if (start != ulong.MaxValue)
         {
-            ulong endInclusive = end;
+            var endInclusive = end;
             if (end != ulong.MaxValue)
             {
                 endInclusive += 1;
@@ -873,8 +873,8 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <returns>The array containing the values of the bitmap.</returns>
     public ulong[] ToArray()
     {
-        ulong count = NativeMethods.roaring64_bitmap_get_cardinality(Pointer);
-        ulong[] values = new ulong[count];
+        var count = NativeMethods.roaring64_bitmap_get_cardinality(Pointer);
+        var values = new ulong[count];
         NativeMethods.roaring64_bitmap_to_uint64_array(Pointer, values);
         return values;
     }
@@ -887,13 +887,13 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <remarks>If the bitmap contains fewer values than the given number then the array will be adjusted to the number of values.</remarks>
     public ulong[] Take(ulong count)
     {
-        ulong cardinality = NativeMethods.roaring64_bitmap_get_cardinality(Pointer);
+        var cardinality = NativeMethods.roaring64_bitmap_get_cardinality(Pointer);
         if (cardinality < count)
         {
             count = cardinality;
         }
 
-        ulong[] values = new ulong[count];
+        var values = new ulong[count];
         NativeMethods.roaring64_bitmap_to_uint64_array(Pointer, values);
         return values;
     }
@@ -932,7 +932,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// </remarks>
     public bool IsValid(out string? reason)
     {
-        var result = NativeMethods.roaring64_bitmap_internal_validate(Pointer, out IntPtr reasonPtr);
+        var result = NativeMethods.roaring64_bitmap_internal_validate(Pointer, out var reasonPtr);
         reason = Marshal.PtrToStringAnsi(reasonPtr);
         return result;
     }
@@ -1003,7 +1003,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     public static Roaring64Bitmap Deserialize(byte[] buffer, SerializationFormat format = SerializationFormat.Portable)
     {
-        IntPtr ptr = format switch
+        var ptr = format switch
         {
             SerializationFormat.Portable => NativeMethods.roaring64_bitmap_portable_deserialize_safe(buffer, (nuint)buffer.Length),
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat)
@@ -1027,7 +1027,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
     public static nuint GetSerializedSize(byte[] buffer, nuint expectedSize, SerializationFormat format = SerializationFormat.Portable)
     {
-        nuint size = format switch
+        var size = format switch
         {
             SerializationFormat.Portable => NativeMethods.roaring64_bitmap_portable_deserialize_size(buffer, expectedSize),
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat)
@@ -1047,7 +1047,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     {
         ShrinkToFit(); // CRoaring requires shrink_to_fit before frozen operations
         NativeMethods.roaring64_bitmap_frozen_serialize(Pointer, memoryPtr);
-        IntPtr ptr = NativeMethods.roaring64_bitmap_frozen_view(memoryPtr, size);
+        var ptr = NativeMethods.roaring64_bitmap_frozen_view(memoryPtr, size);
         return new Roaring64Bitmap(ptr);
     }
 }

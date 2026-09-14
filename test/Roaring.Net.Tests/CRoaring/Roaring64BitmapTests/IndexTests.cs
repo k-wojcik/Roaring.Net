@@ -18,7 +18,7 @@ public class IndexTests
             using IRoaring64BitmapTestObject testObject = factory.GetFromValues(values);
 
             // Act
-            var actualReturn = testObject.ReadOnlyBitmap.TryGetValue(index, out ulong actual);
+            var actualReturn = testObject.ReadOnlyBitmap.TryGetValue(index, out var actual);
 
             // Assert
             Assert.True(actualReturn);
@@ -34,7 +34,7 @@ public class IndexTests
             using IRoaring64BitmapTestObject testObject = factory.GetFromValues(values);
 
             // Act
-            var actualReturn = testObject.ReadOnlyBitmap.TryGetValue(index, out ulong actual);
+            var actualReturn = testObject.ReadOnlyBitmap.TryGetValue(index, out var actual);
 
             // Assert
             Assert.False(actualReturn);
@@ -59,7 +59,7 @@ public class IndexTests
             using IRoaring64BitmapTestObject testObject = factory.GetFromValues(values);
 
             // Act
-            var actualReturn = testObject.ReadOnlyBitmap.TryGetIndex(testedValue, out ulong actual);
+            var actualReturn = testObject.ReadOnlyBitmap.TryGetIndex(testedValue, out var actual);
 
             // Assert
             Assert.Equal(expected, actual);

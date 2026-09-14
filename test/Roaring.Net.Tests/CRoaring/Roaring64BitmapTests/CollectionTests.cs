@@ -34,7 +34,7 @@ public class CollectionTests
         {
             // Arrange
             using IRoaring64BitmapTestObject testObject = factory.GetFromValues(expected);
-            ulong[] actual = new ulong[expected.Length];
+            var actual = new ulong[expected.Length];
 
             // Act
             testObject.ReadOnlyBitmap.CopyTo(actual);
@@ -81,7 +81,7 @@ public class CollectionTests
             var expected = new ulong[] { 0, 1, 2, 3, 4, 0, 0, 0, 0, 0 };
             var input = expected[..5];
             using IRoaring64BitmapTestObject testObject = factory.GetFromValues(input);
-            ulong[] actual = new ulong[input.Length + 5];
+            var actual = new ulong[input.Length + 5];
 
             // Act
             testObject.ReadOnlyBitmap.CopyTo(actual);
@@ -101,7 +101,7 @@ public class CollectionTests
         {
             // Arrange
             using IRoaring64BitmapTestObject testObject = factory.GetFromValues(expected);
-            ulong[] actual = new ulong[expected.Length];
+            var actual = new ulong[expected.Length];
 
             // Act
             testObject.ReadOnlyBitmap.CopyTo(actual.AsMemory());
@@ -148,7 +148,7 @@ public class CollectionTests
             var expected = new ulong[] { 0, 1, 2, 3, 4, 0, 0, 0, 0, 0 };
             var input = expected[..5];
             using IRoaring64BitmapTestObject testObject = factory.GetFromValues(input);
-            ulong[] actual = new ulong[input.Length + 5];
+            var actual = new ulong[input.Length + 5];
 
             // Act
             testObject.ReadOnlyBitmap.CopyTo(actual.AsMemory());
@@ -168,7 +168,7 @@ public class CollectionTests
         {
             // Arrange
             using IRoaring64BitmapTestObject testObject = factory.GetFromValues(expected);
-            ulong[] actual = new ulong[expected.Length];
+            var actual = new ulong[expected.Length];
 
             // Act
             testObject.ReadOnlyBitmap.CopyTo(actual.AsSpan());
@@ -215,7 +215,7 @@ public class CollectionTests
             var expected = new ulong[] { 0, 1, 2, 3, 4, 0, 0, 0, 0, 0 };
             var input = expected[..5];
             using IRoaring64BitmapTestObject testObject = factory.GetFromValues(input);
-            ulong[] actual = new ulong[input.Length + 5];
+            var actual = new ulong[input.Length + 5];
 
             // Act
             testObject.ReadOnlyBitmap.CopyTo(actual.AsSpan());

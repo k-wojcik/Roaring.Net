@@ -18,7 +18,7 @@ public class IndexTests
             using IRoaring32BitmapTestObject testObject = factory.GetFromValues(values);
 
             // Act
-            var actualReturn = testObject.ReadOnlyBitmap.TryGetValue(index, out uint actual);
+            var actualReturn = testObject.ReadOnlyBitmap.TryGetValue(index, out var actual);
 
             // Assert
             Assert.True(actualReturn);
@@ -34,7 +34,7 @@ public class IndexTests
             using IRoaring32BitmapTestObject testObject = factory.GetFromValues(values);
 
             // Act
-            var actualReturn = testObject.ReadOnlyBitmap.TryGetValue(index, out uint actual);
+            var actualReturn = testObject.ReadOnlyBitmap.TryGetValue(index, out var actual);
 
             // Assert
             Assert.False(actualReturn);

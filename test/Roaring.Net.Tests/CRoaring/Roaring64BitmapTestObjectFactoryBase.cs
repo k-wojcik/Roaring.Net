@@ -39,7 +39,7 @@ internal abstract class Roaring64BitmapTestObjectFactoryBase<TBitmap, TTestObjec
         ulong[] values;
         if (count > 0)
         {
-            ulong step = length / count;
+            var step = length / count;
 
             values = new ulong[count];
 

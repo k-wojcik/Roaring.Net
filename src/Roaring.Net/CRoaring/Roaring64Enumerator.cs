@@ -32,7 +32,7 @@ internal sealed class Roaring64Enumerator : IEnumerator<ulong>, IEnumerable<ulon
 
     internal Roaring64Enumerator(IntPtr bitmap)
     {
-        IntPtr ptr = NativeMethods.roaring64_iterator_create(bitmap);
+        var ptr = NativeMethods.roaring64_iterator_create(bitmap);
         if (ptr == IntPtr.Zero)
         {
             throw new InvalidOperationException(ExceptionMessages.UnableToAllocateBitmapIterator);

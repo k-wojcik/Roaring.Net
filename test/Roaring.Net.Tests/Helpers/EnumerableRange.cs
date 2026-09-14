@@ -7,7 +7,7 @@ internal static class EnumerableRange
 {
     public static IEnumerable<ulong> Range(ulong start, ulong count)
     {
-        ulong max = start + count - 1;
+        var max = start + count - 1;
         if (start > max)
         {
             throw new ArgumentOutOfRangeException(nameof(count));
@@ -18,7 +18,7 @@ internal static class EnumerableRange
             yield break;
         }
 
-        for (ulong i = start; i <= max && i >= start; i++)
+        for (var i = start; i <= max && i >= start; i++)
         {
             yield return i;
         }

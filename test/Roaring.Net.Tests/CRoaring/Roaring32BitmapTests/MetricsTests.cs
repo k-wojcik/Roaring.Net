@@ -96,7 +96,7 @@ public class MetricsTests
             using IRoaring32BitmapTestObject testObject = factory.GetEmpty();
 
             // Act
-            uint? actual = testObject.ReadOnlyBitmap.Min;
+            var actual = testObject.ReadOnlyBitmap.Min;
 
             // Assert
             Assert.Null(actual);
@@ -127,7 +127,7 @@ public class MetricsTests
             using IRoaring32BitmapTestObject testObject = factory.GetEmpty();
 
             // Act
-            uint? actual = testObject.ReadOnlyBitmap.Max;
+            var actual = testObject.ReadOnlyBitmap.Max;
 
             // Assert
             Assert.Null(actual);

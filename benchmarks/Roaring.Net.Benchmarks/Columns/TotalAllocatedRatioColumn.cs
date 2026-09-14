@@ -14,8 +14,8 @@ internal class TotalAllocatedRatioColumn : BaselineCustomColumn
     public override string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, IReadOnlyDictionary<string, Metric> baselineMetrics,
         Statistics current, IReadOnlyDictionary<string, Metric> currentMetrics, bool isBaseline)
     {
-        double? ratio = GetAllocationRatio(currentMetrics, baselineMetrics);
-        double? invertedRatio = GetAllocationRatio(baselineMetrics, currentMetrics);
+        var ratio = GetAllocationRatio(currentMetrics, baselineMetrics);
+        var invertedRatio = GetAllocationRatio(baselineMetrics, currentMetrics);
 
         if (ratio == null)
         {
@@ -25,7 +25,7 @@ internal class TotalAllocatedRatioColumn : BaselineCustomColumn
         CultureInfo cultureInfo = summary.GetCultureInfo();
         RatioStyle ratioStyle = summary.Style?.RatioStyle ?? RatioStyle.Value;
 
-        bool advancedPrecision = IsNonBaselinesPrecise(summary, baselineMetrics, benchmarkCase);
+        var advancedPrecision = IsNonBaselinesPrecise(summary, baselineMetrics, benchmarkCase);
         return ratioStyle switch
         {
             RatioStyle.Value => ratio.Value.ToString(advancedPrecision ? "N3" : "N2", cultureInfo),
@@ -51,7 +51,7 @@ internal class TotalAllocatedRatioColumn : BaselineCustomColumn
             return false;
         }
 
-        string? logicalGroupKey = summary.GetLogicalGroupKey(benchmarkCase);
+        var logicalGroupKey = summary.GetLogicalGroupKey(benchmarkCase);
         if (logicalGroupKey == null)
         {
             return false;
@@ -65,8 +65,8 @@ internal class TotalAllocatedRatioColumn : BaselineCustomColumn
         IReadOnlyDictionary<string, Metric>? current,
         IReadOnlyDictionary<string, Metric>? baseline)
     {
-        double? currentBytes = GetAllocatedBytes(current);
-        double? baselineBytes = GetAllocatedBytes(baseline);
+        var currentBytes = GetAllocatedBytes(current);
+        var baselineBytes = GetAllocatedBytes(baseline);
 
         if (currentBytes == null || baselineBytes == null)
         {

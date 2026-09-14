@@ -39,11 +39,11 @@ internal abstract class Roaring32BitmapTestObjectFactoryBase<TBitmap, TTestObjec
         uint[] values;
         if (count > 0)
         {
-            uint step = length / count;
+            var step = length / count;
 
             values = new uint[count];
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 values[i] = start + (uint)i * step;
             }

@@ -261,7 +261,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <remarks>Values that overflow or underflow are dropped.</remarks>
     public void AddOffset(long offset)
     {
-        IntPtr previousPtr = Pointer;
+        var previousPtr = Pointer;
         Pointer = CheckBitmapPointer(NativeMethods.roaring_bitmap_add_offset(Pointer, offset));
         NativeMethods.roaring_bitmap_free(previousPtr);
     }
@@ -680,9 +680,9 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <remarks>This method may be slower than <see cref="OrManyHeap"/> in some cases.</remarks>
     public Roaring32Bitmap OrMany(Roaring32BitmapBase[] bitmaps)
     {
-        int length = bitmaps.Length + 1;
+        var length = bitmaps.Length + 1;
         var pointers = new IntPtr[length];
-        for (int i = 0; i < bitmaps.Length; i++)
+        for (var i = 0; i < bitmaps.Length; i++)
         {
             pointers[i] = bitmaps[i].Pointer;
         }
@@ -699,9 +699,9 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <remarks>This method may be faster than <see cref="OrMany"/> in some cases.</remarks>
     public Roaring32Bitmap OrManyHeap(Roaring32BitmapBase[] bitmaps)
     {
-        int length = bitmaps.Length + 1;
+        var length = bitmaps.Length + 1;
         var pointers = new IntPtr[length];
-        for (int i = 0; i < bitmaps.Length; i++)
+        for (var i = 0; i < bitmaps.Length; i++)
         {
             pointers[i] = bitmaps[i].Pointer;
         }
@@ -772,9 +772,9 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <returns><see cref="Roaring32Bitmap"/> with the result of the symmetric difference of many bitmaps.</returns>
     public Roaring32Bitmap XorMany(params Roaring32BitmapBase[] bitmaps)
     {
-        int length = bitmaps.Length + 1;
+        var length = bitmaps.Length + 1;
         var pointers = new IntPtr[length];
-        for (int i = 0; i < bitmaps.Length; i++)
+        for (var i = 0; i < bitmaps.Length; i++)
         {
             pointers[i] = bitmaps[i].Pointer;
         }
@@ -925,8 +925,8 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <returns>The array containing the values of the bitmap.</returns>
     public uint[] ToArray()
     {
-        ulong count = NativeMethods.roaring_bitmap_get_cardinality(Pointer);
-        uint[] values = new uint[count];
+        var count = NativeMethods.roaring_bitmap_get_cardinality(Pointer);
+        var values = new uint[count];
         NativeMethods.roaring_bitmap_to_uint32_array(Pointer, values);
         return values;
     }
@@ -941,7 +941,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     internal Roaring32Bitmap GetFrozenView(nuint size, byte* memoryPtr)
     {
         NativeMethods.roaring_bitmap_frozen_serialize(Pointer, memoryPtr);
-        IntPtr ptr = NativeMethods.roaring_bitmap_frozen_view(memoryPtr, size);
+        var ptr = NativeMethods.roaring_bitmap_frozen_view(memoryPtr, size);
         return new Roaring32Bitmap(ptr);
     }
 
@@ -953,13 +953,13 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <remarks>If the bitmap contains fewer values than the given number then the array will be adjusted to the number of values.</remarks>
     public uint[] Take(ulong count)
     {
-        ulong cardinality = NativeMethods.roaring_bitmap_get_cardinality(Pointer);
+        var cardinality = NativeMethods.roaring_bitmap_get_cardinality(Pointer);
         if (cardinality < count)
         {
             count = cardinality;
         }
 
-        uint[] values = new uint[count];
+        var values = new uint[count];
         NativeMethods.roaring_bitmap_to_uint32_array(Pointer, values);
         return values;
     }
@@ -998,7 +998,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// </remarks>
     public bool IsValid(out string? reason)
     {
-        var result = NativeMethods.roaring_bitmap_internal_validate(Pointer, out IntPtr reasonPtr);
+        var result = NativeMethods.roaring_bitmap_internal_validate(Pointer, out var reasonPtr);
         reason = Marshal.PtrToStringAnsi(reasonPtr);
         return result;
     }
@@ -1072,7 +1072,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     public static Roaring32Bitmap Deserialize(byte[] buffer, SerializationFormat format = SerializationFormat.Normal)
     {
-        IntPtr ptr = format switch
+        var ptr = format switch
         {
             SerializationFormat.Normal => NativeMethods.roaring_bitmap_deserialize_safe(buffer, (nuint)buffer.Length),
             SerializationFormat.Portable => NativeMethods.roaring_bitmap_portable_deserialize_safe(buffer, (nuint)buffer.Length),
@@ -1100,7 +1100,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// </remarks>
     public static Roaring32Bitmap DeserializeUnsafe(byte[] buffer, SerializationFormat format = SerializationFormat.Normal)
     {
-        IntPtr ptr = format switch
+        var ptr = format switch
         {
             SerializationFormat.Normal => NativeMethods.roaring_bitmap_deserialize(buffer),
             SerializationFormat.Portable => NativeMethods.roaring_bitmap_portable_deserialize(buffer),
@@ -1125,7 +1125,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
     public static nuint GetSerializedSize(byte[] buffer, nuint expectedSize, SerializationFormat format = SerializationFormat.Portable)
     {
-        nuint size = format switch
+        var size = format switch
         {
             SerializationFormat.Portable => NativeMethods.roaring_bitmap_portable_deserialize_size(buffer, expectedSize),
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat)

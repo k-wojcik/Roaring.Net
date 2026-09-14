@@ -140,7 +140,7 @@ public sealed unsafe class Roaring64BitmapMemory : IDisposable
     {
         CheckDisposed();
 
-        IntPtr ptr = format switch
+        var ptr = format switch
         {
             SerializationFormat.Frozen => NativeMethods.roaring64_bitmap_frozen_view(MemoryPtr, Size),
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat)

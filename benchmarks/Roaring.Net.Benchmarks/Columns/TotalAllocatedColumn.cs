@@ -20,12 +20,12 @@ internal class TotalAllocatedColumn : IColumn
         BenchmarkReport report = summary.Reports
             .Single(x => x.BenchmarkCase == benchmarkCase);
 
-        List<KeyValuePair<string, Metric>> metrics = report
+        var metrics = report
             .Metrics
             .Where(x => x.Key is "AllocatedNativeMemoryDescriptor" or "Allocated Memory")
             .ToList();
 
-        double value = metrics.Sum(x => x.Value.Value);
+        var value = metrics.Sum(x => x.Value.Value);
         return SizeValue.FromBytes((long)value).ToString();
     }
 
