@@ -3,6 +3,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <TestTargetFramework>net8.0</TestTargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/Roaring.Net/Roaring.Net.csproj" SetTargetFramework="TargetFramework=$(TestTargetFramework)"  />
