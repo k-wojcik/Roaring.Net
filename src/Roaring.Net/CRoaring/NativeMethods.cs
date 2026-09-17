@@ -440,7 +440,7 @@ internal static unsafe partial class NativeMethods
     public static partial IntPtr roaring64_bitmap_frozen_view(byte* buffer, nuint length);
 
     [LibraryImport("roaring", EntryPoint = "roaring64_bitmap_portable_deserialize_frozen")]
-    public static partial IntPtr roaring64_bitmap_portable_deserialize_frozen(byte* buffer);
+    public static partial IntPtr roaring64_bitmap_portable_deserialize_frozen(byte* buffer, nuint maxbytes);
 
     [StructLayout(LayoutKind.Sequential)]
     internal readonly struct Iterator
