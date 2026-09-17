@@ -148,12 +148,12 @@ internal static unsafe partial class NativeMethods
     public static partial bool roaring64_bitmap_contains(IntPtr bitmap, ulong value);
 
     [return: MarshalAs(UnmanagedType.I1)]
-    [LibraryImport("roaring", EntryPoint = "roaring_bitmap_contains_range")]
-    public static partial bool roaring_bitmap_contains_range(IntPtr bitmap, ulong min, ulong max);
+    [LibraryImport("roaring", EntryPoint = "roaring_bitmap_contains_range_closed")]
+    public static partial bool roaring_bitmap_contains_range_closed(IntPtr bitmap, uint min, uint max);
 
     [return: MarshalAs(UnmanagedType.I1)]
-    [LibraryImport("roaring", EntryPoint = "roaring64_bitmap_contains_range")]
-    public static partial bool roaring64_bitmap_contains_range(IntPtr bitmap, ulong min, ulong max);
+    [LibraryImport("roaring", EntryPoint = "roaring64_bitmap_contains_range_closed")]
+    public static partial bool roaring64_bitmap_contains_range_closed(IntPtr bitmap, ulong min, ulong max);
 
     [return: MarshalAs(UnmanagedType.I1)]
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_select")]

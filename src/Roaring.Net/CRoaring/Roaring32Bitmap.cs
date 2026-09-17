@@ -397,7 +397,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
             throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
         }
 
-        return NativeMethods.roaring_bitmap_contains_range(Pointer, start, (ulong)end + 1);
+        return NativeMethods.roaring_bitmap_contains_range_closed(Pointer, start, end);
     }
 
     /// <summary>

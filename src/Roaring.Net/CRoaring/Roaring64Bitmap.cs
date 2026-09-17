@@ -426,8 +426,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
             throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
         }
 
-        return NativeMethods.roaring64_bitmap_contains_range(Pointer, start, end)
-               && (end != ulong.MaxValue || NativeMethods.roaring64_bitmap_contains(Pointer, end));
+        return NativeMethods.roaring64_bitmap_contains_range_closed(Pointer, start, end);
     }
 
     /// <summary>
