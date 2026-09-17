@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <TestTargetFramework>net8.0</TestTargetFramework>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../../src/Roaring.Net/Roaring.Net.csproj" SetTargetFramework="TargetFramework=$(TestTargetFramework)"  />
+    <ProjectReference Include="../../src/Roaring.Net/Roaring.Net.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="coverlet.collector">

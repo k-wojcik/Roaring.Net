@@ -11,7 +11,7 @@ jobs:
         VCPKG_DISABLE_METRICS: 1
         VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: vcpkg x64-linux
       uses: lukka/run-vcpkg@v11
       env:
@@ -22,7 +22,7 @@ jobs:
     - name: copy lib
       run: mkdir -p libs/x64-linux/ && cp vcpkg_installed/x64-linux-dynamic/lib/libroaring.so libs/x64-linux/
     - name: Upload lib to artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: libs-linux-x64
         path: |
@@ -34,7 +34,7 @@ jobs:
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
 
     - name: Download libs atrifacts
       uses: actions/download-artifact@v4
@@ -43,7 +43,7 @@ jobs:
         path: libs
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: 10.0.x
 
@@ -53,18 +53,15 @@ jobs:
     - name: Build
       run: dotnet build --no-restore --configuration Release /p:TreatWarningsAsErrors=true
 
-    - name: Test .NET 10
+    - name: Test
       run: dotnet test --no-build --configuration Release /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-      
-    - name: Test .NET 8
-      run: dotnet test --configuration Release /p:TestTargetFramework=net8.0
     
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v5.4.2
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
 
-    - uses: geekyeggo/delete-artifact@v5
+    - uses: geekyeggo/delete-artifact@v6
       with:
           name: libs-*
   
