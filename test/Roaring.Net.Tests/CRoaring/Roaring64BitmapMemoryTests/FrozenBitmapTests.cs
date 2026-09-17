@@ -71,5 +71,22 @@ public class FrozenBitmapTests
             Assert.Equal(bitmap.Values, frozenBitmap.Values);
             Assert.True(bitmap.IsValid());
         }
+
+        [Fact]
+        public void ToFrozen_FromPortable_ReturnsValidFrozenBitmap()
+        {
+            // Arrange
+            using Roaring64Bitmap bitmap = SerializationTestBitmap.GetTestBitmap64();
+            var serializedBitmap = bitmap.Serialize(SerializationFormat.Portable);
+
+            // Act
+            using var bitmapMemory = new Roaring64BitmapMemory((nuint)serializedBitmap.Length);
+            serializedBitmap.CopyTo(bitmapMemory.AsSpan());
+            using FrozenRoaring64Bitmap frozenBitmap = bitmapMemory.ToFrozen(SerializationFormat.Portable);
+
+            // Assert
+            Assert.Equal(bitmap.Values, frozenBitmap.Values);
+            Assert.True(bitmap.IsValid());
+        }
     }
 }
