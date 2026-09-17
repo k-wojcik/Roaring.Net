@@ -522,7 +522,6 @@ internal static unsafe partial class NativeMethods
 
     [LibraryImport("roaring", EntryPoint = "roaring64_bitmap_statistics")]
     public static partial void roaring64_bitmap_statistics(IntPtr bitmap, out Statistics64 stats);
-    
 
     [return: MarshalAs(UnmanagedType.I1)]
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_internal_validate")]

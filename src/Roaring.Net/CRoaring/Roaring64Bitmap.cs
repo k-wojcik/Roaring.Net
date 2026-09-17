@@ -356,6 +356,34 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     }
 
     /// <summary>
+    /// Keeps only values within the closed interval [<paramref name="min"/>, <paramref name="max"/>].
+    /// </summary>
+    /// <param name="min">The lower bound of the kept interval (inclusive).</param>
+    /// <param name="max">The upper bound of the kept interval (inclusive).</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
+    public void Mask(ulong min, ulong max)
+    {
+        if (min > max)
+        {
+            throw new ArgumentOutOfRangeException(nameof(min), min, ExceptionMessages.StartValueGreaterThenEndValue);
+        }
+
+        if (min > 0)
+        {
+            NativeMethods.roaring64_bitmap_remove_range_closed(Pointer, 0, min - 1);
+        }
+
+        if (!IsEmpty)
+        {
+            var maximum = Max;
+            if (maximum.HasValue && max < maximum.Value)
+            {
+                NativeMethods.roaring64_bitmap_remove_range_closed(Pointer, max + 1, maximum.Value);
+            }
+        }
+    }
+
+    /// <summary>
     /// Removes value from the bitmap using context from a previous bulk operation to optimize the addition process.
     /// </summary>
     /// <param name="context">A context that stores information between `*Bulk` method calls.</param>

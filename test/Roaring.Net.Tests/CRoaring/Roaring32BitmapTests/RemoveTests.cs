@@ -188,6 +188,48 @@ public class RemoveTests
         }
     }
 
+    public class Mask
+    {
+        [Fact]
+        public void Mask_Range_KeepsOnlyValuesWithinRange()
+        {
+            // Arrange
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetFromValues([1u, 3u, 5u, 7u, 8u, 9u]);
+
+            // Act
+            testObject.Bitmap.Mask(3, 8);
+
+            // Assert
+            Assert.Equal(new[] { 3u, 5u, 7u, 8u }, testObject.Bitmap.Values.ToArray());
+        }
+
+        [Fact]
+        public void Mask_ZeroRange_KeepsOnlyZeroValue()
+        {
+            // Arrange
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetFromValues([1u, 0u, 3u]);
+
+            // Act
+            testObject.Bitmap.Mask(0, 0);
+
+            // Assert
+            Assert.Equal(new[] { 0u }, testObject.Bitmap.Values.ToArray());
+        }
+
+        [Fact]
+        public void Mask_SingleValue_RetainsOnlyThatValue()
+        {
+            // Arrange
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetFromValues([1u, 2u, 3u]);
+
+            // Act
+            testObject.Bitmap.Mask(2, 2);
+
+            // Assert
+            Assert.Equal(new[] { 2u }, testObject.Bitmap.Values.ToArray());
+        }
+    }
+
     public class Clear
     {
         [Fact]

@@ -184,6 +184,48 @@ public class RemoveTests
         }
     }
 
+    public class Mask
+    {
+        [Fact]
+        public void Mask_Range_KeepsOnlyValuesWithinRange()
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetFromValues([1UL, 3UL, 5UL, 7UL, 8UL, 9UL]);
+
+            // Act
+            testObject.Bitmap.Mask(3, 8);
+
+            // Assert
+            Assert.Equal(new[] { 3UL, 5UL, 7UL, 8UL }, testObject.Bitmap.Values.ToArray());
+        }
+
+        [Fact]
+        public void Mask_ZeroRange_KeepsOnlyZeroValue()
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetFromValues([1UL, 0UL, 3UL]);
+
+            // Act
+            testObject.Bitmap.Mask(0, 0);
+
+            // Assert
+            Assert.Equal(new[] { 0UL }, testObject.Bitmap.Values.ToArray());
+        }
+
+        [Fact]
+        public void Mask_SingleValue_RetainsOnlyThatValue()
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetFromValues([1UL, 2UL, 3UL]);
+
+            // Act
+            testObject.Bitmap.Mask(2, 2);
+
+            // Assert
+            Assert.Equal(new[] { 2UL }, testObject.Bitmap.Values.ToArray());
+        }
+    }
+
     public class RemoveBulk
     {
         [Fact]

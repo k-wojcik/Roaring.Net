@@ -342,6 +342,36 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     }
 
     /// <summary>
+    /// Keeps only values within the closed interval [<paramref name="min"/>, <paramref name="max"/>].
+    /// </summary>
+    /// <param name="min">The lower bound of the kept interval (inclusive).</param>
+    /// <param name="max">The upper bound of the kept interval (inclusive).</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
+    public void Mask(uint min, uint max)
+    {
+        if (min > max)
+        {
+            throw new ArgumentOutOfRangeException(nameof(min), min, ExceptionMessages.StartValueGreaterThenEndValue);
+        }
+
+        if (min > 0)
+        {
+            NativeMethods.roaring_bitmap_remove_range_closed(Pointer, 0, min - 1);
+        }
+
+        if (IsEmpty)
+        {
+            return;
+        }
+
+        var maximum = Max;
+        if (max < maximum)
+        {
+            NativeMethods.roaring_bitmap_remove_range_closed(Pointer, max + 1, maximum.Value);
+        }
+    }
+
+    /// <summary>
     /// Removes all values from the bitmap.
     /// </summary>
     public void Clear() => NativeMethods.roaring_bitmap_clear(Pointer);
