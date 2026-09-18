@@ -181,6 +181,20 @@ public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoarin
     public ulong[] CountManyLessOrEqualTo(uint[] values) => _bitmap.CountManyLessOrEqualTo(values);
 
     /// <summary>
+    /// Counts number of values less than or equal to for each element of <paramref name="values"/>.
+    /// </summary>
+    /// <param name="values">An ascending sorted set of tested values.</param>
+    /// <returns>The number values that are less than or equal to the value from <paramref name="values"/> placed under the same index.</returns>
+    public ulong[] CountManyLessOrEqualTo(ReadOnlySpan<uint> values) => _bitmap.CountManyLessOrEqualTo(values);
+
+    /// <summary>
+    /// Counts number of values less than or equal to for each element of <paramref name="values"/>.
+    /// </summary>
+    /// <param name="values">An ascending sorted set of tested values.</param>
+    /// <returns>The number values that are less than or equal to the value from <paramref name="values"/> placed under the same index.</returns>
+    public ulong[] CountManyLessOrEqualTo(ReadOnlyMemory<uint> values) => _bitmap.CountManyLessOrEqualTo(values);
+
+    /// <summary>
     /// Counts number of values in the given range of values.
     /// </summary>
     /// <param name="start">Start of range (inclusive).</param>

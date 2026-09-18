@@ -91,6 +91,14 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
         return pointer;
     }
 
+    private static void ValidateRange(uint start, uint end)
+    {
+        if (start > end)
+        {
+            throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
+        }
+    }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="Roaring32Bitmap"/> class for the given range.
     /// </summary>
@@ -102,10 +110,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     public static Roaring32Bitmap FromRange(uint start, uint end, uint step = 1)
     {
-        if (start > end)
-        {
-            throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
-        }
+        ValidateRange(start, end);
 
         if (step == 0)
         {
@@ -193,6 +198,14 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
         }
     }
 
+    private static void ValidateValueRange(ReadOnlySpan<uint> values, int offset, int count)
+    {
+        if ((uint)offset > values.Length || (uint)count > (uint)(values.Length - offset))
+        {
+            throw new ArgumentOutOfRangeException(nameof(offset), offset, ExceptionMessages.OffsetWithCountGreaterThanNumberOfValues);
+        }
+    }
+
     private static IntPtr CreatePtrFromValues(uint[] values, nuint offset, nuint count)
     {
         ValidateValueRange(values, offset, count);
@@ -260,13 +273,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     public void AddMany(uint[] values) => AddMany(values, 0, (nuint)values.Length);
 
     /// <summary>
-    /// Adds values from the given span to the bitmap.
-    /// </summary>
-    /// <param name="values">A span containing the values to add.</param>
-    public void AddMany(Span<uint> values) => AddMany((ReadOnlySpan<uint>)values);
-
-    /// <summary>
-    /// Adds values from the given span to the bitmap.
+    /// Adds values from the given read-only span to the bitmap.
     /// </summary>
     /// <param name="values">A read-only span containing the values to add.</param>
     public void AddMany(ReadOnlySpan<uint> values)
@@ -283,13 +290,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     }
 
     /// <summary>
-    /// Adds values from the given memory to the bitmap.
-    /// </summary>
-    /// <param name="values">A memory region containing the values to add.</param>
-    public void AddMany(Memory<uint> values) => AddMany(values.Span);
-
-    /// <summary>
-    /// Adds values from the given memory to the bitmap.
+    /// Adds values from the given read-only memory to the bitmap.
     /// </summary>
     /// <param name="values">A read-only memory region containing the values to add.</param>
     public void AddMany(ReadOnlyMemory<uint> values) => AddMany(values.Span);
@@ -320,11 +321,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
     public void AddMany(ReadOnlySpan<uint> values, int offset, int count)
     {
-        if ((uint)offset > values.Length || (uint)count > (uint)(values.Length - offset))
-        {
-            throw new ArgumentOutOfRangeException(nameof(offset), offset, ExceptionMessages.OffsetWithCountGreaterThanNumberOfValues);
-        }
-
+        ValidateValueRange(values, offset, count);
         AddMany(values.Slice(offset, count));
     }
 
@@ -355,11 +352,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
     public void AddRange(uint start, uint end)
     {
-        if (start > end)
-        {
-            throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
-        }
-
+        ValidateRange(start, end);
         NativeMethods.roaring_bitmap_add_range_closed(Pointer, start, end);
     }
 
@@ -410,13 +403,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     public void RemoveMany(uint[] values) => RemoveMany(values, 0, (nuint)values.Length);
 
     /// <summary>
-    /// Removes the values contained in the given span from the bitmap.
-    /// </summary>
-    /// <param name="values">A span containing the values to remove.</param>
-    public void RemoveMany(Span<uint> values) => RemoveMany((ReadOnlySpan<uint>)values);
-
-    /// <summary>
-    /// Removes the values contained in the given span from the bitmap.
+    /// Removes the values contained in the given read-only span from the bitmap.
     /// </summary>
     /// <param name="values">A read-only span containing the values to remove.</param>
     public void RemoveMany(ReadOnlySpan<uint> values)
@@ -433,13 +420,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     }
 
     /// <summary>
-    /// Removes the values contained in the given memory from the bitmap.
-    /// </summary>
-    /// <param name="values">A memory region containing the values to remove.</param>
-    public void RemoveMany(Memory<uint> values) => RemoveMany(values.Span);
-
-    /// <summary>
-    /// Removes the values contained in the given memory from the bitmap.
+    /// Removes the values contained in the given read-only memory from the bitmap.
     /// </summary>
     /// <param name="values">A read-only memory region containing the values to remove.</param>
     public void RemoveMany(ReadOnlyMemory<uint> values) => RemoveMany(values.Span);
@@ -470,11 +451,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
     public void RemoveMany(ReadOnlySpan<uint> values, int offset, int count)
     {
-        if ((uint)offset > values.Length || (uint)count > (uint)(values.Length - offset))
-        {
-            throw new ArgumentOutOfRangeException(nameof(offset), offset, ExceptionMessages.OffsetWithCountGreaterThanNumberOfValues);
-        }
-
+        ValidateValueRange(values, offset, count);
         RemoveMany(values.Slice(offset, count));
     }
 
@@ -505,11 +482,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
     public void RemoveRange(uint start, uint end)
     {
-        if (start > end)
-        {
-            throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
-        }
-
+        ValidateRange(start, end);
         NativeMethods.roaring_bitmap_remove_range_closed(Pointer, start, end);
     }
 
@@ -564,11 +537,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
     public bool ContainsRange(uint start, uint end)
     {
-        if (start > end)
-        {
-            throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
-        }
-
+        ValidateRange(start, end);
         return NativeMethods.roaring_bitmap_contains_range_closed(Pointer, start, end);
     }
 
@@ -725,7 +694,14 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// </summary>
     /// <param name="values">An ascending sorted set of tested values.</param>
     /// <returns>The number of values that are less than or equal to the value from <paramref name="values"/> placed under the same index.</returns>
-    public ulong[] CountManyLessOrEqualTo(uint[] values)
+    public ulong[] CountManyLessOrEqualTo(uint[] values) => CountManyLessOrEqualTo((ReadOnlySpan<uint>)values);
+
+    /// <summary>
+    /// Counts number of values less than or equal to for each element of <paramref name="values"/>.
+    /// </summary>
+    /// <param name="values">A read-only span with ascending sorted values to test.</param>
+    /// <returns>The number of values that are less than or equal to the value from <paramref name="values"/> placed under the same index.</returns>
+    public ulong[] CountManyLessOrEqualTo(ReadOnlySpan<uint> values)
     {
         var items = new ulong[values.Length];
         fixed (uint* valuesPtr = values)
@@ -736,6 +712,13 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     }
 
     /// <summary>
+    /// Counts number of values less than or equal to for each element of <paramref name="values"/>.
+    /// </summary>
+    /// <param name="values">A read-only memory region with ascending sorted values to test.</param>
+    /// <returns>The number of values that are less than or equal to the value from <paramref name="values"/> placed under the same index.</returns>
+    public ulong[] CountManyLessOrEqualTo(ReadOnlyMemory<uint> values) => CountManyLessOrEqualTo(values.Span);
+
+    /// <summary>
     /// Counts number of values in the given range of values.
     /// </summary>
     /// <param name="start">Start of range (inclusive).</param>
@@ -744,11 +727,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
     public ulong CountRange(uint start, uint end)
     {
-        if (start > end)
-        {
-            throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
-        }
-
+        ValidateRange(start, end);
         return NativeMethods.roaring_bitmap_range_cardinality_closed(Pointer, start, end);
     }
 
@@ -774,11 +753,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <remarks>Values outside the range are left unchanged.</remarks>
     public Roaring32Bitmap NotRange(uint start, uint end)
     {
-        if (start > end)
-        {
-            throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
-        }
-
+        ValidateRange(start, end);
         return new(NativeMethods.roaring_bitmap_flip_closed(Pointer, start, end));
     }
 
@@ -791,11 +766,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <remarks>Values outside the range are left unchanged.</remarks>
     public void INotRange(uint start, uint end)
     {
-        if (start > end)
-        {
-            throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
-        }
-
+        ValidateRange(start, end);
         NativeMethods.roaring_bitmap_flip_inplace_closed(Pointer, start, end);
     }
 

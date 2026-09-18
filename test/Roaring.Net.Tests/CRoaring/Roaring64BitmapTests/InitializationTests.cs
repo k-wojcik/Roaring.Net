@@ -62,6 +62,20 @@ public class InitializationTests
 
             Assert.Empty(actual);
         }
+
+        [Fact]
+        public void Ctor_FromReadOnlyMemory_InputHasValues_BitmapContainsExpectedValues()
+        {
+            // Arrange
+            var expected = new[] { 1UL, 2UL, 3UL, ulong.MaxValue };
+            ReadOnlyMemory<ulong> values = expected;
+
+            // Act
+            using var uut = new Roaring64Bitmap(values);
+
+            // Assert
+            Assert.Equal(expected, uut.Values.ToArray());
+        }
     }
 
     public class FromRange
@@ -135,6 +149,20 @@ public class InitializationTests
             IEnumerable<ulong> actual = uut.Values;
 
             Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void FromValues_ReadOnlyMemory_InputHasValues_BitmapContainsExpectedValues()
+        {
+            // Arrange
+            var expected = new[] { 1UL, 2UL, 3UL, ulong.MaxValue };
+            ReadOnlyMemory<ulong> values = expected;
+
+            // Act
+            using var uut = Roaring64Bitmap.FromValues(values);
+
+            // Assert
+            Assert.Equal(expected, uut.Values.ToArray());
         }
 
         [Fact]

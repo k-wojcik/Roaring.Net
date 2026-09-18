@@ -84,6 +84,36 @@ public class CountTests
             // Assert
             Assert.Equal(expected, actual);
         }
+
+        [Theory]
+        [InlineTestObject(new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { 1, 2, 3, 4, 5 }, new ulong[] { 2, 3, 4, 5, 5 })]
+        public void CountManyLessOrEqualTo_Span_ReturnsExpectedNumberOfValues(ulong[] values, ulong[] testedValues, ulong[] expected, IRoaring64BitmapTestObjectFactory factory)
+        {
+            // Arrange
+            using IRoaring64BitmapTestObject testObject = factory.GetFromValues(values);
+            Span<ulong> span = testedValues;
+
+            // Act
+            var actual = testObject.ReadOnlyBitmap.CountManyLessOrEqualTo(span);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineTestObject(new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { 1, 2, 3, 4, 5 }, new ulong[] { 2, 3, 4, 5, 5 })]
+        public void CountManyLessOrEqualTo_Memory_ReturnsExpectedNumberOfValues(ulong[] values, ulong[] testedValues, ulong[] expected, IRoaring64BitmapTestObjectFactory factory)
+        {
+            // Arrange
+            using IRoaring64BitmapTestObject testObject = factory.GetFromValues(values);
+            Memory<ulong> memory = testedValues;
+
+            // Act
+            var actual = testObject.ReadOnlyBitmap.CountManyLessOrEqualTo(memory);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
     }
 
     public class CountRange
