@@ -59,6 +59,36 @@ public class AddTests
     public class AddMany
     {
         [Fact]
+        public void AddMany_ReadOnlySpan_EmptyBitmap_AddsValuesToBitmap()
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetEmpty();
+            ReadOnlySpan<ulong> values = [10UL, 11UL];
+
+            // Act
+            testObject.Bitmap.AddMany(values);
+
+            // Assert
+            Assert.Equal(new[] { 10UL, 11UL }, testObject.Bitmap.Values.ToArray());
+            Assert.Equal(2U, testObject.Bitmap.Count);
+        }
+
+        [Fact]
+        public void AddMany_ReadOnlyMemory_EmptyBitmap_AddsValuesToBitmap()
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetEmpty();
+            ReadOnlyMemory<ulong> values = new ulong[] { 10UL, 11UL };
+
+            // Act
+            testObject.Bitmap.AddMany(values);
+
+            // Assert
+            Assert.Equal(new[] { 10UL, 11UL }, testObject.Bitmap.Values.ToArray());
+            Assert.Equal(2U, testObject.Bitmap.Count);
+        }
+
+        [Fact]
         public void AddMany_EmptyBitmap_AddsValuesToBitmap()
         {
             // Arrange

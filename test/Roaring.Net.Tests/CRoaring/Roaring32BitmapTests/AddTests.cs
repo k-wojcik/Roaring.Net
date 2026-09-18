@@ -59,6 +59,36 @@ public class AddTests
     public class AddMany
     {
         [Fact]
+        public void AddMany_ReadOnlySpan_EmptyBitmap_AddsValuesToBitmap()
+        {
+            // Arrange
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+            ReadOnlySpan<uint> values = [10U, 11U];
+
+            // Act
+            testObject.Bitmap.AddMany(values);
+
+            // Assert
+            Assert.Equal(new[] { 10U, 11U }, testObject.Bitmap.Values.ToArray());
+            Assert.Equal(2U, testObject.Bitmap.Count);
+        }
+
+        [Fact]
+        public void AddMany_ReadOnlyMemory_EmptyBitmap_AddsValuesToBitmap()
+        {
+            // Arrange
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+            ReadOnlyMemory<uint> values = new uint[] { 10U, 11U };
+
+            // Act
+            testObject.Bitmap.AddMany(values);
+
+            // Assert
+            Assert.Equal(new[] { 10U, 11U }, testObject.Bitmap.Values.ToArray());
+            Assert.Equal(2U, testObject.Bitmap.Count);
+        }
+
+        [Fact]
         public void AddMany_EmptyBitmap_AddsValuesToBitmap()
         {
             // Arrange

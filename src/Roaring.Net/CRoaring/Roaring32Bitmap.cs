@@ -63,6 +63,22 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     public Roaring32Bitmap(uint[] values) => Pointer = CheckBitmapPointer(CreatePtrFromValues(values, 0, (uint)values.Length));
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Roaring32Bitmap"/> class with the given values.
+    /// </summary>
+    /// <param name="values">Values that will be added to the bitmap directly when it is created.</param>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    public Roaring32Bitmap(ReadOnlySpan<uint> values) => Pointer = CheckBitmapPointer(CreatePtrFromValues(values));
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Roaring32Bitmap"/> class with the given values.
+    /// </summary>
+    /// <param name="values">Values that will be added to the bitmap directly when it is created.</param>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    public Roaring32Bitmap(ReadOnlyMemory<uint> values) : this(values.Span)
+    {
+    }
+
     internal Roaring32Bitmap(IntPtr pointer) => Pointer = CheckBitmapPointer(pointer);
 
     private static IntPtr CheckBitmapPointer(IntPtr pointer)
@@ -129,6 +145,22 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     public static Roaring32Bitmap FromValues(uint[] values) => FromValues(values, 0U, (nuint)values.Length);
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="Roaring32Bitmap"/> class with the given values.
+    /// </summary>
+    /// <param name="values">Values that will be added to the bitmap directly when it is created.</param>
+    /// <returns>Instance of the <see cref="Roaring32Bitmap"/> class with the given values.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    public static Roaring32Bitmap FromValues(ReadOnlySpan<uint> values) => new(CreatePtrFromValues(values));
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Roaring32Bitmap"/> class with the given values.
+    /// </summary>
+    /// <param name="values">Values that will be added to the bitmap directly when it is created.</param>
+    /// <returns>Instance of the <see cref="Roaring32Bitmap"/> class with the given values.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    public static Roaring32Bitmap FromValues(ReadOnlyMemory<uint> values) => FromValues(values.Span);
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="Roaring32Bitmap"/> class with the given values from subarray.
     /// </summary>
     /// <param name="values">An array containing the values to add.</param>
@@ -139,6 +171,19 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     public static Roaring32Bitmap FromValues(uint[] values, nuint offset, nuint count)
         => new(CreatePtrFromValues(values, offset, count));
+
+    private static IntPtr CreatePtrFromValues(ReadOnlySpan<uint> values)
+    {
+        if (values.IsEmpty)
+        {
+            return NativeMethods.roaring_bitmap_of_ptr(0, null);
+        }
+
+        fixed (uint* valuePtr = values)
+        {
+            return NativeMethods.roaring_bitmap_of_ptr((nuint)values.Length, valuePtr);
+        }
+    }
 
     private static IntPtr CreatePtrFromValues(uint[] values, nuint offset, nuint count)
     {
@@ -210,6 +255,41 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     public void AddMany(uint[] values) => AddMany(values, 0, (nuint)values.Length);
 
     /// <summary>
+    /// Adds values from the given span to the bitmap.
+    /// </summary>
+    /// <param name="values">A span containing the values to add.</param>
+    public void AddMany(Span<uint> values) => AddMany((ReadOnlySpan<uint>)values);
+
+    /// <summary>
+    /// Adds values from the given span to the bitmap.
+    /// </summary>
+    /// <param name="values">A read-only span containing the values to add.</param>
+    public void AddMany(ReadOnlySpan<uint> values)
+    {
+        if (values.IsEmpty)
+        {
+            return;
+        }
+
+        fixed (uint* valuePtr = values)
+        {
+            NativeMethods.roaring_bitmap_add_many(Pointer, (nuint)values.Length, valuePtr);
+        }
+    }
+
+    /// <summary>
+    /// Adds values from the given memory to the bitmap.
+    /// </summary>
+    /// <param name="values">A memory region containing the values to add.</param>
+    public void AddMany(Memory<uint> values) => AddMany(values.Span);
+
+    /// <summary>
+    /// Adds values from the given memory to the bitmap.
+    /// </summary>
+    /// <param name="values">A read-only memory region containing the values to add.</param>
+    public void AddMany(ReadOnlyMemory<uint> values) => AddMany(values.Span);
+
+    /// <summary>
     /// Adds values from the given subarray to the bitmap.
     /// </summary>
     /// <param name="values">An array containing the values to add.</param>
@@ -227,6 +307,31 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
         {
             NativeMethods.roaring_bitmap_add_many(Pointer, count, valuePtr + offset);
         }
+    }
+
+    /// <summary>
+    /// Adds values from the given span slice to the bitmap.
+    /// </summary>
+    /// <param name="values">A span containing the values to add.</param>
+    /// <param name="offset">The position in the span from which to start adding data.</param>
+    /// <param name="count">The number of values to add from the offset position.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
+    public void AddMany(ReadOnlySpan<uint> values, int offset, int count)
+    {
+        var slice = values.Slice(offset, count);
+        AddMany(slice);
+    }
+
+    /// <summary>
+    /// Adds values from the given memory slice to the bitmap.
+    /// </summary>
+    /// <param name="values">A memory region containing the values to add.</param>
+    /// <param name="offset">The position in the memory region from which to start adding data.</param>
+    /// <param name="count">The number of values to add from the offset position.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
+    public void AddMany(ReadOnlyMemory<uint> values, int offset, int count)
+    {
+        AddMany(values.Span.Slice(offset, count));
     }
 
     /// <summary>
@@ -299,6 +404,41 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     public void RemoveMany(uint[] values) => RemoveMany(values, 0, (nuint)values.Length);
 
     /// <summary>
+    /// Removes the values contained in the given span from the bitmap.
+    /// </summary>
+    /// <param name="values">A span containing the values to remove.</param>
+    public void RemoveMany(Span<uint> values) => RemoveMany((ReadOnlySpan<uint>)values);
+
+    /// <summary>
+    /// Removes the values contained in the given span from the bitmap.
+    /// </summary>
+    /// <param name="values">A read-only span containing the values to remove.</param>
+    public void RemoveMany(ReadOnlySpan<uint> values)
+    {
+        if (values.IsEmpty)
+        {
+            return;
+        }
+
+        fixed (uint* valuePtr = values)
+        {
+            NativeMethods.roaring_bitmap_remove_many(Pointer, (nuint)values.Length, valuePtr);
+        }
+    }
+
+    /// <summary>
+    /// Removes the values contained in the given memory from the bitmap.
+    /// </summary>
+    /// <param name="values">A memory region containing the values to remove.</param>
+    public void RemoveMany(Memory<uint> values) => RemoveMany(values.Span);
+
+    /// <summary>
+    /// Removes the values contained in the given memory from the bitmap.
+    /// </summary>
+    /// <param name="values">A read-only memory region containing the values to remove.</param>
+    public void RemoveMany(ReadOnlyMemory<uint> values) => RemoveMany(values.Span);
+
+    /// <summary>
     /// Removes the values contained in the given subarray from the bitmap.
     /// </summary>
     /// <param name="values">An array containing the values to remove.</param>
@@ -316,6 +456,31 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
         {
             NativeMethods.roaring_bitmap_remove_many(Pointer, count, valuePtr + offset);
         }
+    }
+
+    /// <summary>
+    /// Removes the values contained in the given span slice from the bitmap.
+    /// </summary>
+    /// <param name="values">A span containing the values to remove.</param>
+    /// <param name="offset">The position in the span from which to start removing data.</param>
+    /// <param name="count">The number of values to remove from the offset position.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
+    public void RemoveMany(ReadOnlySpan<uint> values, int offset, int count)
+    {
+        var slice = values.Slice(offset, count);
+        RemoveMany(slice);
+    }
+
+    /// <summary>
+    /// Removes the values contained in the given memory slice from the bitmap.
+    /// </summary>
+    /// <param name="values">A memory region containing the values to remove.</param>
+    /// <param name="offset">The position in the memory region from which to start removing data.</param>
+    /// <param name="count">The number of values to remove from the offset position.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
+    public void RemoveMany(ReadOnlyMemory<uint> values, int offset, int count)
+    {
+        RemoveMany(values.Span.Slice(offset, count));
     }
 
     /// <summary>

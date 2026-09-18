@@ -39,8 +39,33 @@ public class RemoveTests
 
     public class RemoveMany
     {
+        [Fact]
+        public void RemoveMany_ReadOnlySpan_BitmapWithValues_RemovesValuesFromBitmap()
+        {
+            // Arrange
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetFromValues(new uint[] { 1, 2, 3, 4, 5 });
+            ReadOnlySpan<uint> values = [1U, 3U, 5U];
 
+            // Act
+            testObject.Bitmap.RemoveMany(values);
 
+            // Assert
+            Assert.Equal(new[] { 2U, 4U }, testObject.Bitmap.Values.ToArray());
+        }
+
+        [Fact]
+        public void RemoveMany_ReadOnlyMemory_BitmapWithValues_RemovesValuesFromBitmap()
+        {
+            // Arrange
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetFromValues(new uint[] { 1, 2, 3, 4, 5 });
+            ReadOnlyMemory<uint> values = new uint[] { 1U, 3U, 5U };
+
+            // Act
+            testObject.Bitmap.RemoveMany(values);
+
+            // Assert
+            Assert.Equal(new[] { 2U, 4U }, testObject.Bitmap.Values.ToArray());
+        }
 
         [Fact]
         public void RemoveMany_BitmapIsEmpty_DoesNotRemoveAnyValue()

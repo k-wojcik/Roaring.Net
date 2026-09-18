@@ -49,6 +49,22 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     public Roaring64Bitmap(ulong[] values) => Pointer = CheckBitmapPointer(CreatePtrFromValues(values, 0, (uint)values.Length));
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Roaring64Bitmap"/> class with the given values.
+    /// </summary>
+    /// <param name="values">Values that will be added to the bitmap directly when it is created.</param>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    public Roaring64Bitmap(ReadOnlySpan<ulong> values) => Pointer = CheckBitmapPointer(CreatePtrFromValues(values));
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Roaring64Bitmap"/> class with the given values.
+    /// </summary>
+    /// <param name="values">Values that will be added to the bitmap directly when it is created.</param>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    public Roaring64Bitmap(ReadOnlyMemory<ulong> values) : this(values.Span)
+    {
+    }
+
     internal Roaring64Bitmap(IntPtr pointer) => Pointer = CheckBitmapPointer(pointer);
 
     private static IntPtr CheckBitmapPointer(IntPtr pointer)
@@ -115,6 +131,22 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     public static Roaring64Bitmap FromValues(ulong[] values) => FromValues(values, 0U, (nuint)values.Length);
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="Roaring64Bitmap"/> class with the given values.
+    /// </summary>
+    /// <param name="values">Values that will be added to the bitmap directly when it is created.</param>
+    /// <returns>Instance of the <see cref="Roaring64Bitmap"/> class with the given values.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    public static Roaring64Bitmap FromValues(ReadOnlySpan<ulong> values) => new(CreatePtrFromValues(values));
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Roaring64Bitmap"/> class with the given values.
+    /// </summary>
+    /// <param name="values">Values that will be added to the bitmap directly when it is created.</param>
+    /// <returns>Instance of the <see cref="Roaring64Bitmap"/> class with the given values.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    public static Roaring64Bitmap FromValues(ReadOnlyMemory<ulong> values) => FromValues(values.Span);
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="Roaring64Bitmap"/> class with the given values from subarray.
     /// </summary>
     /// <param name="values">An array containing the values to add.</param>
@@ -125,6 +157,19 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     public static Roaring64Bitmap FromValues(ulong[] values, nuint offset, nuint count)
         => new(CreatePtrFromValues(values, offset, count));
+
+    private static IntPtr CreatePtrFromValues(ReadOnlySpan<ulong> values)
+    {
+        if (values.IsEmpty)
+        {
+            return NativeMethods.roaring64_bitmap_of_ptr(0, null);
+        }
+
+        fixed (ulong* valuePtr = values)
+        {
+            return NativeMethods.roaring64_bitmap_of_ptr((nuint)values.Length, valuePtr);
+        }
+    }
 
     private static IntPtr CreatePtrFromValues(ulong[] values, nuint offset, nuint count)
     {
@@ -214,6 +259,41 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     public void AddMany(ulong[] values) => AddMany(values, 0, (nuint)values.Length);
 
     /// <summary>
+    /// Adds values from the given span to the bitmap.
+    /// </summary>
+    /// <param name="values">A span containing the values to add.</param>
+    public void AddMany(Span<ulong> values) => AddMany((ReadOnlySpan<ulong>)values);
+
+    /// <summary>
+    /// Adds values from the given span to the bitmap.
+    /// </summary>
+    /// <param name="values">A read-only span containing the values to add.</param>
+    public void AddMany(ReadOnlySpan<ulong> values)
+    {
+        if (values.IsEmpty)
+        {
+            return;
+        }
+
+        fixed (ulong* valuePtr = values)
+        {
+            NativeMethods.roaring64_bitmap_add_many(Pointer, (nuint)values.Length, valuePtr);
+        }
+    }
+
+    /// <summary>
+    /// Adds values from the given memory to the bitmap.
+    /// </summary>
+    /// <param name="values">A memory region containing the values to add.</param>
+    public void AddMany(Memory<ulong> values) => AddMany(values.Span);
+
+    /// <summary>
+    /// Adds values from the given memory to the bitmap.
+    /// </summary>
+    /// <param name="values">A read-only memory region containing the values to add.</param>
+    public void AddMany(ReadOnlyMemory<ulong> values) => AddMany(values.Span);
+
+    /// <summary>
     /// Adds values from the given subarray to the bitmap.
     /// </summary>
     /// <param name="values">An array containing the values to add.</param>
@@ -231,6 +311,31 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
         {
             NativeMethods.roaring64_bitmap_add_many(Pointer, count, valuePtr + offset);
         }
+    }
+
+    /// <summary>
+    /// Adds values from the given span slice to the bitmap.
+    /// </summary>
+    /// <param name="values">A span containing the values to add.</param>
+    /// <param name="offset">The position in the span from which to start adding data.</param>
+    /// <param name="count">The number of values to add from the offset position.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
+    public void AddMany(ReadOnlySpan<ulong> values, int offset, int count)
+    {
+        var slice = values.Slice(offset, count);
+        AddMany(slice);
+    }
+
+    /// <summary>
+    /// Adds values from the given memory slice to the bitmap.
+    /// </summary>
+    /// <param name="values">A memory region containing the values to add.</param>
+    /// <param name="offset">The position in the memory region from which to start adding data.</param>
+    /// <param name="count">The number of values to add from the offset position.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
+    public void AddMany(ReadOnlyMemory<ulong> values, int offset, int count)
+    {
+        AddMany(values.Span.Slice(offset, count));
     }
 
     /// <summary>
@@ -313,6 +418,41 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     public void RemoveMany(ulong[] values) => RemoveMany(values, 0, (nuint)values.Length);
 
     /// <summary>
+    /// Removes the values contained in the given span from the bitmap.
+    /// </summary>
+    /// <param name="values">A span containing the values to remove.</param>
+    public void RemoveMany(Span<ulong> values) => RemoveMany((ReadOnlySpan<ulong>)values);
+
+    /// <summary>
+    /// Removes the values contained in the given span from the bitmap.
+    /// </summary>
+    /// <param name="values">A read-only span containing the values to remove.</param>
+    public void RemoveMany(ReadOnlySpan<ulong> values)
+    {
+        if (values.IsEmpty)
+        {
+            return;
+        }
+
+        fixed (ulong* valuePtr = values)
+        {
+            NativeMethods.roaring64_bitmap_remove_many(Pointer, (nuint)values.Length, valuePtr);
+        }
+    }
+
+    /// <summary>
+    /// Removes the values contained in the given memory from the bitmap.
+    /// </summary>
+    /// <param name="values">A memory region containing the values to remove.</param>
+    public void RemoveMany(Memory<ulong> values) => RemoveMany(values.Span);
+
+    /// <summary>
+    /// Removes the values contained in the given memory from the bitmap.
+    /// </summary>
+    /// <param name="values">A read-only memory region containing the values to remove.</param>
+    public void RemoveMany(ReadOnlyMemory<ulong> values) => RemoveMany(values.Span);
+
+    /// <summary>
     /// Removes the values contained in the given subarray from the bitmap.
     /// </summary>
     /// <param name="values">An array containing the values to remove.</param>
@@ -330,6 +470,31 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
         {
             NativeMethods.roaring64_bitmap_remove_many(Pointer, count, valuePtr + offset);
         }
+    }
+
+    /// <summary>
+    /// Removes the values contained in the given span slice from the bitmap.
+    /// </summary>
+    /// <param name="values">A span containing the values to remove.</param>
+    /// <param name="offset">The position in the span from which to start removing data.</param>
+    /// <param name="count">The number of values to remove from the offset position.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
+    public void RemoveMany(ReadOnlySpan<ulong> values, int offset, int count)
+    {
+        var slice = values.Slice(offset, count);
+        RemoveMany(slice);
+    }
+
+    /// <summary>
+    /// Removes the values contained in the given memory slice from the bitmap.
+    /// </summary>
+    /// <param name="values">A memory region containing the values to remove.</param>
+    /// <param name="offset">The position in the memory region from which to start removing data.</param>
+    /// <param name="count">The number of values to remove from the offset position.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
+    public void RemoveMany(ReadOnlyMemory<ulong> values, int offset, int count)
+    {
+        RemoveMany(values.Span.Slice(offset, count));
     }
 
     /// <summary>
