@@ -9,4 +9,7 @@
             <_Parameter1>$(AssemblyName).Tests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <ThreadWarningsAsErrors>true</ThreadWarningsAsErrors>
+    </PropertyGroup>
 </Project>

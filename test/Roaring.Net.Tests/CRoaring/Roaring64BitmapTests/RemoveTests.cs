@@ -42,6 +42,20 @@ public class RemoveTests
     public class RemoveMany
     {
         [Fact]
+        public void RemoveMany_Span_BitmapWithValues_RemovesValuesFromBitmap()
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetFromValues(new ulong[] { 1, 2, 3, 4, 5 });
+            Span<ulong> values = [1UL, 3UL, 5UL];
+
+            // Act
+            testObject.Bitmap.RemoveMany(values);
+
+            // Assert
+            Assert.Equal(new[] { 2UL, 4UL }, testObject.Bitmap.Values.ToArray());
+        }
+
+        [Fact]
         public void RemoveMany_ReadOnlySpan_BitmapWithValues_RemovesValuesFromBitmap()
         {
             // Arrange
@@ -67,6 +81,31 @@ public class RemoveTests
 
             // Assert
             Assert.Equal(new[] { 2UL, 4UL }, testObject.Bitmap.Values.ToArray());
+        }
+
+        [Fact]
+        public void RemoveMany_Memory_BitmapWithValues_RemovesValuesFromBitmap()
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetFromValues(new ulong[] { 1, 2, 3, 4, 5 });
+            Memory<ulong> values = new ulong[] { 1UL, 3UL, 5UL };
+
+            // Act
+            testObject.Bitmap.RemoveMany(values);
+
+            // Assert
+            Assert.Equal(new[] { 2UL, 4UL }, testObject.Bitmap.Values.ToArray());
+        }
+
+        [Fact]
+        public void RemoveMany_MemorySlice_BitmapWithValues_ThrowsArgumentOutOfRangeException()
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetFromValues(new ulong[] { 1, 2, 3, 4, 5 });
+            var values = new ulong[] { 1UL, 2UL, 3UL, 4UL };
+
+            // Act && Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.RemoveMany(values.AsMemory(), 3, 2));
         }
 
         [Fact]

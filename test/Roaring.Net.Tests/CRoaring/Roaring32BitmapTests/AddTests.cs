@@ -59,6 +59,21 @@ public class AddTests
     public class AddMany
     {
         [Fact]
+        public void AddMany_Span_EmptyBitmap_AddsValuesToBitmap()
+        {
+            // Arrange
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+            Span<uint> values = [10U, 11U];
+
+            // Act
+            testObject.Bitmap.AddMany(values);
+
+            // Assert
+            Assert.Equal(new[] { 10U, 11U }, testObject.Bitmap.Values.ToArray());
+            Assert.Equal(2U, testObject.Bitmap.Count);
+        }
+
+        [Fact]
         public void AddMany_ReadOnlySpan_EmptyBitmap_AddsValuesToBitmap()
         {
             // Arrange
@@ -86,6 +101,32 @@ public class AddTests
             // Assert
             Assert.Equal(new[] { 10U, 11U }, testObject.Bitmap.Values.ToArray());
             Assert.Equal(2U, testObject.Bitmap.Count);
+        }
+
+        [Fact]
+        public void AddMany_Memory_EmptyBitmap_AddsValuesToBitmap()
+        {
+            // Arrange
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+            Memory<uint> values = new uint[] { 10U, 11U };
+
+            // Act
+            testObject.Bitmap.AddMany(values);
+
+            // Assert
+            Assert.Equal(new[] { 10U, 11U }, testObject.Bitmap.Values.ToArray());
+            Assert.Equal(2U, testObject.Bitmap.Count);
+        }
+
+        [Fact]
+        public void AddMany_MemorySlice_EmptyBitmap_ThrowsArgumentOutOfRangeException()
+        {
+            // Arrange
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+            var values = new uint[] { 1U, 2U, 3U, 4U };
+
+            // Act && Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.AddMany(values.AsMemory(), 3, 2));
         }
 
         [Fact]

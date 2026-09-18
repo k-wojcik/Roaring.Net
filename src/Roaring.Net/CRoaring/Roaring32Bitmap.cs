@@ -185,12 +185,17 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
         }
     }
 
-    private static IntPtr CreatePtrFromValues(uint[] values, nuint offset, nuint count)
+    private static void ValidateValueRange(uint[] values, nuint offset, nuint count)
     {
         if ((nuint)values.Length < offset + count)
         {
             throw new ArgumentOutOfRangeException(nameof(offset), offset, ExceptionMessages.OffsetWithCountGreaterThanNumberOfValues);
         }
+    }
+
+    private static IntPtr CreatePtrFromValues(uint[] values, nuint offset, nuint count)
+    {
+        ValidateValueRange(values, offset, count);
 
         fixed (uint* valuePtr = values)
         {
@@ -298,10 +303,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
     public void AddMany(uint[] values, nuint offset, nuint count)
     {
-        if ((nuint)values.Length < offset + count)
-        {
-            throw new ArgumentOutOfRangeException(nameof(offset), offset, ExceptionMessages.OffsetWithCountGreaterThanNumberOfValues);
-        }
+        ValidateValueRange(values, offset, count);
 
         fixed (uint* valuePtr = values)
         {
@@ -318,8 +320,12 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
     public void AddMany(ReadOnlySpan<uint> values, int offset, int count)
     {
-        var slice = values.Slice(offset, count);
-        AddMany(slice);
+        if ((uint)offset > values.Length || (uint)count > (uint)(values.Length - offset))
+        {
+            throw new ArgumentOutOfRangeException(nameof(offset), offset, ExceptionMessages.OffsetWithCountGreaterThanNumberOfValues);
+        }
+
+        AddMany(values.Slice(offset, count));
     }
 
     /// <summary>
@@ -331,7 +337,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
     public void AddMany(ReadOnlyMemory<uint> values, int offset, int count)
     {
-        AddMany(values.Span.Slice(offset, count));
+        AddMany(values.Span, offset, count);
     }
 
     /// <summary>
@@ -447,10 +453,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
     public void RemoveMany(uint[] values, nuint offset, nuint count)
     {
-        if ((nuint)values.Length < offset + count)
-        {
-            throw new ArgumentOutOfRangeException(nameof(offset), offset, ExceptionMessages.OffsetWithCountGreaterThanNumberOfValues);
-        }
+        ValidateValueRange(values, offset, count);
 
         fixed (uint* valuePtr = values)
         {
@@ -467,8 +470,12 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
     public void RemoveMany(ReadOnlySpan<uint> values, int offset, int count)
     {
-        var slice = values.Slice(offset, count);
-        RemoveMany(slice);
+        if ((uint)offset > values.Length || (uint)count > (uint)(values.Length - offset))
+        {
+            throw new ArgumentOutOfRangeException(nameof(offset), offset, ExceptionMessages.OffsetWithCountGreaterThanNumberOfValues);
+        }
+
+        RemoveMany(values.Slice(offset, count));
     }
 
     /// <summary>
@@ -480,7 +487,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
     public void RemoveMany(ReadOnlyMemory<uint> values, int offset, int count)
     {
-        RemoveMany(values.Span.Slice(offset, count));
+        RemoveMany(values.Span, offset, count);
     }
 
     /// <summary>
