@@ -1323,10 +1323,13 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <param name="buffer">An array that contains a bitmap in a serialized form.</param>
     /// <param name="format">The serialization format from which we deserialize the bitmap.</param>
     /// <returns><see cref="Roaring32Bitmap"/> deserialized from the provided array.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="buffer"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     public static Roaring32Bitmap Deserialize(byte[] buffer, SerializationFormat format = SerializationFormat.Normal)
     {
+        ArgumentNullException.ThrowIfNull(buffer);
+
         var ptr = format switch
         {
             SerializationFormat.Normal => NativeMethods.roaring_bitmap_deserialize_safe(buffer, (nuint)buffer.Length),
@@ -1348,6 +1351,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <param name="buffer">An array that contains a bitmap in a serialized form.</param>
     /// <param name="format">The serialization format from which we deserialize the bitmap.</param>
     /// <returns><see cref="Roaring32Bitmap"/> deserialized from the provided array.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="buffer"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     /// <remarks>
@@ -1355,6 +1359,8 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// </remarks>
     public static Roaring32Bitmap DeserializeUnsafe(byte[] buffer, SerializationFormat format = SerializationFormat.Normal)
     {
+        ArgumentNullException.ThrowIfNull(buffer);
+
         var ptr = format switch
         {
             SerializationFormat.Normal => NativeMethods.roaring_bitmap_deserialize(buffer),
@@ -1377,9 +1383,12 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <param name="expectedSize">The expected number of bytes after which the check will be aborted.</param>
     /// <param name="format">The serialization format for which we check the number of bytes.</param>
     /// <returns><c>0</c> if the bitmap is invalid; otherwise, the number of bytes required to deserialize the bitmap.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="buffer"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
     public static nuint GetSerializedSize(byte[] buffer, nuint expectedSize, SerializationFormat format = SerializationFormat.Portable)
     {
+        ArgumentNullException.ThrowIfNull(buffer);
+
         var size = format switch
         {
             SerializationFormat.Portable => NativeMethods.roaring_bitmap_portable_deserialize_size(buffer, expectedSize),

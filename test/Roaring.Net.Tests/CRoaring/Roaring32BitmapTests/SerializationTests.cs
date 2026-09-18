@@ -231,6 +231,13 @@ public class SerializationTests
     public class Deserialize
     {
         [Fact]
+        public void Deserialize_NullBuffer_ThrowsArgumentNullException()
+        {
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => Roaring32Bitmap.Deserialize(null!));
+        }
+
+        [Fact]
         public void Deserialize_NotSupportedSerializationFormat_ThrowsArgumentOutOfRangeException()
         {
             // Act && Assert
@@ -250,6 +257,13 @@ public class SerializationTests
 
     public class DeserializeUnsafe
     {
+        [Fact]
+        public void DeserializeUnsafe_NullBuffer_ThrowsArgumentNullException()
+        {
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => Roaring32Bitmap.DeserializeUnsafe(null!));
+        }
+
         [Fact]
         public void DeserializeUnsafe_NotSupportedSerializationFormat_ThrowsArgumentOutOfRangeException()
         {
@@ -346,6 +360,13 @@ public class SerializationTests
 
     public class GetSerializedSize
     {
+        [Fact]
+        public void GetSerializedSize_NullBuffer_ThrowsArgumentNullException()
+        {
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => Roaring32Bitmap.GetSerializedSize(null!, 10));
+        }
+
         [Theory]
         [InlineData(SerializationFormat.Normal)]
         [InlineData((SerializationFormat)int.MaxValue)]

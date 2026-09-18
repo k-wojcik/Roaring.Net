@@ -79,12 +79,18 @@ public sealed unsafe class Roaring64BitmapMemory : IDisposable
     /// <param name="buffer">A byte array containing the data to write.</param>
     /// <param name="offset">The position in the buffer from which to start reading data.</param>
     /// <param name="count">The number of bytes to write from the offset position.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="buffer"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
     public void Write(byte[] buffer, int offset, int count)
     {
         CheckDisposed();
+        ArgumentNullException.ThrowIfNull(buffer);
+        if ((nuint)count > Size)
+        {
+            throw new ArgumentOutOfRangeException(nameof(count), count, ExceptionMessages.BufferSizeIsTooSmall);
+        }
 
-        var span = new Span<byte>(MemoryPtr, (int)Size);
-        buffer.AsSpan()[offset..count].CopyTo(span);
+        buffer.AsSpan(offset, count).CopyTo(new Span<byte>(MemoryPtr, count));
     }
 
     /// <summary>

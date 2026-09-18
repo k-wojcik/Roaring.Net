@@ -146,15 +146,56 @@ public class WriteTests
         }
 
         [Fact]
-        public void Write_WritesByteArray_ReturnsValidBitmap()
+        public void Write_NullBuffer_ThrowsArgumentNullException()
+        {
+            // Arrange
+            using var bitmapMemory = new Roaring32BitmapMemory(10);
+
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                bitmapMemory.Write(null!, 0, 0);
+            });
+        }
+
+        [Fact]
+        public void Write_OffsetWithCountGreaterThanNumberOfValues_ThrowsArgumentOutOfRangeException()
+        {
+            // Arrange
+            using var bitmapMemory = new Roaring32BitmapMemory(10);
+
+            // Act && Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+            {
+                bitmapMemory.Write(new byte[5], 3, 3);
+            });
+        }
+
+        [Fact]
+        public void Write_CountGreaterThanRegionSize_ThrowsArgumentOutOfRangeException()
+        {
+            // Arrange
+            using var bitmapMemory = new Roaring32BitmapMemory(10);
+
+            // Act && Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+            {
+                bitmapMemory.Write(new byte[15], 0, 11);
+            });
+        }
+
+        [Fact]
+        public void Write_WritesByteArrayFragmentWithOffset_ReturnsValidBitmap()
         {
             // Arrange
             using Roaring32Bitmap bitmap = SerializationTestBitmap.GetTestBitmap();
             var serializedBitmap = bitmap.Serialize(SerializationFormat.Frozen);
+            var buffer = new byte[serializedBitmap.Length + 5];
+            serializedBitmap.CopyTo(buffer, 5);
 
             // Act
             using var bitmapMemory = new Roaring32BitmapMemory((nuint)serializedBitmap.Length);
-            bitmapMemory.Write(serializedBitmap, 0, serializedBitmap.Length);
+            bitmapMemory.Write(buffer, 5, serializedBitmap.Length);
             using FrozenRoaring32Bitmap frozenBitmap = bitmapMemory.ToFrozen();
 
             // Assert
