@@ -143,6 +143,44 @@ public class CountTests
             // Assert
             Assert.Equal(expected, actual);
         }
+
+        [Theory]
+        [InlineTestObject(new ulong[] { }, new ulong[] { }, new ulong[] { })]
+        [InlineTestObject(new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { }, new ulong[] { })]
+        [InlineTestObject(new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { 1, 2, 3, 4, 5 })]
+        [InlineTestObject(new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { 1, 2, 3, 4, 5 }, new ulong[] { 2, 3, 4, 5, 5 })]
+        [InlineTestObject(new ulong[] { 0, 2, 4, 6, 8 }, new ulong[] { 5, 6, 7, 8, 9 }, new ulong[] { 3, 4, 4, 5, 5 })]
+        [InlineTestObject(new ulong[] { 10, 11, 12 }, new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { 0, 0, 0, 0, 0 })]
+        [InlineTestObject(new ulong[] { 0, 1, 2, 3, 4, ulong.MaxValue }, new ulong[] { 0, 1, 2, 3, 4, ulong.MaxValue }, new ulong[] { 1, 2, 3, 4, 5, 6 })]
+        [InlineTestObject(new ulong[] { ulong.MaxValue - 1, ulong.MaxValue }, new ulong[] { ulong.MaxValue - 1, ulong.MaxValue }, new ulong[] { 1, 2 })]
+        public void CountManyLessOrEqualTo_Destination_ForValues_ReturnsExpectedNumberOfValues(ulong[] values, ulong[] testedValues, ulong[] expected,
+            IRoaring64BitmapTestObjectFactory factory)
+        {
+            // Arrange
+            using IRoaring64BitmapTestObject testObject = factory.GetFromValues(values);
+            ReadOnlySpan<ulong> span = testedValues;
+            var destination = new ulong[testedValues.Length];
+
+            // Act
+            testObject.ReadOnlyBitmap.CountManyLessOrEqualTo(span, destination);
+
+            // Assert
+            Assert.Equal(expected, destination);
+        }
+
+        [Theory]
+        [InlineTestObject(new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { 1, 2, 3, 4, 5 })]
+        public void CountManyLessOrEqualTo_Destination_DestinationTooSmall_ThrowsArgumentOutOfRangeException(ulong[] values, ulong[] testedValues,
+            IRoaring64BitmapTestObjectFactory factory)
+        {
+            // Arrange
+            using IRoaring64BitmapTestObject testObject = factory.GetFromValues(values);
+            var destination = new ulong[testedValues.Length - 1];
+
+            // Act && Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                testObject.ReadOnlyBitmap.CountManyLessOrEqualTo(testedValues.AsSpan(), destination.AsSpan()));
+        }
     }
 
     public class CountRange

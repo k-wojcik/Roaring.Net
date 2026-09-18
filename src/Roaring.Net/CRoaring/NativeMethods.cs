@@ -172,6 +172,9 @@ internal static unsafe partial class NativeMethods
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_rank_many")]
     public static partial void roaring_bitmap_rank_many(IntPtr bitmap, uint* begin, uint* end, [Out] ulong[] ans);
 
+    [LibraryImport("roaring", EntryPoint = "roaring_bitmap_rank_many")]
+    public static partial void roaring_bitmap_rank_many(IntPtr bitmap, uint* begin, uint* end, ulong* ans);
+
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_get_index")]
     public static partial long roaring_bitmap_get_index(IntPtr bitmap, uint x);
 

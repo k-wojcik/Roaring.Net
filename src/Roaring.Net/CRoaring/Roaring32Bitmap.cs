@@ -235,7 +235,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
 
     private static void ValidateValueRange(ReadOnlySpan<uint> values, int offset, int count)
     {
-        if ((uint)offset > values.Length || (uint)count > (uint)(values.Length - offset))
+        if (offset < 0 || count < 0 || offset > values.Length - count)
         {
             throw new ArgumentOutOfRangeException(nameof(offset), offset, ExceptionMessages.OffsetWithCountGreaterThanNumberOfValues);
         }
@@ -782,11 +782,28 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     public ulong[] CountManyLessOrEqualTo(ReadOnlySpan<uint> values)
     {
         var items = new ulong[values.Length];
-        fixed (uint* valuesPtr = values)
-        {
-            NativeMethods.roaring_bitmap_rank_many(Pointer, valuesPtr, valuesPtr + values.Length, items);
-        }
+        CountManyLessOrEqualTo(values, items);
         return items;
+    }
+
+    /// <summary>
+    /// Counts number of values less than or equal to for each element of <paramref name="values"/>.
+    /// </summary>
+    /// <param name="values">A read-only span with ascending sorted values to test.</param>
+    /// <param name="destination">A span in which the counted values will be written.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the <paramref name="destination"/> size is too small to write the counted values.</exception>
+    public void CountManyLessOrEqualTo(ReadOnlySpan<uint> values, Span<ulong> destination)
+    {
+        if (destination.Length < values.Length)
+        {
+            throw new ArgumentOutOfRangeException(nameof(destination), destination.Length, ExceptionMessages.BufferSizeIsTooSmall);
+        }
+
+        fixed (uint* valuesPtr = values)
+        fixed (ulong* destinationPtr = destination)
+        {
+            NativeMethods.roaring_bitmap_rank_many(Pointer, valuesPtr, valuesPtr + values.Length, destinationPtr);
+        }
     }
 
     /// <summary>
