@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace Roaring.Net.CRoaring;
@@ -47,7 +48,18 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// </summary>
     /// <param name="values">Values that will be added to the bitmap directly when it is created.</param>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
-    public Roaring64Bitmap(ulong[] values) => Pointer = CheckBitmapPointer(CreatePtrFromValues(values, 0, (uint)values.Length));
+    public Roaring64Bitmap(ulong[] values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        Pointer = CheckBitmapPointer(CreatePtrFromValues(values, 0, (uint)values.Length));
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Roaring64Bitmap"/> class with the given values.
+    /// </summary>
+    /// <param name="values">Values that will be added to the bitmap directly when it is created.</param>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    public Roaring64Bitmap(IEnumerable<ulong> values) => Pointer = CheckBitmapPointer(CreatePtrFromValues(values));
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Roaring64Bitmap"/> class with the given values.
@@ -133,7 +145,19 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <param name="values">Values that will be added to the bitmap directly when it is created.</param>
     /// <returns>Instance of the <see cref="Roaring64Bitmap"/> class with the given values.</returns>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
-    public static Roaring64Bitmap FromValues(ulong[] values) => FromValues(values, 0U, (nuint)values.Length);
+    public static Roaring64Bitmap FromValues(ulong[] values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        return FromValues(values, 0U, (nuint)values.Length);
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Roaring64Bitmap"/> class with the given values.
+    /// </summary>
+    /// <param name="values">Values that will be added to the bitmap directly when it is created.</param>
+    /// <returns>Instance of the <see cref="Roaring64Bitmap"/> class with the given values.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    public static Roaring64Bitmap FromValues(IEnumerable<ulong> values) => new(CreatePtrFromValues(values));
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Roaring64Bitmap"/> class with the given values.
@@ -161,7 +185,17 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     public static Roaring64Bitmap FromValues(ulong[] values, nuint offset, nuint count)
-        => new(CreatePtrFromValues(values, offset, count));
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        return new(CreatePtrFromValues(values, offset, count));
+    }
+
+    private static IntPtr CreatePtrFromValues(IEnumerable<ulong> values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        var valuesArray = values as ulong[] ?? values.ToArray();
+        return CreatePtrFromValues((ReadOnlySpan<ulong>)valuesArray);
+    }
 
     private static IntPtr CreatePtrFromValues(ReadOnlySpan<ulong> values)
     {
@@ -178,6 +212,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
 
     private static void ValidateValueRange(ulong[] values, nuint offset, nuint count)
     {
+        ArgumentNullException.ThrowIfNull(values);
         if ((nuint)values.Length < offset + count)
         {
             throw new ArgumentOutOfRangeException(nameof(offset), offset, ExceptionMessages.OffsetWithCountGreaterThanNumberOfValues);
@@ -274,7 +309,21 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// Adds values from the given array to the bitmap.
     /// </summary>
     /// <param name="values">An array containing the values to add.</param>
-    public void AddMany(ulong[] values) => AddMany(values, 0, (nuint)values.Length);
+    public void AddMany(ulong[] values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        AddMany(values, 0, (nuint)values.Length);
+    }
+
+    /// <summary>
+    /// Adds values from the given enumerable to the bitmap.
+    /// </summary>
+    /// <param name="values">An enumerable containing the values to add.</param>
+    public void AddMany(IEnumerable<ulong> values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        AddMany((ReadOnlySpan<ulong>)(values as ulong[] ?? values.ToArray()));
+    }
 
     /// <summary>
     /// Adds values from the given read-only span to the bitmap.
@@ -414,7 +463,21 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// Removes the values contained in the given array from the bitmap.
     /// </summary>
     /// <param name="values">An array containing the values to remove.</param>
-    public void RemoveMany(ulong[] values) => RemoveMany(values, 0, (nuint)values.Length);
+    public void RemoveMany(ulong[] values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        RemoveMany(values, 0, (nuint)values.Length);
+    }
+
+    /// <summary>
+    /// Removes the values contained in the given enumerable from the bitmap.
+    /// </summary>
+    /// <param name="values">An enumerable containing the values to remove.</param>
+    public void RemoveMany(IEnumerable<ulong> values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        RemoveMany((ReadOnlySpan<ulong>)(values as ulong[] ?? values.ToArray()));
+    }
 
     /// <summary>
     /// Removes the values contained in the given read-only span from the bitmap.
@@ -702,6 +765,17 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <param name="values">An ascending sorted set of tested values.</param>
     /// <returns>The number of values that are less than or equal to the value from <paramref name="values"/> placed under the same index.</returns>
     public ulong[] CountManyLessOrEqualTo(ulong[] values) => CountManyLessOrEqualTo((ReadOnlySpan<ulong>)values);
+
+    /// <summary>
+    /// Counts number of values less than or equal to for each element of <paramref name="values"/>.
+    /// </summary>
+    /// <param name="values">An ascending sorted set of tested values.</param>
+    /// <returns>The number of values that are less than or equal to the value from <paramref name="values"/> placed under the same index.</returns>
+    public ulong[] CountManyLessOrEqualTo(IEnumerable<ulong> values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        return CountManyLessOrEqualTo((ReadOnlySpan<ulong>)(values as ulong[] ?? values.ToArray()));
+    }
 
     /// <summary>
     /// Counts number of values less than or equal to for each element of <paramref name="values"/>.
@@ -1006,6 +1080,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the <paramref name="buffer"/> size is too small to write the bitmap.</exception>
     public void CopyTo(ulong[] buffer)
     {
+        ArgumentNullException.ThrowIfNull(buffer);
         if ((ulong)buffer.LongLength < Count)
         {
             throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, ExceptionMessages.BufferSizeIsTooSmall);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace Roaring.Net.CRoaring;
@@ -61,7 +62,18 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// </summary>
     /// <param name="values">Values that will be added to the bitmap directly when it is created.</param>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
-    public Roaring32Bitmap(uint[] values) => Pointer = CheckBitmapPointer(CreatePtrFromValues(values, 0, (uint)values.Length));
+    public Roaring32Bitmap(uint[] values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        Pointer = CheckBitmapPointer(CreatePtrFromValues(values, 0, (uint)values.Length));
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Roaring32Bitmap"/> class with the given values.
+    /// </summary>
+    /// <param name="values">Values that will be added to the bitmap directly when it is created.</param>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    public Roaring32Bitmap(IEnumerable<uint> values) => Pointer = CheckBitmapPointer(CreatePtrFromValues(values));
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Roaring32Bitmap"/> class with the given values.
@@ -147,7 +159,19 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <param name="values">Values that will be added to the bitmap directly when it is created.</param>
     /// <returns>Instance of the <see cref="Roaring32Bitmap"/> class with the given values.</returns>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
-    public static Roaring32Bitmap FromValues(uint[] values) => FromValues(values, 0U, (nuint)values.Length);
+    public static Roaring32Bitmap FromValues(uint[] values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        return FromValues(values, 0U, (nuint)values.Length);
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Roaring32Bitmap"/> class with the given values.
+    /// </summary>
+    /// <param name="values">Values that will be added to the bitmap directly when it is created.</param>
+    /// <returns>Instance of the <see cref="Roaring32Bitmap"/> class with the given values.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    public static Roaring32Bitmap FromValues(IEnumerable<uint> values) => new(CreatePtrFromValues(values));
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Roaring32Bitmap"/> class with the given values.
@@ -175,7 +199,17 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when arguments have invalid values.</exception>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     public static Roaring32Bitmap FromValues(uint[] values, nuint offset, nuint count)
-        => new(CreatePtrFromValues(values, offset, count));
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        return new(CreatePtrFromValues(values, offset, count));
+    }
+
+    private static IntPtr CreatePtrFromValues(IEnumerable<uint> values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        var valuesArray = values as uint[] ?? values.ToArray();
+        return CreatePtrFromValues((ReadOnlySpan<uint>)valuesArray);
+    }
 
     private static IntPtr CreatePtrFromValues(ReadOnlySpan<uint> values)
     {
@@ -192,6 +226,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
 
     private static void ValidateValueRange(uint[] values, nuint offset, nuint count)
     {
+        ArgumentNullException.ThrowIfNull(values);
         if ((nuint)values.Length < offset + count)
         {
             throw new ArgumentOutOfRangeException(nameof(offset), offset, ExceptionMessages.OffsetWithCountGreaterThanNumberOfValues);
@@ -270,7 +305,21 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// Adds values from the given array to the bitmap.
     /// </summary>
     /// <param name="values">An array containing the values to add.</param>
-    public void AddMany(uint[] values) => AddMany(values, 0, (nuint)values.Length);
+    public void AddMany(uint[] values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        AddMany(values, 0, (nuint)values.Length);
+    }
+
+    /// <summary>
+    /// Adds values from the given enumerable to the bitmap.
+    /// </summary>
+    /// <param name="values">An enumerable containing the values to add.</param>
+    public void AddMany(IEnumerable<uint> values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        AddMany((ReadOnlySpan<uint>)(values as uint[] ?? values.ToArray()));
+    }
 
     /// <summary>
     /// Adds values from the given read-only span to the bitmap.
@@ -400,7 +449,21 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// Removes the values contained in the given array from the bitmap.
     /// </summary>
     /// <param name="values">An array containing the values to remove.</param>
-    public void RemoveMany(uint[] values) => RemoveMany(values, 0, (nuint)values.Length);
+    public void RemoveMany(uint[] values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        RemoveMany(values, 0, (nuint)values.Length);
+    }
+
+    /// <summary>
+    /// Removes the values contained in the given enumerable from the bitmap.
+    /// </summary>
+    /// <param name="values">An enumerable containing the values to remove.</param>
+    public void RemoveMany(IEnumerable<uint> values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        RemoveMany((ReadOnlySpan<uint>)(values as uint[] ?? values.ToArray()));
+    }
 
     /// <summary>
     /// Removes the values contained in the given read-only span from the bitmap.
@@ -694,7 +757,22 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// </summary>
     /// <param name="values">An ascending sorted set of tested values.</param>
     /// <returns>The number of values that are less than or equal to the value from <paramref name="values"/> placed under the same index.</returns>
-    public ulong[] CountManyLessOrEqualTo(uint[] values) => CountManyLessOrEqualTo((ReadOnlySpan<uint>)values);
+    public ulong[] CountManyLessOrEqualTo(uint[] values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        return CountManyLessOrEqualTo((ReadOnlySpan<uint>)values);
+    }
+
+    /// <summary>
+    /// Counts number of values less than or equal to for each element of <paramref name="values"/>.
+    /// </summary>
+    /// <param name="values">An ascending sorted set of tested values.</param>
+    /// <returns>The number of values that are less than or equal to the value from <paramref name="values"/> placed under the same index.</returns>
+    public ulong[] CountManyLessOrEqualTo(IEnumerable<uint> values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        return CountManyLessOrEqualTo((ReadOnlySpan<uint>)(values as uint[] ?? values.ToArray()));
+    }
 
     /// <summary>
     /// Counts number of values less than or equal to for each element of <paramref name="values"/>.
@@ -853,6 +931,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <remarks>This method may be slower than <see cref="OrManyHeap"/> in some cases.</remarks>
     public Roaring32Bitmap OrMany(Roaring32BitmapBase[] bitmaps)
     {
+        ArgumentNullException.ThrowIfNull(bitmaps);
         var length = bitmaps.Length + 1;
         var pointers = new IntPtr[length];
         for (var i = 0; i < bitmaps.Length; i++)
@@ -872,6 +951,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <remarks>This method may be faster than <see cref="OrMany"/> in some cases.</remarks>
     public Roaring32Bitmap OrManyHeap(Roaring32BitmapBase[] bitmaps)
     {
+        ArgumentNullException.ThrowIfNull(bitmaps);
         var length = bitmaps.Length + 1;
         var pointers = new IntPtr[length];
         for (var i = 0; i < bitmaps.Length; i++)
@@ -945,6 +1025,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <returns><see cref="Roaring32Bitmap"/> with the result of the symmetric difference of many bitmaps.</returns>
     public Roaring32Bitmap XorMany(params Roaring32BitmapBase[] bitmaps)
     {
+        ArgumentNullException.ThrowIfNull(bitmaps);
         var length = bitmaps.Length + 1;
         var pointers = new IntPtr[length];
         for (var i = 0; i < bitmaps.Length; i++)
@@ -1053,6 +1134,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the <paramref name="buffer"/> size is too small to write the bitmap.</exception>
     public void CopyTo(uint[] buffer)
     {
+        ArgumentNullException.ThrowIfNull(buffer);
         if ((ulong)buffer.Length < Count)
         {
             throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, ExceptionMessages.BufferSizeIsTooSmall);

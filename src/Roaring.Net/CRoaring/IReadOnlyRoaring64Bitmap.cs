@@ -64,6 +64,7 @@ internal interface IReadOnlyRoaring64Bitmap : IDisposable
     ulong CountLessOrEqualTo(ulong value);
 
     ulong[] CountManyLessOrEqualTo(ulong[] values);
+    ulong[] CountManyLessOrEqualTo(IEnumerable<ulong> values);
     ulong[] CountManyLessOrEqualTo(ReadOnlySpan<ulong> values);
     ulong[] CountManyLessOrEqualTo(ReadOnlyMemory<ulong> values);
 

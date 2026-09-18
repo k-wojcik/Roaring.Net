@@ -42,6 +42,40 @@ public class RemoveTests
     public class RemoveMany
     {
         [Fact]
+        public void RemoveMany_NullValues_ThrowsArgumentNullException()
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetEmpty();
+
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => testObject.Bitmap.RemoveMany((ulong[])null!));
+        }
+
+        [Fact]
+        public void RemoveMany_Enumerable_NullValues_ThrowsArgumentNullException()
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetEmpty();
+
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => testObject.Bitmap.RemoveMany((IEnumerable<ulong>)null!));
+        }
+
+        [Fact]
+        public void RemoveMany_Enumerable_BitmapWithValues_RemovesValuesFromBitmap()
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetFromValues(new ulong[] { 1, 2, 3, 4, 5 });
+            IEnumerable<ulong> values = [1UL, 3UL, 5UL];
+
+            // Act
+            testObject.Bitmap.RemoveMany(values);
+
+            // Assert
+            Assert.Equal(new[] { 2UL, 4UL }, testObject.Bitmap.Values.ToArray());
+        }
+
+        [Fact]
         public void RemoveMany_Span_BitmapWithValues_RemovesValuesFromBitmap()
         {
             // Arrange
@@ -101,11 +135,39 @@ public class RemoveTests
         public void RemoveMany_MemorySlice_BitmapWithValues_ThrowsArgumentOutOfRangeException()
         {
             // Arrange
-            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetFromValues(new ulong[] { 1, 2, 3, 4, 5 });
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetFromValues(new ulong[] { 1UL, 2UL, 3UL, 4UL, 5UL });
             var values = new ulong[] { 1UL, 2UL, 3UL, 4UL };
 
             // Act && Assert
             Assert.Throws<ArgumentOutOfRangeException>(() => testObject.Bitmap.RemoveMany(values.AsMemory(), 3, 2));
+        }
+
+        [Fact]
+        public void RemoveMany_SpanSlice_BitmapWithValues_RemovesValuesFromBitmap()
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetFromValues(new ulong[] { 1UL, 2UL, 3UL, 4UL, 5UL });
+            Span<ulong> values = [1UL, 2UL, 3UL, 4UL];
+
+            // Act
+            testObject.Bitmap.RemoveMany(values, 1, 2);
+
+            // Assert
+            Assert.Equal(new[] { 1UL, 4UL, 5UL }, testObject.Bitmap.Values.ToArray());
+        }
+
+        [Fact]
+        public void RemoveMany_MemorySlice_BitmapWithValues_RemovesValuesFromBitmap()
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetFromValues(new ulong[] { 1UL, 2UL, 3UL, 4UL, 5UL });
+            var values = new ulong[] { 1UL, 2UL, 3UL, 4UL };
+
+            // Act
+            testObject.Bitmap.RemoveMany(values.AsMemory(), 1, 2);
+
+            // Assert
+            Assert.Equal(new[] { 1UL, 4UL, 5UL }, testObject.Bitmap.Values.ToArray());
         }
 
         [Fact]
@@ -139,6 +201,16 @@ public class RemoveTests
 
     public class RemoveMany_WithOffset
     {
+        [Fact]
+        public void RemoveMany_WithOffset_NullValues_ThrowsArgumentNullException()
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetEmpty();
+
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => testObject.Bitmap.RemoveMany((ulong[])null!, (nuint)0, (nuint)0));
+        }
+
         [Theory]
         [InlineData(new ulong[] { 0, 1, 2, 3, 4 }, 0, 5)]
         [InlineData(new ulong[] { 0, 1, 2, 3, 4 }, 4, 1)]
@@ -304,10 +376,7 @@ public class RemoveTests
             using var context = BulkContext64.For(testObject1.Bitmap);
 
             // Act && Assert
-            Assert.Throws<ArgumentException>(() =>
-            {
-                testObject2.Bitmap.RemoveBulk(context, 10);
-            });
+            Assert.Throws<ArgumentException>(() => { testObject2.Bitmap.RemoveBulk(context, 10); });
         }
 
         [Fact]

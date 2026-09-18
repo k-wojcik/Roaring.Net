@@ -13,6 +13,46 @@ public class InitializationTests
     public class Constructor
     {
         [Fact]
+        public void Ctor_NullValues_ThrowsArgumentNullException()
+        {
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => new Roaring64Bitmap((ulong[])null!));
+        }
+
+        [Fact]
+        public void Ctor_Enumerable_NullValues_ThrowsArgumentNullException()
+        {
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => new Roaring64Bitmap((IEnumerable<ulong>)null!));
+        }
+
+        [Fact]
+        public void Ctor_Enumerable_InputHasValues_BitmapContainsExpectedValues()
+        {
+            // Arrange
+            IEnumerable<ulong> expected = [1UL, 2UL, 3UL, ulong.MaxValue];
+
+            // Act
+            using var uut = new Roaring64Bitmap(expected);
+
+            // Assert
+            Assert.Equal(expected, uut.Values.ToArray());
+        }
+
+        [Fact]
+        public void Ctor_Enumerable_InputIsEmpty_BitmapIsEmpty()
+        {
+            // Arrange
+            IEnumerable<ulong> expected = [];
+
+            // Act
+            using var uut = new Roaring64Bitmap(expected);
+
+            // Assert
+            Assert.Empty(uut.Values);
+        }
+
+        [Fact]
         public void Ctor_ZeroIntPtr_ThrowsInvalidOperationException()
         {
             // Act && Assert
@@ -61,6 +101,20 @@ public class InitializationTests
             IEnumerable<ulong> actual = uut.Values;
 
             Assert.Empty(actual);
+        }
+
+        [Fact]
+        public void Ctor_FromReadOnlySpan_InputHasValues_BitmapContainsExpectedValues()
+        {
+            // Arrange
+            var expected = new[] { 1UL, 2UL, 3UL, ulong.MaxValue };
+            ReadOnlySpan<ulong> values = expected;
+
+            // Act
+            using var uut = new Roaring64Bitmap(values);
+
+            // Assert
+            Assert.Equal(expected, uut.Values.ToArray());
         }
 
         [Fact]
@@ -152,6 +206,41 @@ public class InitializationTests
         }
 
         [Fact]
+        public void FromValues_NullValues_ThrowsArgumentNullException()
+        {
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => Roaring64Bitmap.FromValues((ulong[])null!));
+        }
+
+        [Fact]
+        public void FromValues_Enumerable_NullValues_ThrowsArgumentNullException()
+        {
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => Roaring64Bitmap.FromValues((IEnumerable<ulong>)null!));
+        }
+
+        [Fact]
+        public void FromValues_WithOffset_NullValues_ThrowsArgumentNullException()
+        {
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => Roaring64Bitmap.FromValues((ulong[])null!, 0, 0));
+        }
+
+        [Fact]
+        public void FromValues_ReadOnlySpan_InputHasValues_BitmapContainsExpectedValues()
+        {
+            // Arrange
+            var expected = new[] { 1UL, 2UL, 3UL, ulong.MaxValue };
+            ReadOnlySpan<ulong> values = expected;
+
+            // Act
+            using var uut = Roaring64Bitmap.FromValues(values);
+
+            // Assert
+            Assert.Equal(expected, uut.Values.ToArray());
+        }
+
+        [Fact]
         public void FromValues_ReadOnlyMemory_InputHasValues_BitmapContainsExpectedValues()
         {
             // Arrange
@@ -160,6 +249,19 @@ public class InitializationTests
 
             // Act
             using var uut = Roaring64Bitmap.FromValues(values);
+
+            // Assert
+            Assert.Equal(expected, uut.Values.ToArray());
+        }
+
+        [Fact]
+        public void FromValues_Enumerable_InputHasValues_BitmapContainsExpectedValues()
+        {
+            // Arrange
+            List<ulong> expected = [1UL, 2UL, 3UL, ulong.MaxValue];
+
+            // Act
+            using var uut = Roaring64Bitmap.FromValues((IEnumerable<ulong>)expected);
 
             // Assert
             Assert.Equal(expected, uut.Values.ToArray());

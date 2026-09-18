@@ -26,6 +26,16 @@ public class CollectionTests
 
     public class CopyToArray
     {
+        [Fact]
+        public void CopyTo_NullBuffer_ThrowsArgumentNullException()
+        {
+            // Arrange
+            using IRoaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetDefault();
+
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => testObject.ReadOnlyBitmap.CopyTo((ulong[])null!));
+        }
+
         [Theory]
         [InlineTestObject(new ulong[] { })]
         [InlineTestObject(new ulong[] { ulong.MaxValue })]
@@ -52,10 +62,7 @@ public class CollectionTests
             ulong[] actual = [];
 
             // Act && Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() =>
-            {
-                testObject.ReadOnlyBitmap.CopyTo(actual);
-            });
+            Assert.Throws<ArgumentOutOfRangeException>(() => { testObject.ReadOnlyBitmap.CopyTo(actual); });
         }
 
         [Theory]
@@ -67,10 +74,7 @@ public class CollectionTests
             using IRoaring64BitmapTestObject testObject = factory.GetFromValues(input);
 
             // Act && Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() =>
-            {
-                testObject.ReadOnlyBitmap.CopyTo(new ulong[input.Length - 5]);
-            });
+            Assert.Throws<ArgumentOutOfRangeException>(() => { testObject.ReadOnlyBitmap.CopyTo(new ulong[input.Length - 5]); });
         }
 
         [Theory]
@@ -119,10 +123,7 @@ public class CollectionTests
             ulong[] actual = [];
 
             // Act && Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() =>
-            {
-                testObject.ReadOnlyBitmap.CopyTo(actual.AsMemory());
-            });
+            Assert.Throws<ArgumentOutOfRangeException>(() => { testObject.ReadOnlyBitmap.CopyTo(actual.AsMemory()); });
         }
 
         [Theory]
@@ -134,10 +135,7 @@ public class CollectionTests
             using IRoaring64BitmapTestObject testObject = factory.GetFromValues(input);
 
             // Act && Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() =>
-            {
-                testObject.ReadOnlyBitmap.CopyTo(new ulong[input.Length - 5].AsMemory());
-            });
+            Assert.Throws<ArgumentOutOfRangeException>(() => { testObject.ReadOnlyBitmap.CopyTo(new ulong[input.Length - 5].AsMemory()); });
         }
 
         [Theory]
@@ -186,10 +184,7 @@ public class CollectionTests
             ulong[] actual = [];
 
             // Act && Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() =>
-            {
-                testObject.ReadOnlyBitmap.CopyTo(actual.AsSpan());
-            });
+            Assert.Throws<ArgumentOutOfRangeException>(() => { testObject.ReadOnlyBitmap.CopyTo(actual.AsSpan()); });
         }
 
         [Theory]
@@ -201,10 +196,7 @@ public class CollectionTests
             using IRoaring64BitmapTestObject testObject = factory.GetFromValues(input);
 
             // Act && Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() =>
-            {
-                testObject.ReadOnlyBitmap.CopyTo(new ulong[input.Length - 5].AsSpan());
-            });
+            Assert.Throws<ArgumentOutOfRangeException>(() => { testObject.ReadOnlyBitmap.CopyTo(new ulong[input.Length - 5].AsSpan()); });
         }
 
         [Theory]
@@ -245,5 +237,4 @@ public class CollectionTests
             Assert.Equal(expected, actual);
         }
     }
-
 }

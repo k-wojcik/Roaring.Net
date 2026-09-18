@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Roaring.Net.Tests.CRoaring.Roaring64BitmapTests;
@@ -64,6 +65,17 @@ public class CountTests
 
     public class CountManyLessOrEqualTo
     {
+        [Fact]
+        public void CountManyLessOrEqualTo_Enumerable_NullValues_ThrowsArgumentNullException()
+        {
+            // Arrange
+            using IRoaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetDefault();
+
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() =>
+                testObject.ReadOnlyBitmap.CountManyLessOrEqualTo((IEnumerable<ulong>)null!));
+        }
+
         [Theory]
         [InlineTestObject(new ulong[] { }, new ulong[] { }, new ulong[] { })]
         [InlineTestObject(new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { }, new ulong[] { })]
@@ -73,7 +85,8 @@ public class CountTests
         [InlineTestObject(new ulong[] { 10, 11, 12 }, new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { 0, 0, 0, 0, 0 })]
         [InlineTestObject(new ulong[] { 0, 1, 2, 3, 4, ulong.MaxValue }, new ulong[] { 0, 1, 2, 3, 4, ulong.MaxValue }, new ulong[] { 1, 2, 3, 4, 5, 6 })]
         [InlineTestObject(new ulong[] { ulong.MaxValue - 1, ulong.MaxValue }, new ulong[] { ulong.MaxValue - 1, ulong.MaxValue }, new ulong[] { 1, 2 })]
-        public void CountManyLessOrEqualTo_ForValues_ReturnsExpectedNumberOfValues(ulong[] values, ulong[] testedValues, ulong[] expected, IRoaring64BitmapTestObjectFactory factory)
+        public void CountManyLessOrEqualTo_ForValues_ReturnsExpectedNumberOfValues(ulong[] values, ulong[] testedValues, ulong[] expected,
+            IRoaring64BitmapTestObjectFactory factory)
         {
             // Arrange
             using IRoaring64BitmapTestObject testObject = factory.GetFromValues(values);
@@ -110,6 +123,22 @@ public class CountTests
 
             // Act
             var actual = testObject.ReadOnlyBitmap.CountManyLessOrEqualTo(memory);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineTestObject(new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { 1, 2, 3, 4, 5 }, new ulong[] { 2, 3, 4, 5, 5 })]
+        public void CountManyLessOrEqualTo_IEnumerable_ReturnsExpectedNumberOfValues(ulong[] values, ulong[] testedValues, ulong[] expected,
+            IRoaring64BitmapTestObjectFactory factory)
+        {
+            // Arrange
+            using IRoaring64BitmapTestObject testObject = factory.GetFromValues(values);
+            IEnumerable<ulong> enumerable = testedValues;
+
+            // Act
+            var actual = testObject.ReadOnlyBitmap.CountManyLessOrEqualTo(enumerable);
 
             // Assert
             Assert.Equal(expected, actual);

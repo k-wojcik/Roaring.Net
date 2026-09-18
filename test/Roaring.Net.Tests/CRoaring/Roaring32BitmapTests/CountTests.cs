@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Roaring.Net.Tests.CRoaring.Roaring32BitmapTests;
@@ -64,6 +65,28 @@ public class CountTests
 
     public class CountManyLessOrEqualTo
     {
+        [Fact]
+        public void CountManyLessOrEqualTo_NullValues_ThrowsArgumentNullException()
+        {
+            // Arrange
+            using IRoaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
+
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() =>
+                testObject.ReadOnlyBitmap.CountManyLessOrEqualTo((uint[])null!));
+        }
+
+        [Fact]
+        public void CountManyLessOrEqualTo_Enumerable_NullValues_ThrowsArgumentNullException()
+        {
+            // Arrange
+            using IRoaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
+
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() =>
+                testObject.ReadOnlyBitmap.CountManyLessOrEqualTo((IEnumerable<uint>)null!));
+        }
+
         [Theory]
         [InlineTestObject(new uint[] { }, new uint[] { }, new ulong[] { })]
         [InlineTestObject(new uint[] { 0, 1, 2, 3, 4 }, new uint[] { }, new ulong[] { })]
@@ -110,6 +133,22 @@ public class CountTests
 
             // Act
             var actual = testObject.ReadOnlyBitmap.CountManyLessOrEqualTo(memory);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineTestObject(new uint[] { 0, 1, 2, 3, 4 }, new uint[] { 1, 2, 3, 4, 5 }, new ulong[] { 2, 3, 4, 5, 5 })]
+        public void CountManyLessOrEqualTo_IEnumerable_ReturnsExpectedNumberOfValues(uint[] values, uint[] testedValues, ulong[] expected,
+            IRoaring32BitmapTestObjectFactory factory)
+        {
+            // Arrange
+            using IRoaring32BitmapTestObject testObject = factory.GetFromValues(values);
+            IEnumerable<uint> enumerable = testedValues;
+
+            // Act
+            var actual = testObject.ReadOnlyBitmap.CountManyLessOrEqualTo(enumerable);
 
             // Assert
             Assert.Equal(expected, actual);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Roaring.Net.CRoaring;
 using Xunit;
@@ -58,6 +59,41 @@ public class AddTests
 
     public class AddMany
     {
+        [Fact]
+        public void AddMany_NullValues_ThrowsArgumentNullException()
+        {
+            // Arrange
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => testObject.Bitmap.AddMany((uint[])null!));
+        }
+
+        [Fact]
+        public void AddMany_Enumerable_NullValues_ThrowsArgumentNullException()
+        {
+            // Arrange
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => testObject.Bitmap.AddMany((IEnumerable<uint>)null!));
+        }
+
+        [Fact]
+        public void AddMany_Enumerable_EmptyBitmap_AddsValuesToBitmap()
+        {
+            // Arrange
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+            IEnumerable<uint> values = [10U, 11U];
+
+            // Act
+            testObject.Bitmap.AddMany(values);
+
+            // Assert
+            Assert.Equal(new[] { 10U, 11U }, testObject.Bitmap.Values.ToArray());
+            Assert.Equal(2U, testObject.Bitmap.Count);
+        }
+
         [Fact]
         public void AddMany_Span_EmptyBitmap_AddsValuesToBitmap()
         {
@@ -130,6 +166,36 @@ public class AddTests
         }
 
         [Fact]
+        public void AddMany_SpanSlice_EmptyBitmap_AddsValuesToBitmap()
+        {
+            // Arrange
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+            Span<uint> values = [1U, 2U, 3U, 4U];
+
+            // Act
+            testObject.Bitmap.AddMany(values, 1, 2);
+
+            // Assert
+            Assert.Equal(new[] { 2U, 3U }, testObject.Bitmap.Values.ToArray());
+            Assert.Equal(2U, testObject.Bitmap.Count);
+        }
+
+        [Fact]
+        public void AddMany_MemorySlice_EmptyBitmap_AddsValuesToBitmap()
+        {
+            // Arrange
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+            var values = new uint[] { 1U, 2U, 3U, 4U };
+
+            // Act
+            testObject.Bitmap.AddMany(values.AsMemory(), 1, 2);
+
+            // Assert
+            Assert.Equal(new[] { 2U, 3U }, testObject.Bitmap.Values.ToArray());
+            Assert.Equal(2U, testObject.Bitmap.Count);
+        }
+
+        [Fact]
         public void AddMany_EmptyBitmap_AddsValuesToBitmap()
         {
             // Arrange
@@ -181,6 +247,16 @@ public class AddTests
 
     public class AddMany_WithOffset
     {
+        [Fact]
+        public void AddMany_WithOffset_NullValues_ThrowsArgumentNullException()
+        {
+            // Arrange
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
+
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => testObject.Bitmap.AddMany((uint[])null!, (nuint)0, (nuint)0));
+        }
+
         [Theory]
         [InlineData(new uint[] { 0, 1, 2, 3, 4 }, 0, 5)]
         [InlineData(new uint[] { 0, 1, 2, 3, 4 }, 4, 1)]
@@ -210,10 +286,7 @@ public class AddTests
             using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetEmpty();
 
             // Act && Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() =>
-            {
-                testObject.Bitmap.AddMany(values, offset, count);
-            });
+            Assert.Throws<ArgumentOutOfRangeException>(() => { testObject.Bitmap.AddMany(values, offset, count); });
         }
     }
 
@@ -344,10 +417,7 @@ public class AddTests
             using var context = BulkContext.For(testObject1.Bitmap);
 
             // Act && Assert
-            Assert.Throws<ArgumentException>(() =>
-            {
-                testObject2.Bitmap.AddBulk(context, 10);
-            });
+            Assert.Throws<ArgumentException>(() => { testObject2.Bitmap.AddBulk(context, 10); });
         }
 
         [Fact]

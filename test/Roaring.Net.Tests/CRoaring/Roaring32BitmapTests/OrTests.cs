@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Roaring.Net.CRoaring;
 using Xunit;
 
@@ -56,6 +57,16 @@ public class OrTests
 
     public class OrMany
     {
+        [Fact]
+        public void OrMany_NullBitmaps_ThrowsArgumentNullException()
+        {
+            // Arrange
+            using IRoaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
+
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => testObject.ReadOnlyBitmap.OrMany((Roaring32BitmapBase[])null!));
+        }
+
         [Theory]
         [InlineMatrixTestObject(new uint[] { }, new uint[] { }, new uint[] { })]
         [InlineMatrixTestObject(new uint[] { 1 }, new uint[] { 1 }, new uint[] { 1 })]
@@ -82,6 +93,16 @@ public class OrTests
 
     public class OrManyHeap
     {
+        [Fact]
+        public void OrManyHeap_NullBitmaps_ThrowsArgumentNullException()
+        {
+            // Arrange
+            using IRoaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
+
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => testObject.ReadOnlyBitmap.OrManyHeap((Roaring32BitmapBase[])null!));
+        }
+
         [Theory]
         [InlineMatrixTestObject(new uint[] { }, new uint[] { }, new uint[] { })]
         [InlineMatrixTestObject(new uint[] { 1 }, new uint[] { 1 }, new uint[] { 1 })]

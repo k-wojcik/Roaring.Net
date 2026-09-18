@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Roaring.Net.CRoaring;
 using Xunit;
@@ -80,6 +81,16 @@ public class XorTests
 
     public class XorMany
     {
+        [Fact]
+        public void XorMany_NullBitmaps_ThrowsArgumentNullException()
+        {
+            // Arrange
+            using IRoaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetDefault();
+
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => testObject.ReadOnlyBitmap.XorMany((Roaring32BitmapBase[])null!));
+        }
+
         [Theory]
         [InlineMatrixTestObject(new uint[] { }, new uint[] { }, new uint[] { })]
         [InlineMatrixTestObject(new uint[] { 1 }, new uint[] { 1 }, new uint[] { 1 })]
