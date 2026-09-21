@@ -1309,7 +1309,7 @@ public unsafe class Roaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
     public byte[] Serialize(SerializationFormat format = SerializationFormat.Normal)
     {
-        byte[] buffer = new byte[GetSerializationSize(format)];
+        var buffer = new byte[GetSerializationSize(format)];
         Serialize(buffer, format);
         return buffer;
     }

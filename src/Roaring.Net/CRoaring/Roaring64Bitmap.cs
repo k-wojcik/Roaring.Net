@@ -1235,7 +1235,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
     public byte[] Serialize(SerializationFormat format = SerializationFormat.Portable)
     {
-        byte[] buffer = new byte[GetSerializationSize(format)];
+        var buffer = new byte[GetSerializationSize(format)];
         Serialize(buffer, format);
         return buffer;
     }
