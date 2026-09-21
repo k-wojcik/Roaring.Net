@@ -83,9 +83,11 @@ internal interface IReadOnlyRoaring64Bitmap : IDisposable
 
     ulong[] Take(ulong count);
 
-    nuint GetSerializationBytes(SerializationFormat format = SerializationFormat.Normal);
+    nuint GetSerializationSize(SerializationFormat format = SerializationFormat.Normal);
 
     byte[] Serialize(SerializationFormat format = SerializationFormat.Normal);
+
+    void Serialize(Span<byte> destination, SerializationFormat format = SerializationFormat.Normal);
 
     Statistics64 GetStatistics();
 

@@ -40,7 +40,7 @@ public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoarin
 
     internal FrozenRoaring32Bitmap(Roaring32Bitmap bitmap)
     {
-        var size = bitmap.GetSerializationBytes(SerializationFormat.Frozen);
+        var size = bitmap.GetSerializationSize(SerializationFormat.Frozen);
         Memory = new Roaring32BitmapMemory(size, shared: false);
         _bitmap = bitmap.GetFrozenView(size, Memory.MemoryPtr);
 
@@ -461,7 +461,7 @@ public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoarin
     /// <param name="format">Serialization type for which we get the number of bytes.</param>
     /// <returns>Number of bytes required for the given serialization format.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
-    public nuint GetSerializationBytes(SerializationFormat format = SerializationFormat.Normal) => _bitmap.GetSerializationBytes(format);
+    public nuint GetSerializationSize(SerializationFormat format = SerializationFormat.Normal) => _bitmap.GetSerializationSize(format);
 
     /// <summary>
     /// Serializes the current bitmap to the given serialization format.
@@ -470,4 +470,12 @@ public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoarin
     /// <returns>An array that contains a bitmap in a serialized form.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
     public byte[] Serialize(SerializationFormat format = SerializationFormat.Normal) => _bitmap.Serialize(format);
+
+    /// <summary>
+    /// Serializes the current bitmap to the given serialization format.
+    /// </summary>
+    /// <param name="destination">The buffer in which the bitmap will be written.</param>
+    /// <param name="format">The serialization format to which we serialize the bitmap.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported or the <paramref name="destination"/> is too small to write the serialized bitmap.</exception>
+    public void Serialize(Span<byte> destination, SerializationFormat format = SerializationFormat.Normal) => _bitmap.Serialize(destination, format);
 }

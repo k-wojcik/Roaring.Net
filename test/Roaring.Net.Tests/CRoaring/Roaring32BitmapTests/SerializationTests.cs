@@ -8,11 +8,11 @@ namespace Roaring.Net.Tests.CRoaring.Roaring32BitmapTests;
 
 public class SerializationTests
 {
-    public class GetSerializationBytes
+    public class GetSerializationSize
     {
         [Theory]
         [InlineTestObject]
-        public void GetSerializationBytes_NotSupportedSerializationFormat_ThrowsArgumentOutOfRangeException(IRoaring32BitmapTestObjectFactory factory)
+        public void GetSerializationSize_NotSupportedSerializationFormat_ThrowsArgumentOutOfRangeException(IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
             using IRoaring32BitmapTestObject testObject = factory.GetEmpty();
@@ -20,7 +20,7 @@ public class SerializationTests
             // Act && Assert
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                testObject.ReadOnlyBitmap.GetSerializationBytes((SerializationFormat)int.MaxValue);
+                testObject.ReadOnlyBitmap.GetSerializationSize((SerializationFormat)int.MaxValue);
             });
         }
 
@@ -28,13 +28,13 @@ public class SerializationTests
         [InlineTestObject(SerializationFormat.Normal, 5)]
         [InlineTestObject(SerializationFormat.Portable, 8)]
         [InlineTestObject(SerializationFormat.Frozen, 4)]
-        public void GetSerializationBytes_EmptyBitmap_ReturnsValueGreaterThanZero(SerializationFormat format, int size, IRoaring32BitmapTestObjectFactory factory)
+        public void GetSerializationSize_EmptyBitmap_ReturnsValueGreaterThanZero(SerializationFormat format, int size, IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
             using IRoaring32BitmapTestObject testObject = factory.GetEmpty();
 
             // Act
-            var actual = testObject.ReadOnlyBitmap.GetSerializationBytes(format);
+            var actual = testObject.ReadOnlyBitmap.GetSerializationSize(format);
 
             // Assert
             Assert.Equal((nuint)size, actual);
@@ -44,13 +44,13 @@ public class SerializationTests
         [InlineTestObject(SerializationFormat.Normal, 4005)]
         [InlineTestObject(SerializationFormat.Portable, 10008)]
         [InlineTestObject(SerializationFormat.Frozen, 7004)]
-        public void GetSerializationBytes_BitmapContainsValues_ReturnsValueGreaterThanZero(SerializationFormat format, int size, IRoaring32BitmapTestObjectFactory factory)
+        public void GetSerializationSize_BitmapContainsValues_ReturnsValueGreaterThanZero(SerializationFormat format, int size, IRoaring32BitmapTestObjectFactory factory)
         {
             // Arrange
             using IRoaring32BitmapTestObject testObject = factory.GetDefault();
 
             // Act
-            var actual = testObject.ReadOnlyBitmap.GetSerializationBytes(format);
+            var actual = testObject.ReadOnlyBitmap.GetSerializationSize(format);
 
             // Assert
             Assert.Equal((nuint)size, actual);
@@ -241,7 +241,7 @@ public class SerializationTests
         public void Deserialize_NotSupportedSerializationFormat_ThrowsArgumentOutOfRangeException()
         {
             // Act && Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() => Roaring32Bitmap.Deserialize([], (SerializationFormat)int.MaxValue));
+            Assert.Throws<ArgumentOutOfRangeException>(() => Roaring32Bitmap.Deserialize([1, 2, 3], (SerializationFormat)int.MaxValue));
         }
     }
 
@@ -268,7 +268,7 @@ public class SerializationTests
         public void DeserializeUnsafe_NotSupportedSerializationFormat_ThrowsArgumentOutOfRangeException()
         {
             // Act && Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() => Roaring32Bitmap.DeserializeUnsafe([], (SerializationFormat)int.MaxValue));
+            Assert.Throws<ArgumentOutOfRangeException>(() => Roaring32Bitmap.DeserializeUnsafe([1, 2, 3], (SerializationFormat)int.MaxValue));
         }
     }
 
@@ -358,36 +358,36 @@ public class SerializationTests
         }
     }
 
-    public class GetSerializedSize
+    public class GetDeserializationSize
     {
         [Fact]
-        public void GetSerializedSize_NullBuffer_ThrowsArgumentNullException()
+        public void GetDeserializationSize_NullBuffer_ThrowsArgumentNullException()
         {
             // Act && Assert
-            Assert.Throws<ArgumentNullException>(() => Roaring32Bitmap.GetSerializedSize(null!, 10));
+            Assert.Throws<ArgumentNullException>(() => Roaring32Bitmap.GetDeserializationSize(null!, 10));
         }
 
         [Theory]
         [InlineData(SerializationFormat.Normal)]
         [InlineData((SerializationFormat)int.MaxValue)]
-        public void GetSerializedSize_NotSupportedSerializationFormat_ThrowsArgumentOutOfRangeException(SerializationFormat serializationFormat)
+        public void GetDeserializationSize_NotSupportedSerializationFormat_ThrowsArgumentOutOfRangeException(SerializationFormat serializationFormat)
         {
             // Act && Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() => Roaring32Bitmap.GetSerializedSize([], 10, serializationFormat));
+            Assert.Throws<ArgumentOutOfRangeException>(() => Roaring32Bitmap.GetDeserializationSize([1, 2, 3], 10, serializationFormat));
         }
 
         [Fact]
-        public void GetSerializedSize_Portable_InvalidDataCannotDeserialize_ReturnsZero()
+        public void GetDeserializationSize_Portable_InvalidDataCannotDeserialize_ReturnsZero()
         {
             // Act
-            var actual = Roaring32Bitmap.GetSerializedSize([1, 2, 3], uint.MaxValue);
+            var actual = Roaring32Bitmap.GetDeserializationSize([1, 2, 3], uint.MaxValue);
 
             // Assert
             Assert.Equal(0U, actual);
         }
 
         [Fact]
-        public void GetSerializedSize_Portable_ReturnsNumberOfBytesOfSerializedBitmapInBuffer()
+        public void GetDeserializationSize_Portable_ReturnsNumberOfBytesOfSerializedBitmapInBuffer()
         {
             // Arrange
             using Roaring32Bitmap bitmap = SerializationTestBitmap.GetTestBitmap();
@@ -395,7 +395,144 @@ public class SerializationTests
             Array.Resize(ref testData, testData.Length + 100);
 
             // Act
-            var actual = Roaring32Bitmap.GetSerializedSize(testData, (nuint)testData.Length);
+            var actual = Roaring32Bitmap.GetDeserializationSize(testData, (nuint)testData.Length);
+
+            // Assert
+            Assert.Equal((nuint)testData.Length - 100, actual);
+        }
+    }
+
+    public class SerializeSpan
+    {
+        [Theory]
+        [InlineTestObject]
+        public void Serialize_NotSupportedSerializationFormat_ThrowsArgumentOutOfRangeException(IRoaring32BitmapTestObjectFactory factory)
+        {
+            // Arrange
+            using IRoaring32BitmapTestObject testObject = factory.GetFromValues(SerializationTestBitmap.GetTestBitmapValues().ToArray());
+
+            // Act && Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.ReadOnlyBitmap.Serialize(new byte[1], (SerializationFormat)int.MaxValue));
+        }
+
+        [Theory]
+        [InlineTestObject(SerializationFormat.Normal)]
+        [InlineTestObject(SerializationFormat.Portable)]
+        [InlineTestObject(SerializationFormat.Frozen)]
+        public void Serialize_DestinationTooSmall_ThrowsArgumentOutOfRangeException(SerializationFormat format, IRoaring32BitmapTestObjectFactory factory)
+        {
+            // Arrange
+            using IRoaring32BitmapTestObject testObject = factory.GetFromValues(SerializationTestBitmap.GetTestBitmapValues().ToArray());
+            var destination = new byte[(int)testObject.ReadOnlyBitmap.GetSerializationSize(format) - 1];
+
+            // Act && Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.ReadOnlyBitmap.Serialize(destination, format));
+        }
+
+        [Theory]
+        [InlineTestObject(SerializationFormat.Normal)]
+        [InlineTestObject(SerializationFormat.Portable)]
+        [InlineTestObject(SerializationFormat.Frozen)]
+        public void Serialize_WritesSerializedBitmapToDestination_EqualsToSerialize(SerializationFormat format, IRoaring32BitmapTestObjectFactory factory)
+        {
+            // Arrange
+            using IRoaring32BitmapTestObject testObject = factory.GetFromValues(SerializationTestBitmap.GetTestBitmapValues().ToArray());
+            var destination = new byte[testObject.ReadOnlyBitmap.GetSerializationSize(format)];
+
+            // Act
+            testObject.ReadOnlyBitmap.Serialize(destination, format);
+
+            // Assert
+            Assert.Equal(testObject.ReadOnlyBitmap.Serialize(format), destination);
+        }
+    }
+
+    public class DeserializeSpan
+    {
+        [Fact]
+        public void Deserialize_NotSupportedSerializationFormat_ThrowsArgumentOutOfRangeException()
+        {
+            // Act && Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() => Roaring32Bitmap.Deserialize([1, 2, 3], (SerializationFormat)int.MaxValue));
+        }
+
+        [Fact]
+        public void Deserialize_InvalidDataCannotDeserialize_ThrowsInvalidOperationException()
+        {
+            // Act && Assert
+            Assert.Throws<InvalidOperationException>(() => Roaring32Bitmap.Deserialize([]));
+        }
+
+        [Fact]
+        public void Deserialize_DeserializesBitmapFromJava()
+        {
+            // Arrange
+            using Roaring32Bitmap bitmap = SerializationTestBitmap.GetTestBitmap();
+            var testData = File.ReadAllBytes($"{nameof(CRoaring)}/TestData/bitmapwithoutruns.bin");
+
+            // Act
+            var deserializedBitmap = Roaring32Bitmap.Deserialize((ReadOnlySpan<byte>)testData, SerializationFormat.Portable);
+
+            // Assert
+            Assert.Equal(bitmap.AndCount(deserializedBitmap), bitmap.Count);
+        }
+    }
+
+    public class DeserializeUnsafeSpan
+    {
+        [Fact]
+        public void DeserializeUnsafe_NotSupportedSerializationFormat_ThrowsArgumentOutOfRangeException()
+        {
+            // Act && Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() => Roaring32Bitmap.DeserializeUnsafe([1, 2, 3], (SerializationFormat)int.MaxValue));
+        }
+
+        [Fact]
+        public void DeserializeUnsafe_DeserializesBitmapFromJava()
+        {
+            // Arrange
+            using Roaring32Bitmap bitmap = SerializationTestBitmap.GetTestBitmap();
+            var testData = File.ReadAllBytes($"{nameof(CRoaring)}/TestData/bitmapwithoutruns.bin");
+
+            // Act
+            var deserializedBitmap = Roaring32Bitmap.DeserializeUnsafe((ReadOnlySpan<byte>)testData, SerializationFormat.Portable);
+
+            // Assert
+            Assert.Equal(bitmap.AndCount(deserializedBitmap), bitmap.Count);
+        }
+    }
+
+    public class GetDeserializationSizeSpan
+    {
+        [Theory]
+        [InlineData(SerializationFormat.Normal)]
+        [InlineData((SerializationFormat)int.MaxValue)]
+        public void GetDeserializationSize_NotSupportedSerializationFormat_ThrowsArgumentOutOfRangeException(SerializationFormat serializationFormat)
+        {
+            // Act && Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() => Roaring32Bitmap.GetDeserializationSize([1, 2, 3], 10, serializationFormat));
+        }
+
+        [Fact]
+        public void GetDeserializationSize_Portable_InvalidDataCannotDeserialize_ReturnsZero()
+        {
+            // Act
+            var actual = Roaring32Bitmap.GetDeserializationSize([1, 2, 3], uint.MaxValue);
+
+            // Assert
+            Assert.Equal(0U, actual);
+        }
+
+        [Fact]
+        public void GetDeserializationSize_Portable_ReturnsNumberOfBytesOfSerializedBitmapInBuffer()
+        {
+            // Arrange
+            using Roaring32Bitmap bitmap = SerializationTestBitmap.GetTestBitmap();
+            var testData = File.ReadAllBytes($"{nameof(CRoaring)}/TestData/bitmapwithoutruns.bin");
+            Array.Resize(ref testData, testData.Length + 100);
+
+            // Act
+            var actual = Roaring32Bitmap.GetDeserializationSize((ReadOnlySpan<byte>)testData, (nuint)testData.Length);
 
             // Assert
             Assert.Equal((nuint)testData.Length - 100, actual);

@@ -398,34 +398,34 @@ internal static unsafe partial class NativeMethods
     public static partial void roaring64_bitmap_to_uint64_array(IntPtr bitmap, ulong* values);
 
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_serialize")]
-    public static partial nuint roaring_bitmap_serialize(IntPtr bitmap, [Out] byte[] buffer);
+    public static partial nuint roaring_bitmap_serialize(IntPtr bitmap, byte* buffer);
 
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_deserialize")]
-    public static partial IntPtr roaring_bitmap_deserialize(byte[] buffer);
+    public static partial IntPtr roaring_bitmap_deserialize(byte* buffer);
 
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_deserialize_safe")]
-    public static partial IntPtr roaring_bitmap_deserialize_safe(byte[] buffer, nuint maxbytes);
+    public static partial IntPtr roaring_bitmap_deserialize_safe(byte* buffer, nuint maxbytes);
 
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_portable_serialize")]
-    public static partial nuint roaring_bitmap_portable_serialize(IntPtr bitmap, [Out] byte[] buffer);
+    public static partial nuint roaring_bitmap_portable_serialize(IntPtr bitmap, byte* buffer);
 
     [LibraryImport("roaring", EntryPoint = "roaring64_bitmap_portable_serialize")]
     public static partial nuint roaring64_bitmap_portable_serialize(IntPtr bitmap, byte* buffer);
 
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_portable_deserialize")]
-    public static partial IntPtr roaring_bitmap_portable_deserialize(byte[] buffer);
+    public static partial IntPtr roaring_bitmap_portable_deserialize(byte* buffer);
 
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_portable_deserialize_safe")]
-    public static partial IntPtr roaring_bitmap_portable_deserialize_safe(byte[] buffer, nuint maxbytes);
+    public static partial IntPtr roaring_bitmap_portable_deserialize_safe(byte* buffer, nuint maxbytes);
 
     [LibraryImport("roaring", EntryPoint = "roaring64_bitmap_portable_deserialize_safe")]
-    public static partial IntPtr roaring64_bitmap_portable_deserialize_safe(byte[] buffer, nuint maxbytes);
+    public static partial IntPtr roaring64_bitmap_portable_deserialize_safe(byte* buffer, nuint maxbytes);
 
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_portable_deserialize_size")]
-    public static partial nuint roaring_bitmap_portable_deserialize_size(byte[] buffer, nuint maxbytes);
+    public static partial nuint roaring_bitmap_portable_deserialize_size(byte* buffer, nuint maxbytes);
 
     [LibraryImport("roaring", EntryPoint = "roaring64_bitmap_portable_deserialize_size")]
-    public static partial nuint roaring64_bitmap_portable_deserialize_size(byte[] buffer, nuint maxbytes);
+    public static partial nuint roaring64_bitmap_portable_deserialize_size(byte* buffer, nuint maxbytes);
 
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_frozen_serialize")]
     public static partial void roaring_bitmap_frozen_serialize(IntPtr bitmap, byte* buffer);

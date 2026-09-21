@@ -1212,7 +1212,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <param name="format">Serialization format for which we get the number of bytes.</param>
     /// <returns>Number of bytes required for the given serialization format.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
-    public nuint GetSerializationBytes(SerializationFormat format = SerializationFormat.Portable)
+    public nuint GetSerializationSize(SerializationFormat format = SerializationFormat.Portable)
     {
         switch (format)
         {
@@ -1235,31 +1235,45 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
     public byte[] Serialize(SerializationFormat format = SerializationFormat.Portable)
     {
-        byte[] buffer;
+        byte[] buffer = new byte[GetSerializationSize(format)];
+        Serialize(buffer, format);
+        return buffer;
+    }
+
+    /// <summary>
+    /// Serializes the current bitmap to the given serialization format.
+    /// </summary>
+    /// <param name="destination">The buffer in which the bitmap will be written.</param>
+    /// <param name="format">The serialization format to which we serialize the bitmap.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported or the <paramref name="destination"/> is too small to write the serialized bitmap.</exception>
+    public void Serialize(Span<byte> destination, SerializationFormat format = SerializationFormat.Portable)
+    {
+        if ((nuint)destination.Length < GetSerializationSize(format))
+        {
+            throw new ArgumentOutOfRangeException(nameof(destination), destination.Length, ExceptionMessages.BufferSizeIsTooSmall);
+        }
 
         switch (format)
         {
             case SerializationFormat.Portable:
-                buffer = new byte[NativeMethods.roaring64_bitmap_portable_size_in_bytes(Pointer)];
-                fixed (byte* bufferPtr = buffer)
+                fixed (byte* bufferPtr = destination)
                 {
                     NativeMethods.roaring64_bitmap_portable_serialize(Pointer, bufferPtr);
                 }
+
                 break;
             case SerializationFormat.Frozen:
                 ShrinkToFit(); // CRoaring requires shrink_to_fit before frozen operations
-                buffer = new byte[NativeMethods.roaring64_bitmap_frozen_size_in_bytes(Pointer)];
-                fixed (byte* bufferPtr = buffer)
+                fixed (byte* bufferPtr = destination)
                 {
                     NativeMethods.roaring64_bitmap_frozen_serialize(Pointer, bufferPtr);
                 }
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(format), format,
                     ExceptionMessages.UnsupportedSerializationFormat);
         }
-
-        return buffer;
     }
 
     /// <summary>
@@ -1274,12 +1288,35 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     public static Roaring64Bitmap Deserialize(byte[] buffer, SerializationFormat format = SerializationFormat.Portable)
     {
         ArgumentNullException.ThrowIfNull(buffer);
+        return Deserialize(buffer.AsSpan(), format);
+    }
 
-        var ptr = format switch
+    /// <summary>
+    /// Deserializes the bitmap from the given serialization format.
+    /// </summary>
+    /// <param name="buffer">A read-only span that contains a bitmap in a serialized form.</param>
+    /// <param name="format">The serialization format from which we deserialize the bitmap.</param>
+    /// <returns><see cref="Roaring64Bitmap"/> deserialized from the provided span.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
+    /// <remarks>The input buffer is not validated for correctness. A bitmap deserialized from invalid data may be in an inconsistent state; use <see cref="IsValid()"/> to verify the resulting bitmap.</remarks>
+    public static Roaring64Bitmap Deserialize(ReadOnlySpan<byte> buffer, SerializationFormat format = SerializationFormat.Portable)
+    {
+        if (format != SerializationFormat.Portable)
         {
-            SerializationFormat.Portable => NativeMethods.roaring64_bitmap_portable_deserialize_safe(buffer, (nuint)buffer.Length),
-            _ => throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat)
-        };
+            throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat);
+        }
+
+        if (buffer.IsEmpty)
+        {
+            throw new InvalidOperationException(ExceptionMessages.DeserializationFailedUnknownReason);
+        }
+
+        IntPtr ptr;
+        fixed (byte* bufferPtr = buffer)
+        {
+            ptr = NativeMethods.roaring64_bitmap_portable_deserialize_safe(bufferPtr, (nuint)buffer.Length);
+        }
 
         if (ptr == IntPtr.Zero)
         {
@@ -1298,15 +1335,36 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <returns><c>0</c> if the bitmap is invalid; otherwise, the number of bytes required to deserialize the bitmap.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="buffer"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
-    public static nuint GetSerializedSize(byte[] buffer, nuint expectedSize, SerializationFormat format = SerializationFormat.Portable)
+    public static nuint GetDeserializationSize(byte[] buffer, nuint expectedSize, SerializationFormat format = SerializationFormat.Portable)
     {
         ArgumentNullException.ThrowIfNull(buffer);
+        return GetDeserializationSize((ReadOnlySpan<byte>)buffer, expectedSize, format);
+    }
 
-        var size = format switch
+    /// <summary>
+    /// Checks how many bytes will be read from the span to deserialize the bitmap.
+    /// </summary>
+    /// <param name="buffer">A read-only span that contains a bitmap in a serialized form.</param>
+    /// <param name="expectedSize">The expected number of bytes after which the check will be aborted.</param>
+    /// <param name="format">The serialization format for which we check the number of bytes.</param>
+    /// <returns><c>0</c> if the bitmap is invalid; otherwise, the number of bytes required to deserialize the bitmap.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when serialization format is not supported.</exception>
+    public static nuint GetDeserializationSize(ReadOnlySpan<byte> buffer, nuint expectedSize, SerializationFormat format = SerializationFormat.Portable)
+    {
+        if (buffer.IsEmpty)
         {
-            SerializationFormat.Portable => NativeMethods.roaring64_bitmap_portable_deserialize_size(buffer, expectedSize),
-            _ => throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat)
-        };
+            return 0;
+        }
+
+        nuint size;
+        fixed (byte* bufferPtr = buffer)
+        {
+            size = format switch
+            {
+                SerializationFormat.Portable => NativeMethods.roaring64_bitmap_portable_deserialize_size(bufferPtr, expectedSize),
+                _ => throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat)
+            };
+        }
 
         return size;
     }

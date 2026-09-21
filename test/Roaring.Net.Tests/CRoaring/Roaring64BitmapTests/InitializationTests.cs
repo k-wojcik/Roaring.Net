@@ -69,7 +69,7 @@ public class InitializationTests
             using var uut = new Roaring64Bitmap();
 
             // Assert
-            var actual = uut.GetSerializationBytes();
+            var actual = uut.GetSerializationSize();
             Assert.True(actual > 0);
         }
 
