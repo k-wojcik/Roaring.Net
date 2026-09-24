@@ -1370,9 +1370,9 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     }
 
     /// <summary>
-    /// Converts current bitmap to the <see cref="FrozenRoaring32Bitmap"/>.
+    /// Converts current bitmap to the <see cref="FrozenRoaring64Bitmap"/>.
     /// </summary>
-    /// <returns>Instance of the <see cref="FrozenRoaring32Bitmap"/> class with the same values as the current bitmap.</returns>
+    /// <returns>Instance of the <see cref="FrozenRoaring64Bitmap"/> class with the same values as the current bitmap.</returns>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     public FrozenRoaring64Bitmap ToFrozen() => new(this);
 
