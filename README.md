@@ -10,15 +10,14 @@ A .NET wrapper for [CRoaring](https://github.com/RoaringBitmap/CRoaring) - a C i
 
 ## Support
 ### Supported runtimes
-| Platform/Architecture |      **x86**       |      **x64**       |      **arm**       |     **arm64**      |
-|:---------------------:|:------------------:|:------------------:|:------------------:|:------------------:|
-|      **windows**      | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-|       **linux**       |                    | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-|        **osx**        |                    | :white_check_mark: |                    | :white_check_mark: |
+| Platform/Architecture |      **x86**       |      **x64**       |     **arm64**      |
+|:---------------------:|:------------------:|:------------------:|:------------------:|
+|      **windows**      | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+|       **linux**       |                    | :white_check_mark: | :white_check_mark: |
+|        **osx**        |                    | :white_check_mark: | :white_check_mark: |
 
 ### Supported frameworks
 * .NET 10
-* .NET 9
 * .NET 8
 
 ## Usage

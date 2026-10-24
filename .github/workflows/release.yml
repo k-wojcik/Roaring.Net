@@ -103,30 +103,7 @@ jobs:
           path: |
             libs/**/*.so
 
-  build-linux-arm:
-    runs-on: ubuntu-latest
-    env:
-      VCPKG_DISABLE_METRICS: 1
-      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
-    steps:
-      - uses: actions/checkout@v7
-      - name: install deps
-        run: sudo apt update && sudo apt-get install -qy gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
-      - name: arm-linux
-        uses: lukka/run-vcpkg@v11
-        env:
-          VCPKG_DEFAULT_TRIPLET: arm-linux-dynamic
-        with:
-          doNotCache: false
-          runVcpkgInstall: true
-      - name: copy lib
-        run: mkdir -p libs/arm-linux/ && cp vcpkg_installed/arm-linux-dynamic/lib/libroaring.so libs/arm-linux/
-      - name: Upload lib to artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: libs-linux-arm
-          path: |
-            libs/**/*.so
+
 
   windows-x64:
     runs-on: windows-latest
@@ -174,31 +151,7 @@ jobs:
           path: |
             libs/**/*.dll
 
-  windows-arm:
-    runs-on: windows-2022
-    env:
-      VCPKG_DISABLE_METRICS: 1
-      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
-    steps:
-      - uses: actions/checkout@v7
-      - name: Windows SDK downgrade   # https://github.com/actions/runner-images/issues/10981
-        run: .\build\downgrade-win-sdk.bat
 
-      - name: vcpkg arm32-windows
-        uses: lukka/run-vcpkg@v11
-        env:
-          VCPKG_DEFAULT_TRIPLET: arm-windows
-        with:
-          doNotCache: false
-          runVcpkgInstall: true
-      - name: copy lib
-        run: mkdir -p libs/arm32-windows/ && cp vcpkg_installed/arm-windows/bin/roaring.dll libs/arm32-windows/
-      - name: Upload lib to artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: libs-windows-arm32
-          path: |
-            libs/**/*.dll
 
   windows-arm64:
     runs-on: windows-latest
@@ -229,12 +182,10 @@ jobs:
       [
         build-linux-x64,
         build-linux-arm64,
-        build-linux-arm,
         build-osx-x64,
         build-osx-arm64,
         windows-x64,
         windows-x86,
-        windows-arm,
         windows-arm64,
       ]
     env:
