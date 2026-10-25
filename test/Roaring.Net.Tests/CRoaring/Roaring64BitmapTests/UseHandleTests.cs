@@ -24,8 +24,8 @@ public class UseHandleTests
     {
         // Arrange
         using var bitmap = new TestBitmap([1, 2, 3]);
-        IntPtr expected = bitmap.Handle.DangerousGetHandle();
-        IntPtr actual = IntPtr.Zero;
+        var expected = bitmap.Handle.DangerousGetHandle();
+        var actual = IntPtr.Zero;
 
         // Act
         bitmap.UseHandleForTest(pointer =>
@@ -44,7 +44,7 @@ public class UseHandleTests
         using var bitmap = new TestBitmap([1, 2, 3]);
 
         // Act
-        int actual = bitmap.UseHandleForTest(pointer => pointer == IntPtr.Zero ? 0 : 42);
+        var actual = bitmap.UseHandleForTest(pointer => pointer == IntPtr.Zero ? 0 : 42);
 
         // Assert
         Assert.Equal(42, actual);
@@ -67,7 +67,7 @@ public class UseHandleTests
         // Arrange
         var bitmap = new TestBitmap([1, 2, 3]);
         bitmap.Dispose();
-        bool invoked = false;
+        var invoked = false;
 
         // Act && Assert
         Assert.Throws<ObjectDisposedException>(() =>
@@ -104,7 +104,7 @@ public class UseHandleTests
     {
         // Arrange
         var bitmap = new TestBitmap([1, 2, 3]);
-        bool invoked = false;
+        var invoked = false;
 
         // Act
         bitmap.UseHandleForTest(_ =>

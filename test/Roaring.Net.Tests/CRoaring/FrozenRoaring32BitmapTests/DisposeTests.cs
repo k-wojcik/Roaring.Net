@@ -72,7 +72,7 @@ public class DisposeTests
             // Arrange
             using Roaring32Bitmap bitmap = SerializationTestBitmap.GetTestBitmap();
             FrozenRoaring32Bitmap frozenBitmap = bitmap.ToFrozen();
-            uint[] expected = frozenBitmap.ToArray();
+            var expected = frozenBitmap.ToArray();
             SafeRoaring32MemoryHandle memoryHandle = frozenBitmap.Memory.Handle;
             IEnumerator<uint> enumerator = frozenBitmap.Values.GetEnumerator();
 
