@@ -172,17 +172,18 @@ internal sealed unsafe class SafeRoaring64MemoryHandle : SafeHandleZeroOrMinusOn
     }
 }
 
-internal sealed class SafeRoaring32MemoryLease : SafeHandleZeroOrMinusOneIsInvalid
+internal sealed class SafeRoaring32MemoryLease : SafeHandle
 {
     private Roaring32BitmapMemory? _memory;
     private SafeRoaring32BitmapHandle? _viewHandle;
 
-    internal SafeRoaring32MemoryLease(Roaring32BitmapMemory memory, SafeRoaring32BitmapHandle? viewHandle) : base(true)
+    internal SafeRoaring32MemoryLease(Roaring32BitmapMemory memory, SafeRoaring32BitmapHandle? viewHandle) : base(IntPtr.Zero, true)
     {
         _memory = memory;
         _viewHandle = viewHandle;
-        SetHandle(1);
     }
+
+    public override bool IsInvalid => false;
 
     protected override bool ReleaseHandle()
     {
@@ -194,17 +195,18 @@ internal sealed class SafeRoaring32MemoryLease : SafeHandleZeroOrMinusOneIsInval
     }
 }
 
-internal sealed class SafeRoaring64MemoryLease : SafeHandleZeroOrMinusOneIsInvalid
+internal sealed class SafeRoaring64MemoryLease : SafeHandle
 {
     private Roaring64BitmapMemory? _memory;
     private SafeRoaring64BitmapHandle? _viewHandle;
 
-    internal SafeRoaring64MemoryLease(Roaring64BitmapMemory memory, SafeRoaring64BitmapHandle? viewHandle) : base(true)
+    internal SafeRoaring64MemoryLease(Roaring64BitmapMemory memory, SafeRoaring64BitmapHandle? viewHandle) : base(IntPtr.Zero, true)
     {
         _memory = memory;
         _viewHandle = viewHandle;
-        SetHandle(1);
     }
+
+    public override bool IsInvalid => false;
 
     protected override bool ReleaseHandle()
     {
