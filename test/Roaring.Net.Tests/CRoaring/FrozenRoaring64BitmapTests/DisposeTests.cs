@@ -72,7 +72,7 @@ public class DisposeTests
             // Arrange
             using Roaring64Bitmap bitmap = SerializationTestBitmap.GetTestBitmap64();
             FrozenRoaring64Bitmap frozenBitmap = bitmap.ToFrozen();
-            ulong[] expected = frozenBitmap.ToArray();
+            var expected = frozenBitmap.ToArray();
             SafeRoaring64MemoryHandle memoryHandle = frozenBitmap.Memory.Handle;
             IEnumerator<ulong> enumerator = frozenBitmap.Values.GetEnumerator();
 
