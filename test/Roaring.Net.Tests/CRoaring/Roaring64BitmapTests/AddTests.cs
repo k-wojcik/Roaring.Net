@@ -401,6 +401,42 @@ public class AddTests
             var actual = testObject.Bitmap.Values.ToList();
             Assert.Equal(expected, actual);
         }
+
+        [Fact]
+        public void AddOffset_ExistingBitmap_DisposesPreviousHandleAndKeepsBitmapUsable()
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetFromValues([1, 2, 3]);
+            SafeRoaring64BitmapHandle previousHandle = testObject.Bitmap.Handle;
+
+            // Act
+            testObject.Bitmap.AddOffset(1);
+
+            // Assert
+            Assert.True(previousHandle.IsClosed);
+            Assert.NotSame(previousHandle, testObject.Bitmap.Handle);
+            Assert.Equal(new ulong[] { 2, 3, 4 }, testObject.Bitmap.ToArray());
+        }
+
+        [Fact]
+        public void AddOffset_CalledMultipleTimes_DisposesAllPreviousHandles()
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetFromValues([1, 2, 3]);
+            var handles = new List<SafeRoaring64BitmapHandle> { testObject.Bitmap.Handle };
+
+            // Act
+            for (var i = 0; i < 3; i++)
+            {
+                testObject.Bitmap.AddOffset(1);
+                handles.Add(testObject.Bitmap.Handle);
+            }
+
+            // Assert
+            Assert.All(handles.Take(handles.Count - 1), handle => Assert.True(handle.IsClosed));
+            Assert.False(handles[^1].IsClosed);
+            Assert.Equal(new ulong[] { 4, 5, 6 }, testObject.Bitmap.ToArray());
+        }
     }
 
     public class SubtractOffset
@@ -421,6 +457,22 @@ public class AddTests
             // Assert
             var actual = testObject.Bitmap.Values.ToList();
             Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void SubtractOffset_ExistingBitmap_DisposesPreviousHandleAndKeepsBitmapUsable()
+        {
+            // Arrange
+            using Roaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetFromValues([2, 3, 4]);
+            SafeRoaring64BitmapHandle previousHandle = testObject.Bitmap.Handle;
+
+            // Act
+            testObject.Bitmap.SubtractOffset(1);
+
+            // Assert
+            Assert.True(previousHandle.IsClosed);
+            Assert.NotSame(previousHandle, testObject.Bitmap.Handle);
+            Assert.Equal(new ulong[] { 1, 2, 3 }, testObject.Bitmap.ToArray());
         }
     }
 

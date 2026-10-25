@@ -10,38 +10,36 @@ namespace Roaring.Net.CRoaring;
 /// </summary>
 public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bitmap
 {
-    private bool _isDisposed;
-
     /// <summary>
     /// Gets the number of elements (cardinality) contained in the <see cref="Roaring64Bitmap"/>.
     /// </summary>
     /// <returns>The number of elements contained in the <see cref="Roaring64Bitmap"/>.</returns>
-    public ulong Count => NativeMethods.roaring64_bitmap_get_cardinality(Pointer);
+    public ulong Count => NativeMethods.roaring64_bitmap_get_cardinality(Handle);
 
     /// <summary>
     /// Gets a value indicating that <see cref="Roaring64Bitmap"/> is empty (cardinality is zero).
     /// </summary>
     /// <returns><c>true</c> if <see cref="Roaring64Bitmap"/> is empty (cardinality is zero); otherwise, <c>false</c>.</returns>
-    public bool IsEmpty => NativeMethods.roaring64_bitmap_is_empty(Pointer);
+    public bool IsEmpty => NativeMethods.roaring64_bitmap_is_empty(Handle);
 
     /// <summary>
     /// Gets the minimum value in the <see cref="Roaring64Bitmap"/>.
     /// </summary>
     /// <returns>The minimum value in the <see cref="Roaring64Bitmap"/> or <c>null</c> when the bitmap is empty.</returns>
-    public ulong? Min => IsEmpty ? null : NativeMethods.roaring64_bitmap_minimum(Pointer);
+    public ulong? Min => IsEmpty ? null : NativeMethods.roaring64_bitmap_minimum(Handle);
 
     /// <summary>
     /// Gets the maximum value in the <see cref="Roaring64Bitmap"/>.
     /// </summary>
     /// <returns>The maximum value in the <see cref="Roaring64Bitmap"/> or <see langword="null"/> when the bitmap is empty.</returns>
-    public ulong? Max => IsEmpty ? null : NativeMethods.roaring64_bitmap_maximum(Pointer);
+    public ulong? Max => IsEmpty ? null : NativeMethods.roaring64_bitmap_maximum(Handle);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Roaring64Bitmap"/> class.
     /// </summary>
     /// <remarks>Initializes an empty bitmap.</remarks>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
-    public Roaring64Bitmap() => Pointer = CheckBitmapPointer(NativeMethods.roaring64_bitmap_create());
+    public Roaring64Bitmap() => ReplaceHandle(CreateHandle(NativeMethods.roaring64_bitmap_create()));
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Roaring64Bitmap"/> class with the given values.
@@ -51,7 +49,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     public Roaring64Bitmap(ulong[] values)
     {
         ArgumentNullException.ThrowIfNull(values);
-        Pointer = CheckBitmapPointer(CreatePtrFromValues(values, 0, (uint)values.Length));
+        ReplaceHandle(CreateHandle(CreatePtrFromValues(values, 0, (uint)values.Length)));
     }
 
     /// <summary>
@@ -59,14 +57,14 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// </summary>
     /// <param name="values">Values that will be added to the bitmap directly when it is created.</param>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
-    public Roaring64Bitmap(IEnumerable<ulong> values) => Pointer = CheckBitmapPointer(CreatePtrFromValues(values));
+    public Roaring64Bitmap(IEnumerable<ulong> values) => ReplaceHandle(CreateHandle(CreatePtrFromValues(values)));
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Roaring64Bitmap"/> class with the given values.
     /// </summary>
     /// <param name="values">Values that will be added to the bitmap directly when it is created.</param>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
-    public Roaring64Bitmap(ReadOnlySpan<ulong> values) => Pointer = CheckBitmapPointer(CreatePtrFromValues(values));
+    public Roaring64Bitmap(ReadOnlySpan<ulong> values) => ReplaceHandle(CreateHandle(CreatePtrFromValues(values)));
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Roaring64Bitmap"/> class with the given values.
@@ -77,17 +75,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     {
     }
 
-    internal Roaring64Bitmap(IntPtr pointer) => Pointer = CheckBitmapPointer(pointer);
-
-    private static IntPtr CheckBitmapPointer(IntPtr pointer)
-    {
-        if (pointer == IntPtr.Zero)
-        {
-            throw new InvalidOperationException(ExceptionMessages.UnableToAllocateBitmap);
-        }
-
-        return pointer;
-    }
+    internal Roaring64Bitmap(IntPtr pointer) => ReplaceHandle(CreateHandle(pointer));
 
     private static void ValidateRange(ulong start, ulong end)
     {
@@ -244,29 +232,14 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <returns>Instance of the <see cref="Roaring64Bitmap"/> class with the values from given <paramref name="bitmap"/>.</returns>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     public static Roaring64Bitmap FromBitmap(Roaring32BitmapBase bitmap)
-        => new(NativeMethods.roaring64_bitmap_move_from_roaring32(bitmap.Pointer));
-
-    /// <inheritdoc />
-    protected override void Dispose(bool disposing)
-    {
-        if (_isDisposed)
-        {
-            return;
-        }
-
-        NativeMethods.roaring64_bitmap_free(Pointer);
-        _isDisposed = true;
-    }
-
-    /// <inheritdoc />
-    ~Roaring64Bitmap() => Dispose(false);
+        => new(NativeMethods.roaring64_bitmap_move_from_roaring32(bitmap.Handle));
 
     /// <summary>
     /// Copies the bitmap.
     /// </summary>
     /// <returns>Instance of the <see cref="Roaring64Bitmap"/> class with the same values as the current bitmap.</returns>
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
-    public Roaring64Bitmap Clone() => new(NativeMethods.roaring64_bitmap_copy(Pointer));
+    public Roaring64Bitmap Clone() => new(NativeMethods.roaring64_bitmap_copy(Handle));
 
     /// <summary>
     /// Copies the bitmap and adds an offset.
@@ -276,7 +249,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     /// <remarks>Values that overflow are dropped.</remarks>
     public Roaring64Bitmap CloneWithOffset(ulong offset)
-        => new(NativeMethods.roaring64_bitmap_add_offset_signed(Pointer, true, offset));
+        => new(NativeMethods.roaring64_bitmap_add_offset_signed(Handle, true, offset));
 
     /// <summary>
     /// Copies the bitmap and subtracts an offset.
@@ -286,7 +259,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     /// <remarks>Values that underflow are dropped.</remarks>
     public Roaring64Bitmap CloneWithNegativeOffset(ulong offset)
-        => new(NativeMethods.roaring64_bitmap_add_offset_signed(Pointer, false, offset));
+        => new(NativeMethods.roaring64_bitmap_add_offset_signed(Handle, false, offset));
 
     /// <summary>
     /// Overwrites the current bitmap with the bitmap given in the <paramref name="source"/> parameter. <br/>
@@ -297,13 +270,13 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// The <see cref="OverwriteWith"/> method can save on memory allocations compared to the <see cref="Clone"/> method. <br/>
     /// On failure, the current bitmap is left in a valid, empty state (all stored values are deleted).
     /// </remarks>
-    public void OverwriteWith(Roaring64BitmapBase source) => NativeMethods.roaring64_bitmap_overwrite(Pointer, source.Pointer);
+    public void OverwriteWith(Roaring64BitmapBase source) => NativeMethods.roaring64_bitmap_overwrite(Handle, source.Handle);
 
     /// <summary>
     /// Adds a value to the bitmap.
     /// </summary>
     /// <param name="value">A value that will be added to the bitmap.</param>
-    public void Add(ulong value) => NativeMethods.roaring64_bitmap_add(Pointer, value);
+    public void Add(ulong value) => NativeMethods.roaring64_bitmap_add(Handle, value);
 
     /// <summary>
     /// Adds values from the given array to the bitmap.
@@ -338,7 +311,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
 
         fixed (ulong* valuePtr = values)
         {
-            NativeMethods.roaring64_bitmap_add_many(Pointer, (nuint)values.Length, valuePtr);
+            NativeMethods.roaring64_bitmap_add_many(Handle, (nuint)values.Length, valuePtr);
         }
     }
 
@@ -361,7 +334,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
 
         fixed (ulong* valuePtr = values)
         {
-            NativeMethods.roaring64_bitmap_add_many(Pointer, count, valuePtr + offset);
+            NativeMethods.roaring64_bitmap_add_many(Handle, count, valuePtr + offset);
         }
     }
 
@@ -395,7 +368,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// </summary>
     /// <param name="value">A value that will be added to the bitmap.</param>
     /// <returns><c>true</c> if a new value does not exist in the bitmap and has been added; otherwise, <c>false</c>.</returns>
-    public bool TryAdd(ulong value) => NativeMethods.roaring64_bitmap_add_checked(Pointer, value);
+    public bool TryAdd(ulong value) => NativeMethods.roaring64_bitmap_add_checked(Handle, value);
 
     /// <summary>
     /// Adds values from the given range.
@@ -406,7 +379,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     public void AddRange(ulong start, ulong end)
     {
         ValidateRange(start, end);
-        NativeMethods.roaring64_bitmap_add_range_closed(Pointer, start, end);
+        NativeMethods.roaring64_bitmap_add_range_closed(Handle, start, end);
     }
 
     /// <summary>
@@ -417,11 +390,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     /// <remarks>Values that overflow are dropped.</remarks>
     public void AddOffset(ulong offset)
-    {
-        var previousPtr = Pointer;
-        Pointer = CheckBitmapPointer(NativeMethods.roaring64_bitmap_add_offset_signed(Pointer, true, offset));
-        NativeMethods.roaring64_bitmap_free(previousPtr);
-    }
+        => ReplaceHandle(CreateHandle(NativeMethods.roaring64_bitmap_add_offset_signed(Handle, true, offset)));
 
     /// <summary>
     /// Subtract an offset from all values stored in the bitmap.
@@ -431,11 +400,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     /// <remarks>Values that underflow are dropped.</remarks>
     public void SubtractOffset(ulong offset)
-    {
-        var previousPtr = Pointer;
-        Pointer = CheckBitmapPointer(NativeMethods.roaring64_bitmap_add_offset_signed(Pointer, false, offset));
-        NativeMethods.roaring64_bitmap_free(previousPtr);
-    }
+        => ReplaceHandle(CreateHandle(NativeMethods.roaring64_bitmap_add_offset_signed(Handle, false, offset)));
 
     /// <summary>
     /// Adds value to the bitmap using context from a previous bulk operation to optimize the addition process.
@@ -450,14 +415,14 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
             throw new ArgumentException(ExceptionMessages.BulkContextBelongsToOtherBitmap, nameof(context));
         }
 
-        NativeMethods.roaring64_bitmap_add_bulk(Pointer, context.Pointer, value);
+        NativeMethods.roaring64_bitmap_add_bulk(Handle, context.Handle, value);
     }
 
     /// <summary>
     /// Removes a value from the bitmap.
     /// </summary>
     /// <param name="value">A value that will be removed from the bitmap.</param>
-    public void Remove(ulong value) => NativeMethods.roaring64_bitmap_remove(Pointer, value);
+    public void Remove(ulong value) => NativeMethods.roaring64_bitmap_remove(Handle, value);
 
     /// <summary>
     /// Removes the values contained in the given array from the bitmap.
@@ -492,7 +457,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
 
         fixed (ulong* valuePtr = values)
         {
-            NativeMethods.roaring64_bitmap_remove_many(Pointer, (nuint)values.Length, valuePtr);
+            NativeMethods.roaring64_bitmap_remove_many(Handle, (nuint)values.Length, valuePtr);
         }
     }
 
@@ -515,7 +480,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
 
         fixed (ulong* valuePtr = values)
         {
-            NativeMethods.roaring64_bitmap_remove_many(Pointer, count, valuePtr + offset);
+            NativeMethods.roaring64_bitmap_remove_many(Handle, count, valuePtr + offset);
         }
     }
 
@@ -549,7 +514,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// </summary>
     /// <param name="value">A value that will be removed from the bitmap.</param>
     /// <returns><c>true</c> if a value exists in the bitmap and has been removed; otherwise, <c>false</c>.</returns>
-    public bool TryRemove(ulong value) => NativeMethods.roaring64_bitmap_remove_checked(Pointer, value);
+    public bool TryRemove(ulong value) => NativeMethods.roaring64_bitmap_remove_checked(Handle, value);
 
     /// <summary>
     /// Removes values from the given range.
@@ -560,7 +525,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     public void RemoveRange(ulong start, ulong end)
     {
         ValidateRange(start, end);
-        NativeMethods.roaring64_bitmap_remove_range_closed(Pointer, start, end);
+        NativeMethods.roaring64_bitmap_remove_range_closed(Handle, start, end);
     }
 
     /// <summary>
@@ -578,7 +543,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
 
         if (min > 0)
         {
-            NativeMethods.roaring64_bitmap_remove_range_closed(Pointer, 0, min - 1);
+            NativeMethods.roaring64_bitmap_remove_range_closed(Handle, 0, min - 1);
         }
 
         if (!IsEmpty)
@@ -586,7 +551,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
             var maximum = Max;
             if (maximum.HasValue && max < maximum.Value)
             {
-                NativeMethods.roaring64_bitmap_remove_range_closed(Pointer, max + 1, maximum.Value);
+                NativeMethods.roaring64_bitmap_remove_range_closed(Handle, max + 1, maximum.Value);
             }
         }
     }
@@ -604,21 +569,21 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
             throw new ArgumentException(ExceptionMessages.BulkContextBelongsToOtherBitmap, nameof(context));
         }
 
-        NativeMethods.roaring64_bitmap_remove_bulk(Pointer, context.Pointer, value);
+        NativeMethods.roaring64_bitmap_remove_bulk(Handle, context.Handle, value);
     }
 
 
     /// <summary>
     /// Removes all values from the bitmap.
     /// </summary>
-    public void Clear() => NativeMethods.roaring64_bitmap_clear(Pointer);
+    public void Clear() => NativeMethods.roaring64_bitmap_clear(Handle);
 
     /// <summary>
     /// Checks if a value is present in the bitmap.
     /// </summary>
     /// <param name="value">A value for which the check will be performed.</param>
     /// <returns><c>true</c> if a value exists in the bitmap; otherwise, <c>false</c>.</returns>
-    public bool Contains(ulong value) => NativeMethods.roaring64_bitmap_contains(Pointer, value);
+    public bool Contains(ulong value) => NativeMethods.roaring64_bitmap_contains(Handle, value);
 
     /// <summary>
     /// Checks if the values for the given range are present in the bitmap.
@@ -630,7 +595,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     public bool ContainsRange(ulong start, ulong end)
     {
         ValidateRange(start, end);
-        return NativeMethods.roaring64_bitmap_contains_range_closed(Pointer, start, end);
+        return NativeMethods.roaring64_bitmap_contains_range_closed(Handle, start, end);
     }
 
     /// <summary>
@@ -646,7 +611,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
             throw new ArgumentException(ExceptionMessages.BulkContextBelongsToOtherBitmap, nameof(context));
         }
 
-        return NativeMethods.roaring64_bitmap_contains_bulk(Pointer, context.Pointer, value);
+        return NativeMethods.roaring64_bitmap_contains_bulk(Handle, context.Handle, value);
     }
 
     /// <summary>
@@ -661,7 +626,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
             return false;
         }
 
-        return NativeMethods.roaring64_bitmap_equals(Pointer, bitmap.Pointer);
+        return NativeMethods.roaring64_bitmap_equals(Handle, bitmap.Handle);
     }
 
     /// <summary>
@@ -676,7 +641,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
             return false;
         }
 
-        return NativeMethods.roaring64_bitmap_is_subset(Pointer, bitmap.Pointer);
+        return NativeMethods.roaring64_bitmap_is_subset(Handle, bitmap.Handle);
     }
 
     /// <summary>
@@ -691,7 +656,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
             return false;
         }
 
-        return NativeMethods.roaring64_bitmap_is_strict_subset(Pointer, bitmap.Pointer);
+        return NativeMethods.roaring64_bitmap_is_strict_subset(Handle, bitmap.Handle);
     }
 
     /// <summary>
@@ -706,13 +671,13 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
             return false;
         }
 
-        if (NativeMethods.roaring64_bitmap_get_cardinality(bitmap.Pointer) >
-            NativeMethods.roaring64_bitmap_get_cardinality(Pointer))
+        if (NativeMethods.roaring64_bitmap_get_cardinality(bitmap.Handle) >
+            NativeMethods.roaring64_bitmap_get_cardinality(Handle))
         {
             return false;
         }
 
-        return NativeMethods.roaring64_bitmap_is_subset(bitmap.Pointer, Pointer);
+        return NativeMethods.roaring64_bitmap_is_subset(bitmap.Handle, Handle);
     }
 
     /// <summary>
@@ -727,13 +692,13 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
             return false;
         }
 
-        if (NativeMethods.roaring64_bitmap_get_cardinality(bitmap.Pointer) >=
-            NativeMethods.roaring64_bitmap_get_cardinality(Pointer))
+        if (NativeMethods.roaring64_bitmap_get_cardinality(bitmap.Handle) >=
+            NativeMethods.roaring64_bitmap_get_cardinality(Handle))
         {
             return false;
         }
 
-        return NativeMethods.roaring64_bitmap_is_subset(bitmap.Pointer, Pointer);
+        return NativeMethods.roaring64_bitmap_is_subset(bitmap.Handle, Handle);
     }
 
     /// <summary>
@@ -742,7 +707,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <param name="index">The index for which the value will be retrieved. Index values start from 0.</param>
     /// <param name="value">Retrieved value. <c>0</c> if value does not exist in the bitmap.</param>
     /// <returns><c>true</c> if a value exists in the bitmap; otherwise, <c>false</c>.</returns>
-    public bool TryGetValue(ulong index, out ulong value) => NativeMethods.roaring64_bitmap_select(Pointer, index, out value);
+    public bool TryGetValue(ulong index, out ulong value) => NativeMethods.roaring64_bitmap_select(Handle, index, out value);
 
     /// <summary>
     /// Gets the index (rank) for the given value.
@@ -750,14 +715,14 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <param name="value">The value for which the index will be retrieved.</param>
     /// <param name="index">Index (rank) of the <paramref name="value"/>. <c>0</c> if value does not exist in the bitmap.</param>
     /// <returns><c>true</c> if index for <paramref name="value"/> exists in the bitmap; otherwise, <c>false</c>.</returns>
-    public bool TryGetIndex(ulong value, out ulong index) => NativeMethods.roaring64_bitmap_get_index(Pointer, value, out index);
+    public bool TryGetIndex(ulong value, out ulong index) => NativeMethods.roaring64_bitmap_get_index(Handle, value, out index);
 
     /// <summary>
     /// Counts number of values less than or equal to <paramref name="value"/>.
     /// </summary>
     /// <param name="value">The value for which data will be counted.</param>
     /// <returns>The number of values that are less than or equal to the <paramref name="value"/>.</returns>
-    public ulong CountLessOrEqualTo(ulong value) => NativeMethods.roaring64_bitmap_rank(Pointer, value);
+    public ulong CountLessOrEqualTo(ulong value) => NativeMethods.roaring64_bitmap_rank(Handle, value);
 
     /// <summary>
     /// Counts number of values less than or equal to for each element of <paramref name="values"/>.
@@ -804,7 +769,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
 
         for (var i = 0; i < values.Length; i++)
         {
-            destination[i] = NativeMethods.roaring64_bitmap_rank(Pointer, values[i]);
+            destination[i] = NativeMethods.roaring64_bitmap_rank(Handle, values[i]);
         }
     }
 
@@ -825,7 +790,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     public ulong CountRange(ulong start, ulong end)
     {
         ValidateRange(start, end);
-        return NativeMethods.roaring64_bitmap_range_closed_cardinality(Pointer, start, end);
+        return NativeMethods.roaring64_bitmap_range_closed_cardinality(Handle, start, end);
     }
 
     /* unavailable due to CRoaring performance issues
@@ -835,12 +800,12 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// </summary>
     /// <returns>Instance of the <see cref="Roaring64Bitmap"/> class with negated values of current bitmap.</returns>
     public Roaring64Bitmap Not()
-        => new(NativeMethods.roaring64_bitmap_flip_closed(Pointer, ulong.MinValue, ulong.MaxValue));
+        => new(NativeMethods.roaring64_bitmap_flip_closed(Handle, ulong.MinValue, ulong.MaxValue));
 
     /// <summary>
     /// Negates all values in the current bitmap. 
     /// </summary>
-    public void INot() => NativeMethods.roaring64_bitmap_flip_closed_inplace(Pointer, ulong.MinValue, ulong.MaxValue);
+    public void INot() => NativeMethods.roaring64_bitmap_flip_closed_inplace(Handle, ulong.MinValue, ulong.MaxValue);
 
     */
 
@@ -859,7 +824,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
             throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
         }
 
-        return new(NativeMethods.roaring64_bitmap_flip_closed(Pointer, start, end));
+        return new(NativeMethods.roaring64_bitmap_flip_closed(Handle, start, end));
     }
 
     /// <summary>
@@ -876,7 +841,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
             throw new ArgumentOutOfRangeException(nameof(start), start, ExceptionMessages.StartValueGreaterThenEndValue);
         }
 
-        NativeMethods.roaring64_bitmap_flip_closed_inplace(Pointer, start, end);
+        NativeMethods.roaring64_bitmap_flip_closed_inplace(Handle, start, end);
     }
 
     /// <summary>
@@ -892,7 +857,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// </list>
     /// </remarks>
     public Roaring64Bitmap And(Roaring64BitmapBase bitmap) =>
-        new(NativeMethods.roaring64_bitmap_and(Pointer, bitmap.Pointer));
+        new(NativeMethods.roaring64_bitmap_and(Handle, bitmap.Handle));
 
     /// <summary>
     /// Intersects (in place) the current bitmap with the <paramref name="bitmap"/> given in the parameter.
@@ -905,7 +870,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// </list>
     /// </remarks>
     public void IAnd(Roaring64BitmapBase bitmap)
-        => NativeMethods.roaring64_bitmap_and_inplace(Pointer, bitmap.Pointer);
+        => NativeMethods.roaring64_bitmap_and_inplace(Handle, bitmap.Handle);
 
     /// <summary>
     /// Intersects the current bitmap with the <paramref name="bitmap"/> given in the parameter and returns the number of values contained in the resulting bitmap.
@@ -913,7 +878,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <param name="bitmap">Bitmap with which the intersection will be performed.</param>
     /// <returns>Number of values contained in the resulting bitmap after intersection.</returns>
     public ulong AndCount(Roaring64BitmapBase bitmap)
-        => NativeMethods.roaring64_bitmap_and_cardinality(Pointer, bitmap.Pointer);
+        => NativeMethods.roaring64_bitmap_and_cardinality(Handle, bitmap.Handle);
 
     /// <summary>
     /// Creates a difference between the current bitmap and the <paramref name="bitmap"/> given in the parameter.
@@ -921,14 +886,14 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <param name="bitmap">Bitmap with which the difference will be performed.</param>
     /// <returns><see cref="Roaring64Bitmap"/> with the result of the difference of two bitmaps.</returns>
     public Roaring64Bitmap AndNot(Roaring64BitmapBase bitmap) =>
-        new(NativeMethods.roaring64_bitmap_andnot(Pointer, bitmap.Pointer));
+        new(NativeMethods.roaring64_bitmap_andnot(Handle, bitmap.Handle));
 
     /// <summary>
     /// Creates (in place) a difference between the current bitmap with the <paramref name="bitmap"/> given in the parameter.
     /// </summary>
     /// <param name="bitmap">Bitmap with which the difference will be performed.</param>
     public void IAndNot(Roaring64BitmapBase bitmap)
-        => NativeMethods.roaring64_bitmap_andnot_inplace(Pointer, bitmap.Pointer);
+        => NativeMethods.roaring64_bitmap_andnot_inplace(Handle, bitmap.Handle);
 
     /// <summary>
     /// Creates a difference between the current bitmap and the <paramref name="bitmap"/> given in the parameter and returns the number of values contained in the resulting bitmap.
@@ -936,7 +901,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <param name="bitmap">Bitmap with which the difference will be performed.</param>
     /// <returns>Number of values contained in the resulting bitmap after difference.</returns>
     public ulong AndNotCount(Roaring64BitmapBase bitmap)
-        => NativeMethods.roaring64_bitmap_andnot_cardinality(Pointer, bitmap.Pointer);
+        => NativeMethods.roaring64_bitmap_andnot_cardinality(Handle, bitmap.Handle);
 
     /// <summary>
     /// Creates a union between the current bitmap and the <paramref name="bitmap"/> given in the parameter.
@@ -944,7 +909,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <param name="bitmap">Bitmap with which the union will be performed.</param>
     /// <returns><see cref="Roaring64Bitmap"/> with the result of union two bitmaps.</returns>
     public Roaring64Bitmap Or(Roaring64BitmapBase bitmap) =>
-        new(NativeMethods.roaring64_bitmap_or(Pointer, bitmap.Pointer));
+        new(NativeMethods.roaring64_bitmap_or(Handle, bitmap.Handle));
 
     /// <summary>
     /// Creates a union between the current bitmap and the <paramref name="bitmap"/> given in the parameter and returns the number of values contained in the resulting bitmap.
@@ -952,7 +917,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <param name="bitmap">Bitmap with which the union will be performed.</param>
     /// <returns>Number of values contained in the resulting bitmap after union.</returns>
     public ulong OrCount(Roaring64BitmapBase bitmap)
-        => NativeMethods.roaring64_bitmap_or_cardinality(Pointer, bitmap.Pointer);
+        => NativeMethods.roaring64_bitmap_or_cardinality(Handle, bitmap.Handle);
 
     /// <summary>
     /// Creates a union between the current bitmap and the <paramref name="bitmaps"/> given in the parameter.
@@ -961,7 +926,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <returns><see cref="Roaring64Bitmap"/> with the result of union of many bitmaps.</returns>
     public Roaring64Bitmap OrMany(Roaring64BitmapBase[] bitmaps)
     {
-        var result = new Roaring64Bitmap(NativeMethods.roaring64_bitmap_copy(Pointer));
+        var result = new Roaring64Bitmap(NativeMethods.roaring64_bitmap_copy(Handle));
         for (var i = 0; i < bitmaps.Length; i++)
         {
             result.IOr(bitmaps[i]);
@@ -975,7 +940,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// </summary>
     /// <param name="bitmap">Bitmap with which the union will be performed.</param>
     public void IOr(Roaring64BitmapBase bitmap)
-        => NativeMethods.roaring64_bitmap_or_inplace(Pointer, bitmap.Pointer);
+        => NativeMethods.roaring64_bitmap_or_inplace(Handle, bitmap.Handle);
 
     /// <summary>
     /// Creates a symmetric difference between the current bitmap and the <paramref name="bitmap"/> given in the parameter.
@@ -983,7 +948,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <param name="bitmap">Bitmap with which the symmetric difference will be performed.</param>
     /// <returns><see cref="Roaring64Bitmap"/> with the result of the symmetric difference of two bitmaps.</returns>
     public Roaring64Bitmap Xor(Roaring64BitmapBase bitmap) =>
-        new(NativeMethods.roaring64_bitmap_xor(Pointer, bitmap.Pointer));
+        new(NativeMethods.roaring64_bitmap_xor(Handle, bitmap.Handle));
 
     /// <summary>
     /// Creates a symmetric difference between the current bitmap and the <paramref name="bitmaps"/> given in the parameter.
@@ -992,7 +957,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <returns><see cref="Roaring64Bitmap"/> with the result of the symmetric difference of many bitmaps.</returns>
     public Roaring64Bitmap XorMany(params Roaring64BitmapBase[] bitmaps)
     {
-        var result = new Roaring64Bitmap(NativeMethods.roaring64_bitmap_copy(Pointer));
+        var result = new Roaring64Bitmap(NativeMethods.roaring64_bitmap_copy(Handle));
         for (var i = 0; i < bitmaps.Length; i++)
         {
             result.IXor(bitmaps[i]);
@@ -1006,7 +971,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// </summary>
     /// <param name="bitmap">Bitmap with which the symmetric difference will be performed.</param>
     public void IXor(Roaring64BitmapBase bitmap)
-        => NativeMethods.roaring64_bitmap_xor_inplace(Pointer, bitmap.Pointer);
+        => NativeMethods.roaring64_bitmap_xor_inplace(Handle, bitmap.Handle);
 
     /// <summary>
     /// Creates a symmetric difference between the current bitmap and the <paramref name="bitmap"/> given in the parameter and returns the number of values contained in the resulting bitmap. 
@@ -1014,7 +979,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <param name="bitmap">Bitmap with which the symmetric difference will be performed.</param>
     /// <returns>Number of values contained in the resulting bitmap after symmetric difference.</returns>
     public ulong XorCount(Roaring64BitmapBase bitmap)
-        => NativeMethods.roaring64_bitmap_xor_cardinality(Pointer, bitmap.Pointer);
+        => NativeMethods.roaring64_bitmap_xor_cardinality(Handle, bitmap.Handle);
 
     /// <summary>
     /// Checks whether the current bitmaps overlaps (at least one element exists in both bitmaps) the <paramref name="bitmap"/> given in the parameter.
@@ -1022,7 +987,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <param name="bitmap">Bitmap with which the calculation will be performed.</param>
     /// <returns><c>true</c> if current bitmap overlaps the given bitmap and the bitmaps are not empty; otherwise, <c>false</c>.</returns>
     public bool Overlaps(Roaring64BitmapBase bitmap)
-        => NativeMethods.roaring64_bitmap_intersect(Pointer, bitmap.Pointer);
+        => NativeMethods.roaring64_bitmap_intersect(Handle, bitmap.Handle);
 
     /// <summary>
     /// Checks whether the current bitmaps overlaps (at least one element exists in range) the range given in the parameters.
@@ -1047,12 +1012,12 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
                 endInclusive += 1;
             }
 
-            overlaps = NativeMethods.roaring64_bitmap_intersect_with_range(Pointer, start, endInclusive)
-                       || (end == ulong.MaxValue && NativeMethods.roaring64_bitmap_contains(Pointer, end));
+            overlaps = NativeMethods.roaring64_bitmap_intersect_with_range(Handle, start, endInclusive)
+                       || (end == ulong.MaxValue && NativeMethods.roaring64_bitmap_contains(Handle, end));
         }
         else
         {
-            overlaps = NativeMethods.roaring64_bitmap_contains(Pointer, start);
+            overlaps = NativeMethods.roaring64_bitmap_contains(Handle, start);
         }
 
         return overlaps;
@@ -1066,28 +1031,28 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <returns>Value of the Jaccard index.</returns>
     /// <remarks>The Jaccard index is undefined if both bitmaps are empty.</remarks>
     public double GetJaccardIndex(Roaring64BitmapBase bitmap)
-        => NativeMethods.roaring64_bitmap_jaccard_index(Pointer, bitmap.Pointer);
+        => NativeMethods.roaring64_bitmap_jaccard_index(Handle, bitmap.Handle);
 
     /// <summary>
     /// Performs optimizations on the current bitmap.
     /// </summary>
     /// <returns><c>true</c> if the result has at least one run container; otherwise, <c>false</c>.</returns>
     public bool Optimize()
-        => NativeMethods.roaring64_bitmap_run_optimize(Pointer);
+        => NativeMethods.roaring64_bitmap_run_optimize(Handle);
 
     /// <summary>
     /// Removes run-length encoding even when it is more space efficient.
     /// </summary>
     /// <returns><c>true</c> if remove operation has been performed; otherwise, <c>false</c>.</returns>
     public bool RemoveRunCompression()
-        => NativeMethods.roaring64_bitmap_remove_run_compression(Pointer);
+        => NativeMethods.roaring64_bitmap_remove_run_compression(Handle);
 
     /// <summary>
     /// Tries to reallocate memory to reduce the memory usage.
     /// </summary>
     /// <returns>The number of bytes saved after performing the shrink operation.</returns>
     public nuint ShrinkToFit()
-        => NativeMethods.roaring64_bitmap_shrink_to_fit(Pointer);
+        => NativeMethods.roaring64_bitmap_shrink_to_fit(Handle);
 
     /// <summary>
     /// Writes current bitmap to the <paramref name="buffer"/> given in the parameter.
@@ -1102,7 +1067,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
             throw new ArgumentOutOfRangeException(nameof(buffer), buffer.Length, ExceptionMessages.BufferSizeIsTooSmall);
         }
 
-        NativeMethods.roaring64_bitmap_to_uint64_array(Pointer, buffer);
+        NativeMethods.roaring64_bitmap_to_uint64_array(Handle, buffer);
     }
 
     /// <summary>
@@ -1126,7 +1091,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
 
         fixed (ulong* ptr = &MemoryMarshal.GetReference(buffer))
         {
-            NativeMethods.roaring64_bitmap_to_uint64_array(Pointer, ptr);
+            NativeMethods.roaring64_bitmap_to_uint64_array(Handle, ptr);
         }
     }
 
@@ -1134,7 +1099,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// Gets enumerator that returns the values contained in the bitmap.
     /// </summary>
     /// <remarks>The values are ordered from smallest to largest.</remarks>
-    public IEnumerable<ulong> Values => new Roaring64Enumerator(Pointer);
+    public IEnumerable<ulong> Values => new Roaring64Enumerator(Handle);
 
     /// <summary>
     /// Writes current bitmap to the array.
@@ -1142,9 +1107,9 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <returns>The array containing the values of the bitmap.</returns>
     public ulong[] ToArray()
     {
-        var count = NativeMethods.roaring64_bitmap_get_cardinality(Pointer);
+        var count = NativeMethods.roaring64_bitmap_get_cardinality(Handle);
         var values = new ulong[count];
-        NativeMethods.roaring64_bitmap_to_uint64_array(Pointer, values);
+        NativeMethods.roaring64_bitmap_to_uint64_array(Handle, values);
         return values;
     }
 
@@ -1156,14 +1121,14 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <remarks>If the bitmap contains fewer values than the given number then the array will be adjusted to the number of values.</remarks>
     public ulong[] Take(ulong count)
     {
-        var cardinality = NativeMethods.roaring64_bitmap_get_cardinality(Pointer);
+        var cardinality = NativeMethods.roaring64_bitmap_get_cardinality(Handle);
         if (cardinality < count)
         {
             count = cardinality;
         }
 
         var values = new ulong[count];
-        NativeMethods.roaring64_bitmap_to_uint64_array(Pointer, values);
+        NativeMethods.roaring64_bitmap_to_uint64_array(Handle, values);
         return values;
     }
 
@@ -1173,7 +1138,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <returns>Structure containing statistics about the bitmap.</returns>
     public Statistics64 GetStatistics()
     {
-        NativeMethods.roaring64_bitmap_statistics(Pointer, out Statistics64 stats);
+        NativeMethods.roaring64_bitmap_statistics(Handle, out Statistics64 stats);
         return stats;
     }
 
@@ -1201,7 +1166,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// </remarks>
     public bool IsValid(out string? reason)
     {
-        var result = NativeMethods.roaring64_bitmap_internal_validate(Pointer, out var reasonPtr);
+        var result = NativeMethods.roaring64_bitmap_internal_validate(Handle, out var reasonPtr);
         reason = Marshal.PtrToStringAnsi(reasonPtr);
         return result;
     }
@@ -1217,10 +1182,10 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
         switch (format)
         {
             case SerializationFormat.Portable:
-                return NativeMethods.roaring64_bitmap_portable_size_in_bytes(Pointer);
+                return NativeMethods.roaring64_bitmap_portable_size_in_bytes(Handle);
             case SerializationFormat.Frozen:
                 ShrinkToFit(); // CRoaring requires shrink_to_fit before frozen operations
-                return NativeMethods.roaring64_bitmap_frozen_size_in_bytes(Pointer);
+                return NativeMethods.roaring64_bitmap_frozen_size_in_bytes(Handle);
             default:
                 throw new ArgumentOutOfRangeException(nameof(format), format,
                     ExceptionMessages.UnsupportedSerializationFormat);
@@ -1258,7 +1223,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
             case SerializationFormat.Portable:
                 fixed (byte* bufferPtr = destination)
                 {
-                    NativeMethods.roaring64_bitmap_portable_serialize(Pointer, bufferPtr);
+                    NativeMethods.roaring64_bitmap_portable_serialize(Handle, bufferPtr);
                 }
 
                 break;
@@ -1266,7 +1231,7 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
                 ShrinkToFit(); // CRoaring requires shrink_to_fit before frozen operations
                 fixed (byte* bufferPtr = destination)
                 {
-                    NativeMethods.roaring64_bitmap_frozen_serialize(Pointer, bufferPtr);
+                    NativeMethods.roaring64_bitmap_frozen_serialize(Handle, bufferPtr);
                 }
 
                 break;
@@ -1376,11 +1341,11 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <exception cref="InvalidOperationException">Thrown when unable to allocate bitmap.</exception>
     public FrozenRoaring64Bitmap ToFrozen() => new(this);
 
-    internal Roaring64Bitmap GetFrozenView(nuint size, byte* memoryPtr)
+    internal Roaring64Bitmap GetFrozenView(nuint size, Roaring64BitmapMemory memory)
     {
         ShrinkToFit(); // CRoaring requires shrink_to_fit before frozen operations
-        NativeMethods.roaring64_bitmap_frozen_serialize(Pointer, memoryPtr);
-        var ptr = NativeMethods.roaring64_bitmap_frozen_view(memoryPtr, size);
+        NativeMethods.roaring64_bitmap_frozen_serialize_to_memory(Handle, memory.Handle);
+        var ptr = NativeMethods.roaring64_bitmap_frozen_view_from_memory(memory.Handle, size);
         return new Roaring64Bitmap(ptr);
     }
 }

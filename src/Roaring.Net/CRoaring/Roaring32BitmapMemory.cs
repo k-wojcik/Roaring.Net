@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,12 +15,18 @@ public sealed unsafe class Roaring32BitmapMemory : IDisposable
     /// </summary>
     public nuint Size { get; }
 
-    internal readonly byte* MemoryPtr;
+    internal SafeRoaring32MemoryHandle Handle { get; }
 
-    private bool _isDisposed;
+    internal byte* MemoryPtr => (byte*)Handle.DangerousGetHandle();
+
+#if NET9_0_OR_GREATER
+    private readonly Lock _syncRoot = new();
+#else
+    private readonly object _syncRoot = new();
+#endif
+
     private bool _isDisposable;
-
-    private readonly HashSet<Roaring32BitmapBase> _bitmapReferences = new();
+    private int _leaseCount;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Roaring32BitmapMemory"/> class.
@@ -36,7 +41,7 @@ public sealed unsafe class Roaring32BitmapMemory : IDisposable
         }
 
         Size = size;
-        MemoryPtr = AllocateMemory(size);
+        Handle = AllocateMemory(size);
     }
 
     internal Roaring32BitmapMemory(nuint size, bool shared)
@@ -45,10 +50,32 @@ public sealed unsafe class Roaring32BitmapMemory : IDisposable
         _isDisposable = !shared;
     }
 
-    private static byte* AllocateMemory(nuint size)
+    private static SafeRoaring32MemoryHandle AllocateMemory(nuint size)
     {
-        GC.AddMemoryPressure((long)size);
-        return (byte*)NativeMemory.AlignedAlloc(size, 32);
+        var pressure = checked((long)size);
+        GC.AddMemoryPressure(pressure);
+
+        byte* pointer;
+        try
+        {
+            pointer = (byte*)NativeMemory.AlignedAlloc(size, 32);
+        }
+        catch
+        {
+            GC.RemoveMemoryPressure(pressure);
+            throw;
+        }
+
+        try
+        {
+            return new SafeRoaring32MemoryHandle((IntPtr)pointer, size);
+        }
+        catch
+        {
+            NativeMemory.AlignedFree(pointer);
+            GC.RemoveMemoryPressure(pressure);
+            throw;
+        }
     }
 
     /// <summary>
@@ -149,8 +176,8 @@ public sealed unsafe class Roaring32BitmapMemory : IDisposable
 
         var ptr = format switch
         {
-            SerializationFormat.Frozen => NativeMethods.roaring_bitmap_frozen_view(MemoryPtr, Size),
-            SerializationFormat.Portable => NativeMethods.roaring_bitmap_portable_deserialize_frozen(MemoryPtr),
+            SerializationFormat.Frozen => NativeMethods.roaring_bitmap_frozen_view_from_memory(Handle, Size),
+            SerializationFormat.Portable => NativeMethods.roaring_bitmap_portable_deserialize_frozen_from_memory(Handle),
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, ExceptionMessages.UnsupportedSerializationFormat)
         };
 
@@ -159,14 +186,12 @@ public sealed unsafe class Roaring32BitmapMemory : IDisposable
             throw new InvalidOperationException(ExceptionMessages.DeserializationFailedUnknownReason);
         }
 
-        var bitmap = new FrozenRoaring32Bitmap(ptr, this);
-        _bitmapReferences.Add(bitmap);
-        return bitmap;
+        return new FrozenRoaring32Bitmap(ptr, this);
     }
 
     private void CheckDisposed()
     {
-        if (!_isDisposed)
+        if (!Handle.IsClosed)
         {
             return;
         }
@@ -174,53 +199,65 @@ public sealed unsafe class Roaring32BitmapMemory : IDisposable
         throw new ObjectDisposedException(ExceptionMessages.BitmapMemoryDisposed);
     }
 
-    internal void Release(Roaring32BitmapBase bitmap)
+    internal SafeRoaring32MemoryLease AcquireLease(SafeRoaring32BitmapHandle? viewHandle)
     {
-        _bitmapReferences.Remove(bitmap);
-
-        if (_bitmapReferences.Count > 0 || !_isDisposable)
+        lock (_syncRoot)
         {
-            return;
-        }
+            CheckDisposed();
 
-        Dispose();
+            var lease = new SafeRoaring32MemoryLease(this, viewHandle);
+            _leaseCount++;
+            return lease;
+        }
+    }
+
+    internal void ReleaseLease()
+    {
+        lock (_syncRoot)
+        {
+            if (_leaseCount > 0)
+            {
+                _leaseCount--;
+            }
+
+            if (_leaseCount != 0 || !_isDisposable)
+            {
+                return;
+            }
+
+            Handle.Dispose();
+        }
+    }
+
+    internal void DisposeOwnedIfUnleased()
+    {
+        lock (_syncRoot)
+        {
+            if (!_isDisposable || _leaseCount != 0)
+            {
+                return;
+            }
+
+            Handle.Dispose();
+        }
     }
 
     /// <inheritdoc />
     public void Dispose()
     {
-        if (_bitmapReferences.Count > 0)
+        lock (_syncRoot)
         {
+            if (_isDisposable)
+            {
+                return;
+            }
+
             _isDisposable = true;
-            return;
-        }
 
-        Dispose(true);
-        GC.SuppressFinalize(this);
+            if (_leaseCount == 0)
+            {
+                Handle.Dispose();
+            }
+        }
     }
-
-    private void Dispose(bool disposing)
-    {
-        if (_isDisposed)
-        {
-            return;
-        }
-
-        if (MemoryPtr != null)
-        {
-            NativeMemory.AlignedFree(MemoryPtr);
-        }
-
-        if (Size > 0)
-        {
-            GC.RemoveMemoryPressure((long)Size);
-        }
-
-        _isDisposed = true;
-    }
-
-    /// <summary>
-    /// Finalizer.
-    /// </summary>
-    ~Roaring32BitmapMemory() => Dispose(false);
 }

@@ -6,6 +6,7 @@ namespace Roaring.Net.CRoaring;
 
 internal sealed class Roaring64Enumerator : IEnumerator<ulong>, IEnumerable<ulong>
 {
+    private readonly SafeRoaring64IteratorHandle _iteratorHandle;
     private readonly IntPtr _iterator;
     private bool _isFirst;
     private bool _isDisposed;
@@ -30,14 +31,28 @@ internal sealed class Roaring64Enumerator : IEnumerator<ulong>, IEnumerable<ulon
 
     object IEnumerator.Current => Current;
 
-    internal Roaring64Enumerator(IntPtr bitmap)
+    internal Roaring64Enumerator(SafeRoaring64BitmapHandle bitmap, object? owner = null, Roaring64BitmapMemory? memory = null)
     {
-        var ptr = NativeMethods.roaring64_iterator_create(bitmap);
+        SafeRoaring64MemoryLease? memoryLease = memory?.AcquireLease(null);
+
+        IntPtr ptr;
+        try
+        {
+            ptr = NativeMethods.roaring64_iterator_create(bitmap);
+        }
+        catch
+        {
+            memoryLease?.Dispose();
+            throw;
+        }
+
         if (ptr == IntPtr.Zero)
         {
+            memoryLease?.Dispose();
             throw new InvalidOperationException(ExceptionMessages.UnableToAllocateBitmapIterator);
         }
 
+        _iteratorHandle = new SafeRoaring64IteratorHandle(ptr, bitmap, memoryLease, owner);
         _iterator = ptr;
         _isFirst = true;
     }
@@ -60,26 +75,18 @@ internal sealed class Roaring64Enumerator : IEnumerator<ulong>, IEnumerable<ulon
 
     public void Reset() => throw new NotSupportedException(ExceptionMessages.OperationNotSupported);
 
-    private void Dispose(bool _)
+    public void Dispose()
     {
         if (_isDisposed)
         {
             return;
         }
 
-        NativeMethods.roaring64_iterator_free(_iterator);
         _isDisposed = true;
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        _iteratorHandle.Dispose();
     }
 
     public IEnumerator<ulong> GetEnumerator() => this;
-
-    ~Roaring64Enumerator() => Dispose(false);
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
