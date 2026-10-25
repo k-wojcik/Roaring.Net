@@ -15,9 +15,7 @@ public sealed unsafe class BulkContext64 : IDisposable
 {
     internal Roaring64BitmapBase Bitmap { get; }
 
-    internal readonly IntPtr Pointer;
-
-    private bool _isDisposed;
+    internal SafeBulkContextHandle Handle { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BulkContext64"/> class.
@@ -26,42 +24,31 @@ public sealed unsafe class BulkContext64 : IDisposable
     public BulkContext64(Roaring64BitmapBase bitmap)
     {
         var size = Marshal.SizeOf<BulkContext64Internal>();
-        Pointer = Marshal.AllocHGlobal(size);
-        Unsafe.InitBlockUnaligned(Pointer.ToPointer(), 0, (uint)size);
-        Bitmap = bitmap;
+        var pointer = Marshal.AllocHGlobal(size);
+
+        try
+        {
+            Unsafe.InitBlockUnaligned(pointer.ToPointer(), 0, (uint)size);
+            Handle = new SafeBulkContextHandle(pointer);
+            Bitmap = bitmap;
+        }
+        catch
+        {
+            Marshal.FreeHGlobal(pointer);
+            throw;
+        }
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="BulkContext"/> class.
+    /// Initializes a new instance of the <see cref="BulkContext64"/> class.
     /// </summary>
     /// <param name="bitmap">Bitmap with which the context will be used.</param>
     /// <returns>Context for the passed bitmap,</returns>
     public static BulkContext64 For(Roaring64BitmapBase bitmap) => new(bitmap);
 
-    private void Dispose(bool disposing)
-    {
-        if (_isDisposed)
-        {
-            return;
-        }
-
-        Marshal.FreeHGlobal(Pointer);
-
-        _isDisposed = true;
-    }
-
     /// <inheritdoc />
     public void Dispose()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    /// Finalizer.
-    /// </summary>
-    ~BulkContext64()
-    {
-        Dispose(false);
+        Handle.Dispose();
     }
 }

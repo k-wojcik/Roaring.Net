@@ -7,11 +7,12 @@ namespace Roaring.Net.CRoaring;
 /// Represents a 32-bit CRoaring frozen bitmap. <br/>
 /// <a href="https://github.com/RoaringBitmap/CRoaring/blob/60d0e97fa021b04f8a6ad50e3877ca16d988c80e/include/roaring/roaring.h#L694-L711"> "Frozen" serialization format.</a>
 /// </summary>
-public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bitmap
+public class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoaring32Bitmap
 {
     internal Roaring32BitmapMemory Memory { get; }
 
     private readonly Roaring32Bitmap _bitmap;
+    private readonly SafeRoaring32MemoryLease _memoryLease;
     private bool _isDisposed;
 
     /// <summary>
@@ -42,17 +43,54 @@ public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoarin
     {
         var size = bitmap.GetSerializationSize(SerializationFormat.Frozen);
         Memory = new Roaring32BitmapMemory(size, shared: false);
-        _bitmap = bitmap.GetFrozenView(size, Memory.MemoryPtr);
 
-        Pointer = _bitmap.Pointer;
+        _bitmap = CreateFrozenView(bitmap, size, Memory, out SafeRoaring32MemoryLease memoryLease);
+        _memoryLease = memoryLease;
+
+        ReplaceHandle(_bitmap.Handle);
     }
 
     internal FrozenRoaring32Bitmap(IntPtr pointer, Roaring32BitmapMemory memory)
     {
-        Pointer = pointer;
+        _bitmap = CreateFrozenView(pointer, memory, out SafeRoaring32MemoryLease memoryLease);
+        _memoryLease = memoryLease;
         Memory = memory;
 
-        _bitmap = new Roaring32Bitmap(pointer);
+        ReplaceHandle(_bitmap.Handle);
+    }
+
+    private static Roaring32Bitmap CreateFrozenView(Roaring32Bitmap bitmap, nuint size, Roaring32BitmapMemory memory, out SafeRoaring32MemoryLease lease)
+    {
+        Roaring32Bitmap? view = null;
+
+        try
+        {
+            view = bitmap.GetFrozenView(size, memory);
+            lease = memory.AcquireLease(view.Handle);
+            return view;
+        }
+        catch
+        {
+            view?.Dispose();
+            memory.DisposeOwnedIfUnleased();
+            throw;
+        }
+    }
+
+    private static Roaring32Bitmap CreateFrozenView(IntPtr pointer, Roaring32BitmapMemory memory, out SafeRoaring32MemoryLease lease)
+    {
+        var view = new Roaring32Bitmap(pointer);
+
+        try
+        {
+            lease = memory.AcquireLease(view.Handle);
+            return view;
+        }
+        catch
+        {
+            view.Dispose();
+            throw;
+        }
     }
 
     /// <inheritdoc />
@@ -63,14 +101,13 @@ public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoarin
             return;
         }
 
-        _bitmap.Dispose();
-        Memory.Release(this);
-
         _isDisposed = true;
-    }
 
-    /// <inheritdoc />
-    ~FrozenRoaring32Bitmap() => Dispose(false);
+        _bitmap.Dispose();
+        _memoryLease.Dispose();
+
+        base.Dispose(disposing);
+    }
 
     /// <summary>
     /// Checks if a value is present in the bitmap.
@@ -105,7 +142,7 @@ public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoarin
             throw new ArgumentException(ExceptionMessages.BulkContextBelongsToOtherBitmap, nameof(context));
         }
 
-        return NativeMethods.roaring_bitmap_contains_bulk(Pointer, context.Pointer, value);
+        return NativeMethods.roaring_bitmap_contains_bulk(Handle, context.Handle, value);
     }
 
     /// <summary>
@@ -392,7 +429,7 @@ public unsafe class FrozenRoaring32Bitmap : Roaring32BitmapBase, IReadOnlyRoarin
     /// Gets enumerator that returns the values contained in the bitmap.
     /// </summary>
     /// <remarks>The values are ordered from smallest to largest.</remarks>
-    public IEnumerable<uint> Values => _bitmap.Values;
+    public IEnumerable<uint> Values => new Roaring32Enumerator(_bitmap.Handle, this, Memory);
 
     /// <summary>
     /// Writes current bitmap to the array.

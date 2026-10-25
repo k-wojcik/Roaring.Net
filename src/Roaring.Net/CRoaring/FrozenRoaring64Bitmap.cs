@@ -6,11 +6,12 @@ namespace Roaring.Net.CRoaring;
 /// <summary>
 /// Represents a 64-bit CRoaring frozen bitmap. <br/>
 /// </summary>
-public unsafe class FrozenRoaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bitmap
+public class FrozenRoaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bitmap
 {
     internal Roaring64BitmapMemory Memory { get; }
 
     private readonly Roaring64Bitmap _bitmap;
+    private readonly SafeRoaring64MemoryLease _memoryLease;
     private bool _isDisposed;
 
     /// <summary>
@@ -42,17 +43,54 @@ public unsafe class FrozenRoaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoarin
         bitmap.ShrinkToFit(); // CRoaring requires shrink_to_fit before frozen operations
         var size = bitmap.GetSerializationSize(SerializationFormat.Frozen);
         Memory = new Roaring64BitmapMemory(size, shared: false);
-        _bitmap = bitmap.GetFrozenView(size, Memory.MemoryPtr);
 
-        Pointer = _bitmap.Pointer;
+        _bitmap = CreateFrozenView(bitmap, size, Memory, out SafeRoaring64MemoryLease memoryLease);
+        _memoryLease = memoryLease;
+
+        ReplaceHandle(_bitmap.Handle);
     }
 
     internal FrozenRoaring64Bitmap(IntPtr pointer, Roaring64BitmapMemory memory)
     {
-        Pointer = pointer;
+        _bitmap = CreateFrozenView(pointer, memory, out SafeRoaring64MemoryLease memoryLease);
+        _memoryLease = memoryLease;
         Memory = memory;
 
-        _bitmap = new Roaring64Bitmap(pointer);
+        ReplaceHandle(_bitmap.Handle);
+    }
+
+    private static Roaring64Bitmap CreateFrozenView(Roaring64Bitmap bitmap, nuint size, Roaring64BitmapMemory memory, out SafeRoaring64MemoryLease lease)
+    {
+        Roaring64Bitmap? view = null;
+
+        try
+        {
+            view = bitmap.GetFrozenView(size, memory);
+            lease = memory.AcquireLease(view.Handle);
+            return view;
+        }
+        catch
+        {
+            view?.Dispose();
+            memory.DisposeOwnedIfUnleased();
+            throw;
+        }
+    }
+
+    private static Roaring64Bitmap CreateFrozenView(IntPtr pointer, Roaring64BitmapMemory memory, out SafeRoaring64MemoryLease lease)
+    {
+        var view = new Roaring64Bitmap(pointer);
+
+        try
+        {
+            lease = memory.AcquireLease(view.Handle);
+            return view;
+        }
+        catch
+        {
+            view.Dispose();
+            throw;
+        }
     }
 
     /// <inheritdoc />
@@ -63,14 +101,13 @@ public unsafe class FrozenRoaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoarin
             return;
         }
 
-        _bitmap.Dispose();
-        Memory.Release(this);
-
         _isDisposed = true;
-    }
 
-    /// <inheritdoc />
-    ~FrozenRoaring64Bitmap() => Dispose(false);
+        _bitmap.Dispose();
+        _memoryLease.Dispose();
+
+        base.Dispose(disposing);
+    }
 
     /// <summary>
     /// Checks if a value is present in the bitmap.
@@ -101,7 +138,7 @@ public unsafe class FrozenRoaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoarin
             throw new ArgumentException(ExceptionMessages.BulkContextBelongsToOtherBitmap, nameof(context));
         }
 
-        return NativeMethods.roaring64_bitmap_contains_bulk(Pointer, context.Pointer, value);
+        return NativeMethods.roaring64_bitmap_contains_bulk(Handle, context.Handle, value);
     }
 
     /// <summary>
@@ -343,7 +380,7 @@ public unsafe class FrozenRoaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoarin
     /// Gets enumerator that returns the values contained in the bitmap.
     /// </summary>
     /// <remarks>The values are ordered from smallest to largest.</remarks>
-    public IEnumerable<ulong> Values => _bitmap.Values;
+    public IEnumerable<ulong> Values => new Roaring64Enumerator(_bitmap.Handle, this, Memory);
 
     /// <summary>
     /// Writes current bitmap to the array.

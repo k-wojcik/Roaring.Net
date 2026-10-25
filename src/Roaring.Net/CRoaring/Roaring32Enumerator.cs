@@ -6,6 +6,7 @@ namespace Roaring.Net.CRoaring;
 
 internal sealed unsafe class Roaring32Enumerator : IEnumerator<uint>, IEnumerable<uint>
 {
+    private readonly SafeRoaring32IteratorHandle _iteratorHandle;
     private readonly NativeMethods.Iterator* _iterator;
     private bool _isFirst;
     private bool _isDisposed;
@@ -25,14 +26,28 @@ internal sealed unsafe class Roaring32Enumerator : IEnumerator<uint>, IEnumerabl
 
     object IEnumerator.Current => Current;
 
-    internal Roaring32Enumerator(IntPtr bitmap)
+    internal Roaring32Enumerator(SafeRoaring32BitmapHandle bitmap, object? owner = null, Roaring32BitmapMemory? memory = null)
     {
-        var ptr = NativeMethods.roaring_iterator_create(bitmap);
+        SafeRoaring32MemoryLease? memoryLease = memory?.AcquireLease(null);
+
+        IntPtr ptr;
+        try
+        {
+            ptr = NativeMethods.roaring_iterator_create(bitmap);
+        }
+        catch
+        {
+            memoryLease?.Dispose();
+            throw;
+        }
+
         if (ptr == IntPtr.Zero)
         {
+            memoryLease?.Dispose();
             throw new InvalidOperationException(ExceptionMessages.UnableToAllocateBitmapIterator);
         }
 
+        _iteratorHandle = new SafeRoaring32IteratorHandle(ptr, bitmap, memoryLease, owner);
         _iterator = (NativeMethods.Iterator*)ptr;
         _isFirst = true;
     }
@@ -55,26 +70,18 @@ internal sealed unsafe class Roaring32Enumerator : IEnumerator<uint>, IEnumerabl
 
     public void Reset() => throw new NotSupportedException(ExceptionMessages.OperationNotSupported);
 
-    private void Dispose(bool _)
+    public void Dispose()
     {
         if (_isDisposed)
         {
             return;
         }
 
-        NativeMethods.roaring_uint32_iterator_free(new IntPtr(_iterator));
         _isDisposed = true;
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        _iteratorHandle.Dispose();
     }
 
     public IEnumerator<uint> GetEnumerator() => this;
-
-    ~Roaring32Enumerator() => Dispose(false);
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

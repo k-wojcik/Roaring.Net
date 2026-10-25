@@ -19,4 +19,21 @@ public class DisposeTests
             bitmap.Dispose();
         }
     }
+
+    public class Lifetime
+    {
+        [Fact]
+        public void FromBitmap_SourceBitmapDisposed_ResultStillContainsValues()
+        {
+            // Arrange
+            var source = new Roaring32Bitmap(new uint[] { 1, 2, 3 });
+            using var bitmap = Roaring64Bitmap.FromBitmap(source);
+
+            // Act
+            source.Dispose();
+
+            // Assert
+            Assert.Equal(new ulong[] { 1, 2, 3 }, bitmap.ToArray());
+        }
+    }
 }

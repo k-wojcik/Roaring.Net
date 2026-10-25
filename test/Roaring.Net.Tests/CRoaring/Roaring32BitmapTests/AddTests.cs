@@ -404,6 +404,42 @@ public class AddTests
             var actual = testObject.Bitmap.Values.ToList();
             Assert.Equal(expected, actual);
         }
+
+        [Fact]
+        public void AddOffset_ExistingBitmap_DisposesPreviousHandleAndKeepsBitmapUsable()
+        {
+            // Arrange
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetFromValues([1, 2, 3]);
+            SafeRoaring32BitmapHandle previousHandle = testObject.Bitmap.Handle;
+
+            // Act
+            testObject.Bitmap.AddOffset(1);
+
+            // Assert
+            Assert.True(previousHandle.IsClosed);
+            Assert.NotSame(previousHandle, testObject.Bitmap.Handle);
+            Assert.Equal(new uint[] { 2, 3, 4 }, testObject.Bitmap.ToArray());
+        }
+
+        [Fact]
+        public void AddOffset_CalledMultipleTimes_DisposesAllPreviousHandles()
+        {
+            // Arrange
+            using Roaring32BitmapTestObject testObject = Roaring32BitmapTestObjectFactory.Default.GetFromValues([1, 2, 3]);
+            var handles = new List<SafeRoaring32BitmapHandle> { testObject.Bitmap.Handle };
+
+            // Act
+            for (var i = 0; i < 3; i++)
+            {
+                testObject.Bitmap.AddOffset(1);
+                handles.Add(testObject.Bitmap.Handle);
+            }
+
+            // Assert
+            Assert.All(handles.Take(handles.Count - 1), handle => Assert.True(handle.IsClosed));
+            Assert.False(handles[^1].IsClosed);
+            Assert.Equal(new uint[] { 4, 5, 6 }, testObject.Bitmap.ToArray());
+        }
     }
 
     public class AddBulk
