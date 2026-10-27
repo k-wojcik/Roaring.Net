@@ -61,6 +61,10 @@ internal static unsafe partial class NativeMethods
     public static partial ulong roaring64_bitmap_range_closed_cardinality(SafeRoaring64BitmapHandle bitmap, ulong range_start, ulong range_end);
 
     [return: MarshalAs(UnmanagedType.I1)]
+    [LibraryImport("roaring", EntryPoint = "roaring_bitmap_range_uint32_array")]
+    public static partial bool roaring_bitmap_range_uint32_array(SafeRoaring32BitmapHandle bitmap, nuint offset, nuint limit, uint[] values);
+
+    [return: MarshalAs(UnmanagedType.I1)]
     [LibraryImport("roaring", EntryPoint = "roaring_bitmap_is_empty")]
     public static partial bool roaring_bitmap_is_empty(SafeRoaring32BitmapHandle bitmap);
 
@@ -531,6 +535,9 @@ internal static unsafe partial class NativeMethods
     [return: MarshalAs(UnmanagedType.I1)]
     [LibraryImport("roaring", EntryPoint = "roaring64_iterator_advance")]
     public static partial bool roaring64_iterator_advance(IntPtr iterator);
+
+    [LibraryImport("roaring", EntryPoint = "roaring64_iterator_read")]
+    public static partial nuint roaring64_iterator_read(IntPtr iterator, ulong* buffer, nuint count);
 
     [LibraryImport("roaring", EntryPoint = "roaring_uint32_iterator_copy")]
     public static partial IntPtr roaring_uint32_iterator_copy(IntPtr iterator);

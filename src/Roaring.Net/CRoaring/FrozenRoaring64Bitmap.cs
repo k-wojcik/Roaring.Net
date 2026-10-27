@@ -419,7 +419,16 @@ public class FrozenRoaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bitm
     /// <param name="count">Number of values to take from the bitmap.</param>
     /// <returns>An array containing the given number of values from the bitmap.</returns>
     /// <remarks>If the bitmap contains fewer values than the given number then the array will be adjusted to the number of values.</remarks>
+    [Obsolete("Use Take(int count) instead.")]
     public ulong[] Take(ulong count) => _bitmap.Take(count);
+
+    /// <summary>
+    /// Takes the given number of values from the current bitmap and puts them into an array.
+    /// </summary>
+    /// <param name="count">Number of values to take from the bitmap.</param>
+    /// <returns>An array containing the given number of values from the bitmap.</returns>
+    /// <remarks>If the bitmap contains fewer values than the given number then the array will be adjusted to the number of values.</remarks>
+    public ulong[] Take(int count) => _bitmap.Take(count);
 
     /// <summary>
     /// Gets statistics about the bitmap.
