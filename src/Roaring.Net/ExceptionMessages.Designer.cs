@@ -87,6 +87,15 @@ namespace Roaring.Net {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The count is too large to fit in an array..
+        /// </summary>
+        internal static string CountTooLargeForArray {
+            get {
+                return ResourceManager.GetString("CountTooLargeForArray", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The passed context is belongs to another bitmap..
         /// </summary>
         internal static string BulkContextBelongsToOtherBitmap {

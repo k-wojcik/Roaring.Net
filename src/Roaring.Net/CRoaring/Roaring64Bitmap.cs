@@ -1119,16 +1119,54 @@ public unsafe class Roaring64Bitmap : Roaring64BitmapBase, IReadOnlyRoaring64Bit
     /// <param name="count">Number of values to take from the bitmap.</param>
     /// <returns>An array containing the given number of values from the bitmap.</returns>
     /// <remarks>If the bitmap contains fewer values than the given number then the array will be adjusted to the number of values.</remarks>
+    [Obsolete("Use Take(int count) instead.")]
     public ulong[] Take(ulong count)
     {
-        var cardinality = NativeMethods.roaring64_bitmap_get_cardinality(Handle);
-        if (cardinality < count)
+        if (count > (ulong)Array.MaxLength)
         {
-            count = cardinality;
+            throw new OverflowException(ExceptionMessages.CountTooLargeForArray);
+        }
+
+        return Take((int)count);
+    }
+
+    /// <summary>
+    /// Takes the given number of values from the current bitmap and puts them into an array.
+    /// </summary>
+    /// <param name="count">Number of values to take from the bitmap.</param>
+    /// <returns>An array containing the given number of values from the bitmap.</returns>
+    /// <remarks>If the bitmap contains fewer values than the given number then the array will be adjusted to the number of values.</remarks>
+    public ulong[] Take(int count)
+    {
+        if (count < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(count));
+        }
+
+        if (Array.MaxLength < count)
+        {
+            throw new OverflowException(ExceptionMessages.CountTooLargeForArray);
+        }
+
+        var cardinality = NativeMethods.roaring64_bitmap_get_cardinality(Handle);
+        if (cardinality < (ulong)count)
+        {
+            count = (int)cardinality;
         }
 
         var values = new ulong[count];
-        NativeMethods.roaring64_bitmap_to_uint64_array(Handle, values);
+        var iterator = NativeMethods.roaring64_iterator_create(Handle);
+        try
+        {
+            fixed (ulong* ptr = values)
+            {
+                NativeMethods.roaring64_iterator_read(iterator, ptr, (nuint)count);
+            }
+        }
+        finally
+        {
+            NativeMethods.roaring64_iterator_free(iterator);
+        }
         return values;
     }
 

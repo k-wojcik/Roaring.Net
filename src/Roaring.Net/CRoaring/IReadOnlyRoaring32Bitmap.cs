@@ -91,7 +91,10 @@ internal interface IReadOnlyRoaring32Bitmap : IDisposable
 
     uint[] ToArray();
 
+    [Obsolete("Use Take(int count) instead.")]
     uint[] Take(ulong count);
+
+    uint[] Take(int count);
 
     nuint GetSerializationSize(SerializationFormat format = SerializationFormat.Normal);
 

@@ -225,7 +225,27 @@ public class CollectionTests
         [InlineTestObject(2, new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { 0, 1 })]
         [InlineTestObject(0, new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { })]
         [InlineTestObject(1, new ulong[] { ulong.MaxValue }, new ulong[] { ulong.MaxValue })]
-        public void Take_ForCount_ReturnsForValuesLimitedToCount(ulong count, ulong[] values, ulong[] expected, IRoaring64BitmapTestObjectFactory factory)
+        public void Take_ForULongCount_ReturnsForValuesLimitedToCount(ulong count, ulong[] values, ulong[] expected, IRoaring64BitmapTestObjectFactory factory)
+        {
+            // Arrange
+            using IRoaring64BitmapTestObject testObject = factory.GetFromValues(values);
+
+            // Act
+#pragma warning disable CS0618 // Type or member is obsolete
+            var actual = testObject.ReadOnlyBitmap.Take(count);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineTestObject(20, new ulong[] { }, new ulong[] { })]
+        [InlineTestObject(20, new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { 0, 1, 2, 3, 4 })]
+        [InlineTestObject(2, new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { 0, 1 })]
+        [InlineTestObject(0, new ulong[] { 0, 1, 2, 3, 4 }, new ulong[] { })]
+        [InlineTestObject(1, new ulong[] { ulong.MaxValue }, new ulong[] { ulong.MaxValue })]
+        public void Take_ForIntCount_ReturnsForValuesLimitedToCount(int count, ulong[] values, ulong[] expected, IRoaring64BitmapTestObjectFactory factory)
         {
             // Arrange
             using IRoaring64BitmapTestObject testObject = factory.GetFromValues(values);
@@ -235,6 +255,47 @@ public class CollectionTests
 
             // Assert
             Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void Take_CountExceedsArrayMaxLength_ThrowsOverflowException()
+        {
+            // Arrange
+            using IRoaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetDefault();
+            var count = (ulong)Array.MaxLength + 1;
+
+            // Act && Assert
+#pragma warning disable CS0618 // Type or member is obsolete
+            Assert.Throws<OverflowException>(() => testObject.ReadOnlyBitmap.Take(count));
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+
+        [Fact]
+        public void Take_IntCountExceedsArrayMaxLength_ThrowsOverflowException()
+        {
+            // Arrange
+            using IRoaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetDefault();
+            if (Array.MaxLength == int.MaxValue)
+            {
+                return;
+            }
+
+            var count = Array.MaxLength + 1;
+
+            // Act && Assert
+            Assert.Throws<OverflowException>(() => testObject.ReadOnlyBitmap.Take(count));
+        }
+
+        [Fact]
+        public void Take_NegativeCount_ThrowsArgumentOutOfRangeException()
+        {
+
+            // Arrange
+            using IRoaring64BitmapTestObject testObject = Roaring64BitmapTestObjectFactory.Default.GetDefault();
+            const int count = -1;
+
+            // Act && Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() => testObject.ReadOnlyBitmap.Take(count));
         }
     }
 }

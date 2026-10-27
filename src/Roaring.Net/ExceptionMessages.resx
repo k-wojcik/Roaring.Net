@@ -57,4 +57,7 @@
     <data name="BufferSizeIsTooSmall" xml:space="preserve">
         <value>Buffer size is too small to save the bitmap.</value>
     </data>
+    <data name="CountTooLargeForArray" xml:space="preserve">
+        <value>The count is too large to fit in an array.</value>
+    </data>
 </root>
